@@ -84,7 +84,7 @@ A quaternion expresses "rotation by θ around some axis".<br>
 	- Intuitive, but can suffer from gimbal lock(loss of one rotational DOF when axes align)
 
 - Quaternion
-	- Unit quaternion representation of 3D orientation (maps to SO(3) up to sign) (stores its result — independent)
+	- Unit quaternion representation of 3D orientation, maps to SO(3) up to sign (stores its result — independent)
 	- Rotation can be composed via quaternion multiplication
 	- Stable in continuous rotation
 	- No gimbal lock
