@@ -46,13 +46,18 @@ def delta_quat_from_omega(omega: Vec3, dt: float) -> Quat:
                 [np.cos(half), u[0]*np.sin(half), u[1]*np.sin(half), u[2]*np.sin(half)],
                 dtype=np.float64)
 
-def rotate_world_to_body(q, v_world) -> Vec3:
+def rotate_world_to_body(q: Quat, v_world: Vec3) -> Vec3:
         """
         v_world = q ⊗ v ⊗ q⁻¹
         v: embed as pure quaternion (0, v)
         """
         vq: Quat = np.array([0, v_world[0], v_world[1], v_world[2]], dtype=np.float64)
         res: Quat = quat_mul(quat_mul(quat_conj(q), vq), q)
+        return np.array([res[1], res[2], res[3]], dtype=np.float64)
+
+def rotate_body_to_world(q: Quat, v_body: Vec3) -> Vec3:
+        vq: Quat = np.array([0, v_body[0], v_body[1], v_body[2]], dtype=np.float64)
+        res: Quat = quat_mul(quat_mul(q, vq), quat_conj(q))
         return np.array([res[1], res[2], res[3]], dtype=np.float64)
 
 """
