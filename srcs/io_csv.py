@@ -81,3 +81,17 @@ def load_acc(csv_path: Path, t_new: ScalarBatch) -> Vec3Batch:
 
         a_src_interp: Vec3Batch = as_vec3_batch(resample_batch(t_new, t_src, a_src))
         return a_src_interp
+
+def load_acc_lin_ref(csv_path, t_new: ScalarBatch) -> Vec3Batch:
+        """
+        Returns:
+                a_lin_src_interp: (N-1,) interpolated ref linear acc (Vec3Batch)
+        """
+        df: pd.DataFrame = load_sorted_frame(csv_path,
+                                             ["seconds_elapsed", "z", "y", "x"],
+                                             ["seconds_elapsed", "x", "y", "z"])
+        t_src: ScalarBatch = as_scalar_batch(df["seconds_elapsed"].to_numpy())
+        a_src: Vec3Batch = as_vec3_batch(df[["x", "y", "z"]].to_numpy())
+
+        a_lin_src_interp: Vec3Batch = as_vec3_batch(resample_batch(t_new, t_src, a_src))
+        return a_lin_src_interp

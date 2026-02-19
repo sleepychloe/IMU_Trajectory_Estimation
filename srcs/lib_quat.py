@@ -7,9 +7,9 @@ EPS: float = 1e-12
 
 def quat_norm(q: Quat) -> Quat:
         n: float = np.sqrt(q[0]**2 + q[1]**2 + q[2]**2 + q[3]**2)
-        if n > EPS:
-                return q / n
-        return as_quat(np.array([1, 0, 0, 0]))
+        if n < EPS:
+                return as_quat(np.array([1, 0, 0, 0]))
+        return q / n
 
 def quat_mul(q1: Quat, q2: Quat) -> Quat:
         w1, x1, y1, z1 = q1

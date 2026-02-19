@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
+import matplotlib.pyplot as plt
 
-from my_types import Quat, ScalarBatch, QuatBatch
-from my_types import as_scalar_batch
+from my_types import Quat, ScalarBatch, Vec3Batch, QuatBatch
+from my_types import as_scalar_batch, as_vec3_batch
 import lib_quat as libq
 
 """
@@ -32,4 +33,52 @@ def save_err_csv(path: Path, t: ScalarBatch, err: ScalarBatch) -> None:
                 "seconds_elapsed": t.astype(np.float64),
                 "angle_err" : err.astype(np.float64)
         })
+        df.to_csv(path, index=False)
+
+def load_err_csv(path: Path) -> tuple[ScalarBatch, ScalarBatch]:
+        df: pd.DataFrame = pd.read_csv(path)
+        t: ScalarBatch = as_scalar_batch(df["seconds_elapsed"].to_numpy())
+        err = ScalarBatch = as_scalar_batch(df["angle_err"].to_numpy())
+        return t, err
+
+def plot_err_from_csv(series: list[tuple[str, Path]]) -> None:
+        plt.figure(figsize=(12,4))
+        plt.title("Orientation error (rad)")
+        plt.xlabel("seconds_elapsed (s)")
+        plt.ylabel("angle error (rad)")
+
+        for label, path in series:
+                t, err = load_err_csv(path)
+                plt.plot(t, err, label=label)
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.show()
+
+def evaluate_estimated_vec3_autosign(est: Vec3Batch, ref: Vec3Batch) -> tuple[Vec3Batch, float]:
+        d: Vec3Batch = None
+        est_sign_fixed: Vec3Batch = est.copy()
+
+        d_minus: Vec3Batch = as_vec3_batch(est - ref)
+        d_plus: Vec3Batch = as_vec3_batch(est + ref)
+
+        rmse_minus: float = np.sqrt(np.mean(np.sum(d_minus*d_minus, axis=1)))
+        rmse_plus: float = np.sqrt(np.mean(np.sum(d_plus*d_plus, axis=1)))
+
+        if (rmse_plus < rmse_minus):
+                d = d_plus
+                est_sign_fixed *= -1
+        else:
+                d = d_minus
+
+        rmse_norm: float = np.sqrt(np.mean(np.sum(d*d, axis=1)))
+        print("RMSE norm:", rmse_norm)
+        return est_sign_fixed, rmse_norm
+
+def save_estimated_vec3_csv(path: Path, t: ScalarBatch, vec3_batch: Vec3Batch) -> None:
+        df: pd.DataFrame = pd.DataFrame({
+                "seconds_elapsed": t.astype(np.float64),
+                "x": vec3_batch[:,0].astype(np.float64),
+                "y": vec3_batch[:,1].astype(np.float64),
+                "z": vec3_batch[:,2].astype(np.float64)
+	})
         df.to_csv(path, index=False)
