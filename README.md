@@ -1,3 +1,6 @@
+Currently in progress
+
+
 ## Lists
 
  * [Understanding Coordinate Systems and Sensors for IMU Orientation Estimation](#orientation) <br>
@@ -525,9 +528,7 @@ I observed that gyro-based stationary gating improves Gyro+Acc performance, but 
 <br>
 
 In Gyro+Acc, a gyro-based stationary gate (small ||ω||) helps because it reduces the probability of applying accelerometer-based gravity correction during motion.<br>
-
 <br>
-
 During translation, ||a𝑚𝑒𝑎𝑠|| often deviates from g0,<br>
 meaning the accelerometer direction is no longer a clean gravity measurement and can inject incorrect tilt corrections.<br>
 
