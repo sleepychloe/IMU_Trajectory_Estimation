@@ -97,7 +97,7 @@ Quaternion definition:<body>
 Measurement model:<br>
 
 ```
-	𝜔_meas(t) = 𝜔_true(t) + b_g + n_gyro(t)
+	ω_meas(t) = ω_true(t) + b_g + n_gyro(t)
 
 	b_g: gyro bias
 	n_gyro: measurement noise
@@ -218,7 +218,7 @@ Goal: `m_ref_world_h`, used to correct yaw drift.<br>
 	For reliable bias estimation:
 
 	1. | ||a_meas|| - g0| ≈ 0
-	2. |𝜔| ≈ 0
+	2. |ω| ≈ 0
 ```
 
 <br>
@@ -341,7 +341,7 @@ A quaternion expresses "rotation by θ around some axis".<br>
 
 #### IMU Orientation Update <a name="quaternion-applications-imu"></a>
 
-Using gyroscope angular velocity `𝜔 = (𝜔𝑥, 𝜔𝑦, ω𝑧)`(integrated over time),<br>
+Using gyroscope angular velocity `ω = (ω𝑥, ω𝑦, ω𝑧)`(integrated over time),<br>
 orientation is propagated by:<br>
 
 ```
