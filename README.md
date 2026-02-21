@@ -48,6 +48,8 @@ The orientation is represented using a quaternion `q` that maps:<br>
 
 #### World Frame (Inertial Frame) <a name="orientation-coordinate-world">
 
+<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/00_coord_world.png" width="610" height="255">
+
 The world frame is fixed.<br>
 <br>
 
@@ -64,6 +66,8 @@ Gravity is assumed constant:<br>
 
 
 #### Body Frame (Sensor Frame) <a name="orientation-coordinate-body">
+
+<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/01_coord_body.png" width="610" height="255">
 
 The body frame is attached to the device (smartphone).<br>
 
