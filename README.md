@@ -1,6 +1,6 @@
 ## Lists
 
- * [IMU Orientation Estimation](#orientation) <br>
+ * [Understanding Coordinate Systems and Sensors for IMU Orientation Estimation](#orientation) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Coordinate Frame](#orientation-coordinate) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [World Frame (Inertial Frame)](#orientation-coordinate-world) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Body Frame (Sensor Frame)](#orientation-coordinate-body) <br>
@@ -10,6 +10,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Magnetometer](#orientation-sensor-mag) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Gravity vs Magnetic Field](#orientation-grav-mag) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Initial Magnetic Reference (Yaw Anchor)](#orientation-grav-mag-init-mag-ref) <br>
+
+ * [Implementation – IMU Orientation Estimation](#implementation) <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [[Step 1] Gyroscope Propagation](#implementation-gyro) <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [[Step 2] Accelerometer Correction (Roll/Pitch)](#implementation-acc) <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [[Step 3] Linear Acceleration Estimation](#implementation-acc-linear) <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [[Step 4] Magnetometer Correction (Yaw)](#implementation-mag) <br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Gating Observation After Implementation](#implementation-gating-observation) <br>
 
  * [Quaternion](#quaternion) <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Quaternion](#quaternion-quaternion) <br>
@@ -26,7 +33,7 @@
 <br>
 <br>
 
-## IMU Orientation Estimation <a name="orientation">
+## Understanding Coordinate Systems and Sensors for IMU Orientation Estimation <a name="orientation">
 
 The physical modeling and implementation logic behind orientation estimation using:<br>
 
@@ -38,7 +45,7 @@ The physical modeling and implementation logic behind orientation estimation usi
 The orientation is represented using a quaternion `q` that maps:<br>
 
 ```
-	q : body -> world
+	q : body → world
 ```
 
 <br>
@@ -77,10 +84,8 @@ When the device rotates:<br>
 
 ```
 	g_world = (0, 0, -g0),
-	g_body = (g1, g2, g3),
+	g_body = (g𝑥, g𝑦, g𝑧),
 	||g_body|| = g0
-
-
 ```
 <br>
 
@@ -147,7 +152,6 @@ At rest (a_linear_world = 0):<br>
 	a_meas ≈ - R(q)ᵀ⋅g_world,
 
 	a_meas / ||a_meas|| ≈ - g_body / ||g_body|| = - g_body_unit
-
 ```
 
 <br>
@@ -157,9 +161,10 @@ At rest (a_linear_world = 0):<br>
 
 Measurement model:<br>
 ```
-	m_meas(t) = m_body(t) + b_m + distortions + n_mag(t)
+	m_meas(t) = A * m_true(t) + b_hi n_mag(t)
 
-	b_m: mag bias
+	A: soft-iron 3x3 matrix
+	b_hi: hard-iron bias
 	n_mag: measurement noise
 ```
 <br>
@@ -173,7 +178,7 @@ Ideal case:<br>
 Distortions include:<br>
 
 - Hard-iron offset
-- Soft-iron scaling (3*3 matrix)
+- Soft-iron scaling (3x3 matrix)
 
 <br>
 Thus magnetometer reliability requires:<br>
@@ -241,17 +246,312 @@ Goal: `m_ref_world_h`, used to correct yaw drift.<br>
 
 ```
 	m̂_world_h = R(q_pred)⋅ m̂_body_h
-	                    Σ_{t ∈ T} w(t) * m̂_world_h(t)
-	m_ref_world_h = ────────────────────────────────────
-	                 || Σ_{t ∈ T} w(t) * m̂_world_h(t) ||
+	                    Σ_{t ∈ T} weight(t) * m̂_world_h(t)
+	m_ref_world_h = ───────────────────────────────────────
+	                 || Σ_{t ∈ T} weight(t) * m̂_world_h(t) ||
 
 	T: initial stable window
-	w(t): weighting (stationary + norm gate)
+	weight(t): weighting (stationary + norm gate)
 ``` 
 
 <br>
 
 This defines a stable yaw reference without requiring absolute north.<br>
+
+<br>
+<br>
+<br>
+<br>
+
+## Implementation – IMU Orientation Estimation <a name=implementation></a>
+
+Implementation logic of quaternion-based orientation estimation using:<br>
+
+- Gyroscope (Propagation)
+- Accelerometer (Roll/Pitch correction)
+- Magnetometer (Yaw correction)
+<br>
+
+The quaternion `q` is defined as:<br>
+
+```
+	q : body → world
+```
+
+<br>
+<br>
+
+### [Step 1] Gyroscope Propagation <a name="implementation-gyro"></a>
+
+1. Continuous quaternion dynamics (body → world):<br>
+
+```
+	q̇(t) = 1/2 ⋅ q(t) ⊗ Ω(ω𝑚𝑒𝑎𝑠(t))
+
+	Ω(ω) : [0, ω𝑥, ω𝑦, ω𝑧]
+```
+<br>
+
+2. Discrete integration over dt:<br>
+
+```
+	θ = ||ω||⋅dt
+	u = ω / ||ω|| (if ||ω|| > 0)
+```
+<br>
+
+3. Small rotation quaternion ∆q𝑔𝑦𝑟𝑜:<br>
+
+```
+	        ┏              ┓
+	        ┃   cos(θ/2)   ┃
+	∆q𝑔𝑦𝑟𝑜 = ┃  u𝑥⋅sin(θ/2) ┃
+	        ┃  u𝑦⋅sin(θ/2) ┃
+	        ┃  u𝑧⋅sin(θ/2) ┃
+	        ┗              ┛
+```
+<br>
+
+4. Prediction update:<br>
+
+```
+	q𝑝𝑟𝑒𝑑 = normalize(q ⊗ ∆q𝑔𝑦𝑟𝑜)
+```
+
+<br>
+<br>
+
+### [Step 2] Accelerometer Correction (Roll/Pitch) <a name="implementation-acc"></a>
+
+1. World gravity direction:<br>
+
+```
+	g𝑤𝑜𝑟𝑙𝑑_𝑢𝑛𝑖𝑡 = g𝑤𝑜𝑟𝑙𝑑 / ||g𝑤𝑜𝑟𝑙𝑑|| = (0, 0, -1)
+```
+<br>
+
+2.  Predicted gravity direction in body frame:<br>
+
+```
+	g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡 = R(q𝑝𝑟𝑒𝑑)ᵀ⋅g𝑤𝑜𝑟𝑙𝑑_𝑢𝑛𝑖𝑡
+```
+<br>
+
+3. Error axis:<br>
+
+```
+	e_axis𝑎𝑐𝑐 = g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡 × (-a𝑚𝑒𝑎𝑠_𝑢𝑛𝑖𝑡)
+
+	||e_axis𝑎𝑐𝑐|| = sinφ
+```
+<br>
+
+4. Accel gating:<br>
+
+```
+	dev𝑎𝑐𝑐 = | ||a𝑚𝑒𝑎𝑠|| - g0 |
+	weight𝑎𝑐𝑐 = exp( -1/2 * (dev𝑎𝑐𝑐 / σ𝑎𝑐𝑐)²)
+
+	σ𝑎𝑐𝑐: accel gating sigma
+```
+<br>
+
+(optional) Gyro gating:<br>
+
+```
+	weight𝑔𝑦𝑟𝑜 = exp( -1/2 * ( ω𝑛𝑜𝑟𝑚 / σ𝑔𝑦𝑟𝑜)²)
+	weight𝑎𝑐𝑐 = weight𝑎𝑐𝑐 * weight𝑔𝑦𝑟𝑜
+
+	σ𝑔𝑦𝑟𝑜: gyro gating sigma
+```
+<br>
+
+5. Correction quaternion ∆q𝑐𝑜𝑟𝑟:<br>
+
+```
+	        ┏                                     ┓
+	        ┃                  1                  ┃
+	∆q𝑐𝑜𝑟𝑟 = ┃  1/2 ⋅ K𝑎𝑐𝑐 ⋅ weight𝑎𝑐𝑐 ⋅ e_axis𝑎𝑐𝑐_𝑥 ┃
+	        ┃  1/2 ⋅ K𝑎𝑐𝑐 ⋅ weight𝑎𝑐𝑐 ⋅ e_axis𝑎𝑐𝑐_𝑦 ┃
+	        ┃  1/2 ⋅ K𝑎𝑐𝑐 ⋅ weight𝑎𝑐𝑐 ⋅ e_axis𝑎𝑐𝑐_𝑧 ┃
+	        ┗                                     ┛
+```
+<br>
+
+6. Update:<br>
+
+```
+	q̂ = normalize(q𝑝𝑟𝑒𝑑 ⊗ ∆q𝑐𝑜𝑟𝑟)
+```
+
+
+<br>
+<br>
+
+### [Step 3] Linear Acceleration Estimation <a name="implementation-acc-linear"></a>
+
+1. Predicted gravity vector in body frame:<br>
+
+```
+	g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦 = g0 ⋅ g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡
+```
+<br>
+
+2. Predicted linear acceleration in body frame:<br>
+```
+	a𝑒𝑠𝑡_𝑙𝑖𝑛𝑒𝑎𝑟_𝑏𝑜𝑑𝑦 ≈ a𝑚𝑒𝑎𝑠 + g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦
+```
+<br>
+<br>
+
+### [Step 4] Magnetometer Correction (Yaw) <a name="implementation-mag"></a>
+
+Yaw does not change gravity direction:<br>
+
+```
+	R𝑧(ψ)ᵀ ⋅ g𝑤𝑜𝑟𝑙𝑑_𝑢𝑛𝑖𝑡 = g𝑤𝑜𝑟𝑙𝑑_𝑢𝑛𝑖𝑡
+```
+<br>
+Thus magnetometer is required for heading correction.<br>
+<br>
+
+1. Tilt compensation(Projecting mag onto the horizontal plane — remove gravity component):<br>
+
+```
+	Normalize magnetic measurement:
+		m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡 = m𝑚𝑒𝑎𝑠 / ||m𝑚𝑒𝑎𝑠||
+
+	Remove gravity component:
+		m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_ℎ = m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡 - (m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡 ⋅ g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡) * g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡
+
+	Normalize:
+		m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_ℎ_𝑢𝑛𝑖𝑡 = m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_ℎ / ||m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_ℎ||
+```
+<br>
+
+2. Predicted magnetic direction:<br>
+
+```
+	Predicted magnetic field in body frame:
+		m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦 = R(q𝑝𝑟𝑒𝑑)ᵀ⋅m𝑟𝑒𝑓_𝑤𝑜𝑟𝑙𝑑_ℎ
+
+	Remove gravity component:
+		m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_ℎ = m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦 - (m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦 ⋅ g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡) * g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡
+
+	Normalize:
+		m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_ℎ_𝑢𝑛𝑖𝑡 = m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_ℎ / ||m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_ℎ||
+```
+<br>
+
+3. Error axis:<br>
+
+```
+	e_axis𝑚𝑎𝑔 = m𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_ℎ_𝑢𝑛𝑖𝑡 × m𝑚𝑒𝑎𝑠_𝑏𝑜𝑑𝑦_ℎ_𝑢𝑛𝑖𝑡
+
+	||e_axis𝑚𝑎𝑔|| = sinφ
+```
+<br>
+
+4. Magnetometer gating<br>
+
+4-1. Norm gate:<br>
+
+```
+	m₀ = median( ||m𝑚𝑒𝑎𝑠|| )
+	dev𝑚𝑎𝑔 = | ||m𝑚𝑒𝑎𝑠|| - m₀ |
+	weight𝑚𝑎𝑔 = exp ( -1/2 * (dev𝑚𝑎𝑔 / σ𝑚𝑎𝑔)²)
+
+	σ𝑚𝑎𝑔: mag gating sigma
+```
+<br>
+
+Use `median` because it is robust to outlier.<br>
+
+<br>
+
+(optional) Gyro gating:<br>
+
+```
+	weight𝑔𝑦𝑟𝑜 = exp( -1/2 * ( ω𝑛𝑜𝑟𝑚 / σ𝑔𝑦𝑟𝑜)²)
+	weight𝑚𝑎𝑔 = weight𝑚𝑎𝑔 * weight𝑔𝑦𝑟𝑜
+
+	σ𝑔𝑦𝑟𝑜: gyro gating sigma
+```
+<br>
+
+4-2. Innovation gate:<br>
+
+```
+	weight𝑚𝑎𝑔 = weight𝑚𝑎𝑔 * exp( -1/2 * (||e_axis𝑚𝑎𝑔|| / σ𝑒_𝑚𝑎𝑔)² )
+
+	σ𝑒_𝑚𝑎𝑔: mag error sigma (σ𝑒_𝑚𝑎𝑔 and σ𝑚𝑎𝑔 above is independent value)
+```
+<br>
+
+Reduce impact of mag if ||e_axis𝑚𝑎𝑔|| changes abruptly.<br>
+
+<br>
+<br>
+
+5. Correction quaternion ∆q𝑐𝑜𝑟𝑟:<br>
+
+Total correction vector:<br>
+
+```
+	e𝑡𝑜𝑡𝑎𝑙 = K𝑎𝑐𝑐 ⋅ weight𝑎𝑐𝑐 ⋅ e_axis𝑎𝑐𝑐 + K𝑚𝑎𝑔 ⋅ weight𝑚𝑎𝑔 ⋅ e_axis𝑚𝑎𝑔
+
+	       ┏                    ┓
+	       ┃          1         ┃
+	∆𝑐𝑜𝑟𝑟 = ┃  1/2 ⋅ e_axis𝑡𝑜𝑡𝑎𝑙_𝑥 ┃
+	       ┃  1/2 ⋅ e_axis𝑡𝑜𝑡𝑎𝑙_𝑦 ┃
+	       ┃  1/2 ⋅ e_axis𝑡𝑜𝑡𝑎𝑙_𝑧 ┃
+	       ┗                    ┛
+```
+<br>
+
+6. Final update:<br>
+
+```
+	q̂ = normalize(q𝑝𝑟𝑒𝑑 ⊗ ∆q𝑐𝑜𝑟𝑟)
+```
+
+<br>
+<br>
+
+### Gating Observation After Implementation <a name="implementation-gating-observation"></a>
+
+I observed that gyro-based stationary gating improves Gyro+Acc performance, but can degrade Gyro+Acc+Mag performance.<br>
+
+<br>
+
+In Gyro+Acc, a gyro-based stationary gate (small ||ω||) helps because it reduces the probability of applying accelerometer-based gravity correction during motion.<br>
+
+<br>
+
+During translation, ||a𝑚𝑒𝑎𝑠|| often deviates from g0,<br>
+meaning the accelerometer direction is no longer a clean gravity measurement and can inject incorrect tilt corrections.<br>
+
+<br>
+
+However, in Gyro+Acc+Mag, magnetometer yaw correction depends on a stable tilt estimate (roll/pitch),<br>
+because tilt compensation projects the measured magnetic vector onto the gravity-defined horizontal plane:<br>
+
+```
+	m_ℎ = m_𝑢𝑛𝑖𝑡 - (m_𝑢𝑛𝑖𝑡 ⋅ g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡) * g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡
+```
+<br>
+
+If gyro gating suppresses accel correction too aggressively (especially during rotation or dynamic motion), roll/pitch estimation can become noisier (gyro drift + less accel correction).<br>
+The destabilizes g𝑒𝑠𝑡_𝑏𝑜𝑑𝑦_𝑢𝑛𝑖𝑡, which makes tilt compensation less reliable, and can corrupt the magnetometer error axis,<br>
+worsening the yaw correction even when mag gating is enabled.<br>
+
+<br>
+
+Conculution:<br>
+
+1. Use gyro-based gating primarily to control accelerometer trust (gravity correction)
+
+2. For magnetometer updates, prefer magnitude/innovation gates, and avoid fully disabling mag updates during rotation
 
 <br>
 <br>
