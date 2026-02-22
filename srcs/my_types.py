@@ -11,6 +11,11 @@ Quat: TypeAlias = Annotated[NDArray[np.float64], Literal["shape=(4,) dtype=float
 Vec3Batch: TypeAlias = Annotated[NDArray[np.float64], Literal["shape=(N,3) dtype=float64"]]
 QuatBatch: TypeAlias = Annotated[NDArray[np.float64], Literal["shape=(N,4) dtype=float64"]]
 
+BoolBatch: TypeAlias = Annotated[NDArray[np.bool_], Literal["shape=(N,) dtype=bool"]]
+Int8Batch: TypeAlias = Annotated[NDArray[np.int8], Literal["shape=(N,) dtype=int8"]]
+Int32Batch: TypeAlias = Annotated[NDArray[np.int32], Literal["shape=(N,) dtype=int32"]]
+Int64Batch: TypeAlias = Annotated[NDArray[np.int64], Literal["shape=(N,) dtype=int64"]]
+
 def is_scalar_batch(x: NDArray[np.float64]) -> TypeGuard[ScalarBatch]:
         return x.ndim == 1
 
@@ -50,3 +55,19 @@ def as_quat_batch(x: NDArray[np.float64]) -> QuatBatch:
         if not is_quat_batch(x):
                 raise ValueError(f"Expected QuatBatch shape (N,4), got {x.shape} (ndim={x.ndim})")
         return cast(QuatBatch, x)
+
+def is_bool_batch(x: NDArray[np.bool_]) -> TypeGuard[BoolBatch]:
+        return x.ndim == 1
+
+def as_bool_batch(x: NDArray[np.bool_]) -> BoolBatch:
+        if not is_bool_batch(x):
+                raise ValueError(f"Expected BoolBatch shape (N,), got {x.shape} (ndim={x.ndim})")
+        return cast(BoolBatch, x)
+
+def is_int8_batch(x: NDArray[np.int8]) -> TypeGuard[Int8Batch]:
+	return x.ndim == 1
+
+def as_int8_batch(x: NDArray[np.int8]) -> Int8Batch:
+        if not is_int8_batch(x):
+                raise ValueError(f"Expected Int8Batch shape (N,), got {x.shape} (ndim={x.ndim})")
+        return cast(Int8Batch, x)

@@ -38,7 +38,7 @@ def save_err_csv(path: Path, t: ScalarBatch, err: ScalarBatch) -> None:
 def load_err_csv(path: Path) -> tuple[ScalarBatch, ScalarBatch]:
         df: pd.DataFrame = pd.read_csv(path)
         t: ScalarBatch = as_scalar_batch(df["seconds_elapsed"].to_numpy())
-        err = ScalarBatch = as_scalar_batch(df["angle_err"].to_numpy())
+        err: ScalarBatch = as_scalar_batch(df["angle_err"].to_numpy())
         return t, err
 
 def plot_err_from_csv(series: list[tuple[str, Path]]) -> None:
@@ -52,6 +52,20 @@ def plot_err_from_csv(series: list[tuple[str, Path]]) -> None:
                 plt.plot(t, err, label=label)
         plt.grid(True, alpha=0.3)
         plt.legend()
+        plt.show()
+
+def plot_err_colored_by_weights(t: ScalarBatch, err: ScalarBatch,
+                                weight: ScalarBatch, title: str) -> None:
+        plt.figure(figsize=(12,4))
+        sc = plt.scatter(t, err, c=weight, s=6)
+        plt.title("Error colored by " + title)
+        plt.xlabel("seconds_elapsed (s)")
+        plt.ylabel("angle error (rad)")
+
+        plt.plot(t, err, alpha=0.5)
+        plt.grid(True, alpha=0.3)
+        plt.colorbar(sc, label="weight")
+        plt.tight_layout()
         plt.show()
 
 def evaluate_estimated_vec3_autosign(est: Vec3Batch, ref: Vec3Batch) -> tuple[Vec3Batch, float]:
