@@ -23,10 +23,10 @@ def calc_angle_err(q_est: QuatBatch, q_ref: QuatBatch) -> ScalarBatch:
         return as_scalar_batch(2 * np.arccos(w_err))
 
 def print_err_status(label: str, err: ScalarBatch) -> None:
-        print(f"{label} angle error in rad — min/max/mean")
-        print(err.min(), err.max(), err.mean())
-        print(f"\n{label} angle error in deg — min/max/mean")
-        print(np.rad2deg(err.min()), np.rad2deg(err.max()), np.rad2deg(err.mean()))
+        print(f"{label} angle error in rad — min/max/mean/p90")
+        print(err.min(), err.max(), err.mean(), np.percentile(err, 90))
+        print(f"\n{label} angle error in deg — min/max/mean/p90")
+        print(np.rad2deg(err.min()), np.rad2deg(err.max()), np.rad2deg(err.mean()), np.rad2deg(np.percentile(err, 90)))
 
 def save_err_csv(path: Path, t: ScalarBatch, err: ScalarBatch) -> None:
         df: pd.DataFrame = pd.DataFrame({
@@ -41,7 +41,7 @@ def load_err_csv(path: Path) -> tuple[ScalarBatch, ScalarBatch]:
         err: ScalarBatch = as_scalar_batch(df["angle_err"].to_numpy())
         return t, err
 
-def plot_err_from_csv(series: list[tuple[str, Path]]) -> None:
+def plot_err_from_csv(series: list[tuple[str, Path]], save_path: Path | None = None) -> None:
         plt.figure(figsize=(12,4))
         plt.title("Orientation error (rad)")
         plt.xlabel("seconds_elapsed (s)")
@@ -52,7 +52,13 @@ def plot_err_from_csv(series: list[tuple[str, Path]]) -> None:
                 plt.plot(t, err, label=label)
         plt.grid(True, alpha=0.3)
         plt.legend()
+
+        if save_path is not None:
+                save_path.parent.mkdir(parents=True, exist_ok=True)
+                plt.tight_layout()
+                plt.savefig(save_path, dpi=200, bbox_inches="tight")
         plt.show()
+        plt.close()
 
 def plot_err_colored_by_weights(t: ScalarBatch, err: ScalarBatch,
                                 weight: ScalarBatch, title: str) -> None:

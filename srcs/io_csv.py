@@ -46,12 +46,12 @@ def load_ref(csv_path: Path, t_new: ScalarBatch) -> QuatBatch:
         t_src: ScalarBatch = as_scalar_batch(df["seconds_elapsed"].to_numpy())
         q_src: QuatBatch = as_quat_batch(df[["qw", "qx", "qy", "qz"]].to_numpy())
 
+        q_src_interp: QuatBatch = as_quat_batch(resample_batch(t_new, t_src, q_src))
+
         # fix quaternion sign continuity
         for i in range(1, len(q_src)):
                 if np.dot(q_src[i - 1], q_src[i]) < 0:
                         q_src[i] *= -1
-
-        q_src_interp: QuatBatch = as_quat_batch(resample_batch(t_new, t_src, q_src))
         return q_src_interp
 
 def load_acc(csv_path: Path, t_new: ScalarBatch) -> Vec3Batch:

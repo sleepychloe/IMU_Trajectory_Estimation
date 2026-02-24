@@ -131,9 +131,8 @@ such as gyro bias/drift, gravity misinterpretation during translation, magnetic 
 
 #### Experiment 1 — Gyro-only propagation <a name="project-exp-1"></a>
 
-- Integrate angular velocity to propagate orientation
-- Observe drift accumulation over time
-- Justify and quantify the impact of initial trimming using before/after plots and statistics
+- [exp 1-1] No initial sample cut
+- [exp 1-2] Initial stabilization trimmed
 
 <br>
 <br>
