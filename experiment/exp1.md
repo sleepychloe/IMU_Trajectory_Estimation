@@ -51,7 +51,6 @@ Orientation is a unit quaternion `q` mapping:<br>
 ```
 <br>
 <br>
-<br>
 
 #### Gyro Propagation <a name="exp-1-etup-gyro"></a>
 
@@ -60,7 +59,6 @@ At each timestep, angular velocity ω is converted into a small delta quaternion
 ```
 	q_pred = normalize(q ⊗ Δq)
 ```
-<br>
 <br>
 
 ##### [Implementation]
@@ -85,7 +83,6 @@ def integrate_gyro(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch) -> QuatBatch:
 
 <br>
 <br>
-<br>
 
 #### Error Metric <a name="exp-1-setup-err"></a>
 
@@ -102,7 +99,6 @@ The angular distance between the gyro estimate and REF:<br>
 
 min / max / mean / p90 are reported in radians and degrees.<br>
 
-<br>
 <br>
 
 ##### [Implementation]
