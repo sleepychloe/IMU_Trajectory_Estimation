@@ -170,8 +170,8 @@ such as gyro bias/drift, gravity misinterpretation during translation, magnetic 
 Full experimental process and results:<br>
 
 - [Experiment 1](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp1.md)
-- [Experiment 2]()
-- [Experiment 3]()
+<!--- [Experiment 2]()
+- [Experiment 3]()-->
 
 <br>
 <br>
@@ -195,7 +195,7 @@ and orientation was propagated using pure gyro integration.<br>
 
 ##### [Result]
 
-| unit  |  Mean error  |  p90 error   |
+| Unit  |  Mean error  |  p90 error   |
 |:-----:|-------------:|-------------:|
 |  rad  | 2.98634      | 3.12675      |
 |  deg  | 171.10485    | 179.14982    |
@@ -241,7 +241,7 @@ For this dataset, stabilization detected at `t = 23 s`.<br>
 
 ##### [Result]
 
-| unit  |  Mean error  |  p90 error   |
+| Unit  |  Mean error  |  p90 error   |
 |:-----:|-------------:|-------------:|
 |  rad  | 0.53778      | 0.81277      |
 |  deg  | 30.81266     | 46.56837     |
