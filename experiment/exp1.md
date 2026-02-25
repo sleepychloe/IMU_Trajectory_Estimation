@@ -52,7 +52,7 @@ Orientation is a unit quaternion `q` mapping:<br>
 <br>
 <br>
 
-#### Gyro Propagation <a name="exp-1-etup-gyro"></a>
+#### Gyro Propagation <a name="exp-1-setup-gyro"></a>
 
 At each timestep, angular velocity ω is converted into a small delta quaternion Δq, then updated:<br>
 
