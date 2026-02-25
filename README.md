@@ -186,21 +186,21 @@ and why gyro-only orientation estimation is fundamentally unstable over long dur
 <br>
 <br>
 
-#### [exp 1-1] No initial sample cut <a name="exp1-1"></a>
+#### [exp 1-1] No initial sample cut <a name="exp-1-1"></a>
 
 The initial quaternion was aligned with the reference at `t = 0 s`,<br>
 and orientation was propagated using pure gyro integration.<br>
 
 <br>
 
-##### Result
+##### [Result]
 
 - Mean error ≈ 2.98634rad (171.10°)
 - p90 error ≈ 3.12675rad (179.15°)
 
 <br>
 
-##### Observation
+##### [Observation]
 
 The orientation collapsed close to a 180° inversion.<br>
 
@@ -219,7 +219,7 @@ This demonstrates:<br>
 <br>
 <br>
 
-#### [exp 1-2] Initial stabilization trimmed <a name="exp1-2">
+#### [exp 1-2] Initial stabilization trimmed <a name="exp-1-2">
 
 Instead of cutting a fixed number of seconds, an automatic stabilization detector was applied.<br>
 <br>
@@ -237,14 +237,14 @@ For this dataset, stabilization detected at `t = 23 s`.<br>
 
 <br>
 
-##### Result
+##### [Result]
 
 - Mean error ≈ 0.53778rad (30.81°)
 - p90 error ≈ 0.81277rad (46.57°)
 
 <br>
 
-##### Observation
+##### [Observation]
 
 Drift shows the expected gradual accumulation pattern:<br>
 
@@ -255,7 +255,7 @@ Drift shows the expected gradual accumulation pattern:<br>
 <br>
 <br>
 
-#### Conculusion <a name="exp1-conclusion">
+#### Conculusion <a name="exp-1-conclusion">
 
 Experiment 1-1 and 1-2 shows that:<br>
 
