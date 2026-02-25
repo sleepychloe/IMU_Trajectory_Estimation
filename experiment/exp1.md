@@ -40,9 +40,9 @@ Only the gyroscope is integrated, and the result is compared against REF.<br>
 <br>
 <br>
 
-## Setup <a name="exp-1-setup"></a>
+### Setup <a name="exp-1-setup"></a>
 
-### Quaternion Convention <a name="exp-1-setup-quat"></a>
+#### Quaternion Convention <a name="exp-1-setup-quat"></a>
 
 Orientation is a unit quaternion `q` mapping:<br>
 
@@ -53,9 +53,9 @@ Orientation is a unit quaternion `q` mapping:<br>
 <br>
 <br>
 
-### Gyro Propagation <a name="sexp-1-etup-gyro"></a>
+#### Gyro Propagation <a name="exp-1-etup-gyro"></a>
 
-At each timestep, angular velocity ω is converted into a small delta quaternion Δq, then update:<br>
+At each timestep, angular velocity ω is converted into a small delta quaternion Δq, then updated:<br>
 
 ```
 	q_pred = normalize(q ⊗ Δq)
@@ -63,11 +63,11 @@ At each timestep, angular velocity ω is converted into a small delta quaternion
 <br>
 <br>
 
-#### Implementation
+##### [Implementation]
 
-(in pipelines.py)
+```py
+# pipelines.py
 
-```
 def gyro_predict(q: Quat, w_avg: Vec3, dt: float) -> Quat:
         dq: Quat = libq.delta_quat_from_omega(w_avg, dt)
         q_pred: Quat = libq.quat_norm(libq.quat_mul(q, dq))
@@ -87,7 +87,7 @@ def integrate_gyro(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch) -> QuatBatch:
 <br>
 <br>
 
-### Error Metric <a name="exp-1-setup-err"></a>
+#### Error Metric <a name="exp-1-setup-err"></a>
 
 The angular distance between the gyro estimate and REF:<br>
 
@@ -100,16 +100,16 @@ The angular distance between the gyro estimate and REF:<br>
 
 <br>
 
-min / max/ mean / p90 are reported in radians and degrees.<br>
+min / max / mean / p90 are reported in radians and degrees.<br>
 
 <br>
 <br>
 
-#### Implementation
+##### [Implementation]
 
-(in evaluation.py)
+```py
+# evaluation.py
 
-```
 def calc_angle_err(q_est: QuatBatch, q_ref: QuatBatch) -> ScalarBatch:
         w_err: ScalarBatch = as_scalar_batch(np.empty(len(q_est)))
         for i in range(len(q_est)):
@@ -191,11 +191,11 @@ to avoid premature stabilization detection under mild motion/noise.<br>
 <br>
 <br>
 
-#### Implementation
+##### [Implementation]
 
-(in resample.py)
+```py
+# resample.py
 
-```
 def find_stable_start_idx(dt: ScalarBatch, w: Vec3Batch, q_ref: QuatBatch,
                           sample_window: int, threshold: float, sample_hz: int,
                           consecutive: int, min_cut_second: int, max_cut_second: int
@@ -546,12 +546,12 @@ Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 
 ## Cross-dataset Summary <a name="exp-1-data-sum"></a>
 
-| Dataset | Applied Cut (s)   | Mean (no cut) | Mean (cut)    | p90 (no cut)  | p90 (cut)     |
-|:--------|------------------:|--------------:|--------------:|--------------:|--------------:|
-| data 01 | 10 s (pass: 1 s)  | 31.37006 deg  | 22.40684 deg  | 36.01396 deg  | 32.44667 deg  |
-| data 02 | 10 s (pass: 3 s)  | 109.42990 deg | 21.99183 deg  | 117.76002 deg | 31.17450 deg  |
-| data 03 | 23 s (pass: 23 s) | 171.10485 deg | 30.81266 deg  | 179.14982 deg | 46.56837 deg  |
-| data 04 | 10 s (pass: 0 s)  | 59.88517 deg  | 50.88316 deg  | 132.12219 deg | 116.70718 deg |
+| Dataset | Detector passed | Cut  | Mean (no cut) | Mean (cut)    | p90 (no cut)  | p90 (cut)     |
+|:--------|----------------:|-----:|--------------:|--------------:|--------------:|--------------:|
+| data 01 | 1 s             | 10 s | 31.37006 deg  | 22.40684 deg  | 36.01396 deg  | 32.44667 deg  |
+| data 02 | 3 s             | 10 s | 109.42990 deg | 21.99183 deg  | 117.76002 deg | 31.17450 deg  |
+| data 03 | 23 s            | 23 s | 171.10485 deg | 30.81266 deg  | 179.14982 deg | 46.56837 deg  |
+| data 04 | 0 s             | 10 s | 59.88517 deg  | 50.88316 deg  | 132.12219 deg | 116.70718 deg |
 
 <br>
 
