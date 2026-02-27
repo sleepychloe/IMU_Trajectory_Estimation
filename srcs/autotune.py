@@ -1,5 +1,6 @@
 import numpy as np
-from typing import Any
+from typing import Any, Callable
+from dataclasses import dataclass
 
 from my_types import Vec3, Quat, ScalarBatch, Vec3Batch, QuatBatch, BoolBatch, Int8Batch, Int32Batch, Int64Batch
 from my_types import as_vec3, as_scalar_batch, as_bool_batch, as_int8_batch
@@ -158,11 +159,19 @@ def suggest_gate_sigma(w: Vec3Batch, a: Vec3Batch, g0: float,
         print("Suggested acc_sigma: ", acc_sigma)
         return gyro_sigma, acc_sigma
 
-def choose_tau_from_quasi_static(q0: Quat, w: Vec3Batch, dt: ScalarBatch, a: Vec3Batch,
-                                 g0: float, g_world_unit: Vec3,
-                                 acc_gate_sigma: float, gyro_gate_sigma: float,
+@dataclass
+class SweepBest:
+        scale: float
+        sigma: float
+        angle_err: ScalarBatch
+        mean_err: float
+        q_est: QuatBatch
+        extra: tuple[Any, ...]
+
+def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
                                  best_quasi_static: tuple[int, int, int] | None = None,
-                                 tau_candidates: tuple[float, ...] = (0.15, 0.2, 0.25, 0.35, 0.5, 0.75, 1)
+                                 tau_candidates: tuple[float, ...] = (0.15, 0.2, 0.25, 0.35, 0.5, 0.75, 1),
+                                 runner_kwargs: dict[str, Any] = None,
                                  ) -> tuple[list[dict[str, Any]], float, float]:
         """
         Returns:
@@ -180,10 +189,8 @@ def choose_tau_from_quasi_static(q0: Quat, w: Vec3Batch, dt: ScalarBatch, a: Vec
         for tau in tau_candidates:
                 K = float(dt_midean / tau)
 
-                _, g_body_est, _, _, _ = integrate_gyro_acc(
-                                                        q0.copy(), w, dt,
-                                                        K, g0, g_world_unit,
-                                                        acc_gate_sigma, gyro_gate_sigma, a)
+                _, extra = runner_func(K=K, **runner_kwargs)
+                g_body_est, _, _, _ = extra
 
                 # In quasi_static segment, gravity in body frame should be stable.
                 # Use direction variance as a stability proxy.
@@ -197,9 +204,40 @@ def choose_tau_from_quasi_static(q0: Quat, w: Vec3Batch, dt: ScalarBatch, a: Vec
                 ang: ScalarBatch = np.arccos(dot)
                 score: float = float(np.mean(ang)) # lower is better
 
+                print(f"tau={float(tau)}", f", K={K}", f", quasi_static_score_mean_angle(rad)={score}")
+
                 tau_table.append({
                         "tau": float(tau), "K": K,
                         "quasi_static_score_mean_angle(rad)": score})
         tau_table.sort(key=lambda d: d["quasi_static_score_mean_angle(rad)"])
         best_tau: float = tau_table[0]["tau"]
         return tau_table, best_tau, K
+
+def calc_sigma(base: float, scale: float) -> float:
+        if np.isinf(base) or np.isinf(scale):
+                return np.inf
+        return base * scale
+
+def choose_best_by_sigma_scale(scales: tuple[float, ...],
+                               K: float, sigma_base: float, q_ref: QuatBatch,
+                               runner_func: Callable[[float], tuple[Any, ...]],
+                               sigma_kw: str,
+                               fixed_kwargs: dict[str, Any] = None
+                               ) -> SweepBest:
+        best: SweepBest = None
+
+        for s in scales:
+                sigma: float = calc_sigma(sigma_base, s)
+
+                kwargs = dict(fixed_kwargs)
+                kwargs[sigma_kw] = sigma
+                q_est, extra = runner_func(K=K, **kwargs)
+
+                angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
+                mean_err: float = float(np.mean(angle_err))
+
+                print(f"scale={s}", f", {sigma_kw}={sigma:.7f}", f", mean_err(rad)={mean_err:.7f}")
+
+                if best is None or mean_err < best.mean_err:
+                        best = SweepBest(s, sigma, angle_err, mean_err, q_est, extra)
+        return best
