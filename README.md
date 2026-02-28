@@ -367,7 +367,7 @@ In this configuration, both `p_gyro = 90` and `p_acc = 90` were used.<br>
 
 <br>
 
-In practice, this run selects accel gating but ends up not applying gyro gating (gyro_gate_sigma = inf).<br>
+In practice, this run selects accel gating but ends up not applying gyro gating (`gyro_gate_sigma = inf`).<br>
 
 <br>
 
