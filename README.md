@@ -291,7 +291,7 @@ Gating improves robustness by suppressing bad accel updates.<br>
 <br>
 <br>
 
-#### [exp 2-1] Gyro + Accel without gating <a name="exp2-1"></a>
+#### [exp 2-1] Gyro + Accel without gating <a name="exp-2-1"></a>
 
 In Experiment 2, gyro propagation and accelerometer are always enabled.<br>
 Accelerometer correction pulls the estimated gravity direction toward the measured acceleration direction.<br>
@@ -333,7 +333,7 @@ With accelerometer correction, both mean error and p90 error are reduced compare
 <br>
 <br>
 
-#### [exp 2-2] Gyro + Accel with Accel gating <a name="exp2-2"></a>
+#### [exp 2-2] Gyro + Accel with Accel gating <a name="exp-2-2"></a>
 
 Accelerometer gating is applied in this experiment.<br>
 The accelerometer correction weight is reduced when the measurement looks unreliable,<br>
@@ -367,7 +367,7 @@ In particular, the plot shows a noticeable reduction in angle error around ~350â
 <br>
 <br>
 
-#### [exp 2-3] Gyro + Accel with Gyro/Accel gating <a name="exp2-3"></a>
+#### [exp 2-3] Gyro + Accel with Gyro/Accel gating <a name="exp-2-3"></a>
 
 Both gyroscope and accelerometer gating are enabled in this experiment.<br>
 In practice, this run selects accel gating but ends up not applying gyro gating (gyro_gate_sigma = inf).<br>
