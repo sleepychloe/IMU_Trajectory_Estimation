@@ -37,7 +37,7 @@ tau=3.0 , K=0.0033529459636459555 , quasi_static_score_mean_angle(rad)=0.0889470
 
 chosen tau:  3.0 , K:  0.0033529459636459555 
 
-[choosen value]
+[chosen value]
 tau= 3.0 K= 0.0033529459636459555
 acc_gate_sigma=inf
 gyro_gate_sigma=inf
@@ -75,7 +75,7 @@ scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.8593738
 
 chosen sa=inf,  acc_gate_sigma=inf
 
-[choosen value]
+[chosen value]
 tau= 3.0 , K= 0.0033529459636459555
 sa=inf,  acc_gate_sigma=inf
 gyro_gate_sigma=inf
@@ -121,7 +121,7 @@ scale=inf , gyro_gate_sigma=inf , mean_err(rad)=0.8593738
 
 chosen sg=inf,  gyro_gate_sigma=inf
 
-[choosen value]
+[chosen value]
 tau= 3.0 , K= 0.0033529459636459555
 sa=inf,  acc_gate_sigma=inf
 sg=inf,  gyro_gate_sigma=inf

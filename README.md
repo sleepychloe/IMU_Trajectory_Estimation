@@ -212,29 +212,11 @@ The orientation collapsed close to a 180° inversion.<br>
 Once the error approaches π radians, the estimate becomes effectively flipped relative to the reference orientation.<br>
 
 <br>
-
-This demonstrates:<br>
-
-- Gyro integration accumulates bias over time
-- Early transient misalignment can permanently corrupt orientation
-- Long-horizon drift is unavoidable without correction
-
-<br>
 <br>
 
-#### [exp 1-2] Initial stabilization trimmed <a name="exp-1-2">
+#### [exp 1-2] Initial stabilization trimmed <a name="exp-1-2"></a>
 
 Instead of cutting a fixed number of seconds, an automatic stabilization detector was applied.<br>
-<br>
-
-Detector overview:<br>
-
-- Slide a 10-second window
-- Integrate gyro inside the window
-- Compute p90 angular error against REF
-- Detect stabilization when `p90 < threshold` for consecutive windows
-
-<br>
 
 For this dataset, stabilization detected at `t = 23 s`.<br>
 
@@ -251,16 +233,13 @@ For this dataset, stabilization detected at `t = 23 s`.<br>
 
 ##### [Observation]
 
-Drift shows the expected gradual accumulation pattern:<br>
-
-- Error grows slowly due to bias
-- No catastrophic 180° collapse
-- Drift pattern becomes interpretable
+Drift shows the expected gradual accumulation pattern.<br>
+Error grows slowly due to bias accumulation, without catastrophic 180° collapse<br>
 
 <br>
 <br>
 
-#### Conculusion <a name="exp-1-conclusion">
+#### Conclusion <a name="exp-1-conclusion"></a>
 
 - Early transient misalignment can dominate global error statistics
 - Even after trimming, gyro-only estimation drifts steadily
@@ -284,7 +263,7 @@ This directly motivates Experiment 2 and Experiment 3.<br>
 
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp2/data03_exp2_02.png" width="952" height="311">
 
-This dataset is a clean demostration of why gating matters.<br>
+This dataset is a clean demonstration of why gating matters.<br>
 Accelerometer correction helps overall, but blindly trusting accel can be unstable when linear accel is strong.<br>
 Gating improves robustness by suppressing bad accel updates.<br>
 
@@ -293,8 +272,9 @@ Gating improves robustness by suppressing bad accel updates.<br>
 
 #### [exp 2-1] Gyro + Accel without gating <a name="exp-2-1"></a>
 
-In Experiment 2, gyro propagation and accelerometer are always enabled.<br>
-Accelerometer correction pulls the estimated gravity direction toward the measured acceleration direction.<br>
+In Experiment 2, gyro propagation and accelerometer correction are always enabled.<br>
+Accelerometer correction pulls the estimated gravity direction in the body frame toward the measured acceleration direction,<br>
+under the assumption that acceleration is dominated by gravity.<br>
 
 <br>
 
@@ -307,12 +287,12 @@ No gating is applied here, so accelerometer correction is applied uniformly acro
 
 ##### [Result]
 
-Best quasi static(start, end, length):  (41487, 43669, 2182)<br>
+Best quasi-static(start, end, length):  (41487, 43669, 2182)<br>
 
 <br>
 
 ```
-[choosen value]
+[chosen value]
 tau= 0.3 K= 0.0333292643229773
 acc_gate_sigma=inf
 gyro_gate_sigma=inf
@@ -337,14 +317,20 @@ With accelerometer correction, both mean error and p90 error are reduced compare
 
 Accelerometer gating is applied in this experiment.<br>
 The accelerometer correction weight is reduced when the measurement looks unreliable,<br>
-using a reliability proxy based on deviation from gravity ||norm_a𝑚𝑒𝑎𝑠 - g0||.<br>
+using a reliability proxy based on deviation of measured acceleration magnitude from gravity, `| ||a𝑚𝑒𝑎𝑠|| - g0 |`.<br>
+
+<br>
+
+Also, the gating threshold was selected by minimizing mean error.<br>
+Using a tail-aware objective may further emphasize robustness gains.<br>
+In this experiment, `p_acc = 90`.<br>
 
 <br>
 
 ##### [Result]
 
 ```
-[choosen value]
+[chosen value]
 tau= 0.2 , K= 0.04999389648446595
 sa=1,  acc_gate_sigma=0.6755996
 gyro_gate_sigma=inf
@@ -361,8 +347,13 @@ gyro_gate_sigma=inf
 
 ##### [Observation]
 
+`tau` changed 0.3 to 0.2.<br>
+Since `tau` is selected independently per configuration using the quasi-static stability criterion, introducing gating slightly modifies the estimated gravity stability, which can shift the optimal `tau`.<br>
+
+<br>
+
 With accel gating, both mean and p90 improve compared to exp 2-1.<br>
-In particular, the plot shows a noticeable reduction in angle error around ~350–450 s.<br>
+In particular, the plot above shows a noticeable reduction in angle error around ~350–450 s.<br>
 
 <br>
 <br>
@@ -370,6 +361,12 @@ In particular, the plot shows a noticeable reduction in angle error around ~350�
 #### [exp 2-3] Gyro + Accel with Gyro/Accel gating <a name="exp-2-3"></a>
 
 Both gyroscope and accelerometer gating are enabled in this experiment.<br>
+
+The gating threshold was selected by minimizing mean error.<br>
+In this configuration, both `p_gyro = 90` and `p_acc = 90` were used.<br>
+
+<br>
+
 In practice, this run selects accel gating but ends up not applying gyro gating (gyro_gate_sigma = inf).<br>
 
 <br>
@@ -377,6 +374,7 @@ In practice, this run selects accel gating but ends up not applying gyro gating 
 ##### [Result]
 
 ```
+[chosen value]
 tau= 0.2 , K= 0.04999389648446595
 sa=1,  acc_gate_sigma=0.6755996
 sg=inf,  gyro_gate_sigma=inf
@@ -393,18 +391,28 @@ sg=inf,  gyro_gate_sigma=inf
 
 ##### [Observation]
 
-In this dataset, accel gating provides the benefit, while gyro gating is not selected.<br>
+In this dataset, accel gating provides the benefit, while gyro gating is not selected. (`gyro_gate_sigma = inf`)<br>
+The result is identical to exp 2-2.<br>
 
 <br>
 <br>
 
 #### Conclusion <a name="exp-2-conclusion"></a>
 
+- During dynamic motion (when `a ≠ g`), accelerometer correction can inject incorrect tilt updates
+- Gating reduces the accelerometer influence in those moments, preventing large error spikes and improving p90.
+
 Therefore:<br>
 
 - Accelerometer correction is essential for stabilizing roll/pitch, but it is only conditionally reliable
 - Gating acts like a trust controller: it can improve robustness under motion,
 but overly aggressive gating can degrade performance by rejecting useful accel updates.
+
+<br>
+<br>
+
+Note that improvements are dataset-dependent.<br>
+In other motion regimes, gating may provide marginal benefit or be rejected by the optimizer.<br>
 
 <br>
 <br>
@@ -933,7 +941,7 @@ worsening the yaw correction even when mag gating is enabled.<br>
 <br>
 <br>
 
-Conculution:<br>
+Conclution:<br>
 
 1. Use gyro-based gating primarily to control accelerometer trust (gravity correction)
 

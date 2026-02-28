@@ -1,15 +1,15 @@
 
 
-[START] 2026-02-28 21:15:24.702
+[START] 2026-02-28 23:33:06.610
 
 [INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
 
-[END] 2026-02-28 21:15:25.166
+[END] 2026-02-28 23:33:07.069
 
 
 
 
-[START] 2026-02-28 21:15:25.177
+[START] 2026-02-28 23:33:07.079
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -19,12 +19,12 @@ Best quasi static(start, end, length):  (2523, 3540, 1017)
 Suggested gyro_sigma:  0.44791971689543864
 Suggested acc_sigma:  2.908568806018301
 
-[END] 2026-02-28 21:15:25.828
+[END] 2026-02-28 23:33:07.696
 
 
 
 
-[START] 2026-02-28 21:15:26.625
+[START] 2026-02-28 23:33:08.559
 
 tau=0.2 , K=0.049993896484394895 , quasi_static_score_mean_angle(rad)=0.0453472834175563
 tau=0.3 , K=0.03332926432292993 , quasi_static_score_mean_angle(rad)=0.03706716993476759
@@ -37,7 +37,7 @@ tau=3.0 , K=0.003332926432292993 , quasi_static_score_mean_angle(rad)=0.02996250
 
 chosen tau:  3.0 , K:  0.003332926432292993 
 
-[choosen value]
+[chosen value]
 tau= 3.0 K= 0.003332926432292993
 acc_gate_sigma=inf
 gyro_gate_sigma=inf
@@ -48,12 +48,12 @@ gyro_gate_sigma=inf
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.16188152956129193 80.44979025728507 19.56163774339873 29.500193313967625
 
-[END] 2026-02-28 21:16:01.354
+[END] 2026-02-28 23:33:39.749
 
 
 
 
-[START] 2026-02-28 21:16:01.365
+[START] 2026-02-28 23:33:39.760
 
 [choosing tau, K]
 tau=0.2 , K=0.049993896484394895 , quasi_static_score_mean_angle(rad)=0.0437275322370169
@@ -75,7 +75,7 @@ scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.3414150
 
 chosen sa=1,  acc_gate_sigma=2.9085688
 
-[choosen value]
+[chosen value]
 tau= 3.0 , K= 0.003332926432292993
 sa=1,  acc_gate_sigma=2.9085688
 gyro_gate_sigma=inf
@@ -86,12 +86,12 @@ gyro_gate_sigma=inf
 [exp 2-2] Gyro+Acc+Gating(Acc) angle error in deg — min/max/mean/p90
 0.16046951034440796 80.34216489533617 19.491867311941444 29.429404518706395
 
-[END] 2026-02-28 21:16:51.788
+[END] 2026-02-28 23:34:26.529
 
 
 
 
-[START] 2026-02-28 21:16:51.802
+[START] 2026-02-28 23:34:26.542
 
 [choosing tau, K]
 tau=0.2 , K=0.049993896484394895 , quasi_static_score_mean_angle(rad)=0.03943992605456148
@@ -121,7 +121,7 @@ scale=inf , gyro_gate_sigma=inf , mean_err(rad)=0.3401973
 
 chosen sg=1,  gyro_gate_sigma=0.4479197
 
-[choosen value]
+[chosen value]
 tau= 3.0 , K= 0.003332926432292993
 sa=1,  acc_gate_sigma=2.9085688
 sg=1,  gyro_gate_sigma=0.4479197
@@ -132,12 +132,12 @@ sg=1,  gyro_gate_sigma=0.4479197
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) angle error in deg — min/max/mean/p90
 0.15943109075520323 80.32279729871439 19.42833632897957 29.358202856938803
 
-[END] 2026-02-28 21:18:01.906
+[END] 2026-02-28 23:35:34.146
 
 
 
 
-[START] 2026-02-28 21:18:07.989
+[START] 2026-02-28 23:35:39.994
 
 [Gravity]
 RMSE norm: 0.22485205751909645
@@ -162,6 +162,6 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 [Consistency ratio]
 rmse_norm of (a_lin_est / g_est):  3.303648159874818
 
-[END] 2026-02-28 21:18:08.376
+[END] 2026-02-28 23:35:40.369
 
 
