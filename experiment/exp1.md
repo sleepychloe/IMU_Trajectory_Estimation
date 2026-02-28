@@ -298,27 +298,27 @@ Each plot compares:<br>
 <br>
 
 ```
-[START] 2026-02-26 20:27:00.922
+[START] 2026-02-27 22:12:21.931
 
-Gyro only: no sample cut angle error in rad — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in rad — min/max/mean/p90
 0.016900799939842653 1.0850920070565426 0.5475108313340219 0.6285622393965337
 
-Gyro only: no sample cut angle error in deg — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in deg — min/max/mean/p90
 0.9683445069479396 62.171192387719636 31.370059873138523 36.01396347871306
 
-[END] 2026-02-26 20:27:02.728
+[END] 2026-02-27 22:12:23.648
 
 
 
-[START] 2026-02-26 20:27:03.010
+[START] 2026-02-27 22:12:23.982
 
-Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
 0.002692606276233363 1.41733946975559 0.39107310298265935 0.5663011403381867
 
-Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 0.15427497551860841 81.2075697543053 22.406838281991387 32.446665274823836
 
-[END] 2026-02-26 20:27:04.854
+[END] 2026-02-27 22:12:25.836
 ```
 
 <br>
@@ -363,27 +363,27 @@ Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 <br>
 
 ```
-[START] 2026-02-26 20:26:12.539
+[START] 2026-02-27 22:12:39.241
 
-Gyro only: no sample cut angle error in rad — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in rad — min/max/mean/p90
 0.009464702257402596 2.6688536472865168 1.909912008440155 2.055300097693392
 
-Gyro only: no sample cut angle error in deg — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in deg — min/max/mean/p90
 0.5422874936971117 152.91405012761385 109.42989732497534 117.76002123065714
 
-[END] 2026-02-26 20:26:15.460
+[END] 2026-02-27 22:12:42.434
 
 
 
-[START] 2026-02-26 20:26:15.991
+[START] 2026-02-27 22:12:42.857
 
-Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
 0.004019503743449339 0.7197238920239989 0.3838298145823989 0.5440975838643741
 
-Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 0.23030060023668236 41.23714142770451 21.991828426860398 31.174495198693997
 
-[END] 2026-02-26 20:26:18.959
+[END] 2026-02-27 22:12:46.095
 ```
 
 <br>
@@ -427,27 +427,27 @@ Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 <br>
 
 ```
-[START] 2026-02-26 20:24:49.801
+[START] 2026-02-27 22:12:54.863
 
-Gyro only: no sample cut angle error in rad — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in rad — min/max/mean/p90
 0.006497650316757928 3.1415925744092994 2.9863430261847146 3.126754275860046
 
-Gyro only: no sample cut angle error in deg — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in deg — min/max/mean/p90
 0.37228793990207176 179.9999954632919 171.10485157871042 179.14982358126457
 
-[END] 2026-02-26 20:24:54.362
+[END] 2026-02-27 22:12:59.212
 
 
 
-[START] 2026-02-26 20:24:55.846
+[START] 2026-02-27 22:13:00.757
 
-Gyro only: sample cut 23.0s angle error in rad — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 23.0s angle error in rad — min/max/mean/p90
 0.00827387251043809 1.2902038650243064 0.5377823159898106 0.8127713667204784
 
-Gyro only: sample cut 23.0s angle error in deg — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 23.0s angle error in deg — min/max/mean/p90
 0.47405797507741365 73.92323617735929 30.812657002986956 46.56836902216311
 
-[END] 2026-02-26 20:25:00.565
+[END] 2026-02-27 22:13:05.584
 ```
 
 <br>
@@ -492,27 +492,27 @@ Gyro only: sample cut 23.0s angle error in deg — min/max/mean/p90
 <br>
 
 ```
-[START] 2026-02-26 20:23:23.880
+[START] 2026-02-27 22:13:23.931
 
-Gyro only: no sample cut angle error in rad — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in rad — min/max/mean/p90
 0.0017503209553177612 3.1380681380116897 1.0451934334037227 2.3059672108235416
 
-Gyro only: no sample cut angle error in deg — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in deg — min/max/mean/p90
 0.10028600353301406 179.79806013254657 59.88517250882119 132.12218887574306
 
-[END] 2026-02-26 20:23:56.902
+[END] 2026-02-27 22:13:59.005
 
 
 
-[START] 2026-02-26 20:23:57.115
+[START] 2026-02-27 22:13:59.267
 
-Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
 0.003631716393424654 3.138840519423176 0.8880786152784693 2.036924604732547
 
-Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 0.2080820217317055 179.8423143275991 50.883156531278644 116.70718303752838
 
-[END] 2026-02-26 20:24:28.423
+[END] 2026-02-27 22:14:29.766
 ```
 
 <br>

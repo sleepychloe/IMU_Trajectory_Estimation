@@ -1,35 +1,35 @@
 
 
-[START] 2026-02-26 20:23:23.880
+[START] 2026-02-27 22:13:23.931
 
-Gyro only: no sample cut angle error in rad — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in rad — min/max/mean/p90
 0.0017503209553177612 3.1380681380116897 1.0451934334037227 2.3059672108235416
 
-Gyro only: no sample cut angle error in deg — min/max/mean/p90
+[exp 1-1] Gyro only: no sample cut angle error in deg — min/max/mean/p90
 0.10028600353301406 179.79806013254657 59.88517250882119 132.12218887574306
 
-[END] 2026-02-26 20:23:56.902
+[END] 2026-02-27 22:13:59.005
 
 
 
 
-[START] 2026-02-26 20:23:56.918
+[START] 2026-02-27 22:13:59.023
 
 [INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
 
-[END] 2026-02-26 20:23:57.101
+[END] 2026-02-27 22:13:59.248
 
 
 
 
-[START] 2026-02-26 20:23:57.115
+[START] 2026-02-27 22:13:59.267
 
-Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in rad — min/max/mean/p90
 0.003631716393424654 3.138840519423176 0.8880786152784693 2.036924604732547
 
-Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
+[exp 1-2] Gyro only: sample cut 10.0s angle error in deg — min/max/mean/p90
 0.2080820217317055 179.8423143275991 50.883156531278644 116.70718303752838
 
-[END] 2026-02-26 20:24:28.423
+[END] 2026-02-27 22:14:29.766
 
 

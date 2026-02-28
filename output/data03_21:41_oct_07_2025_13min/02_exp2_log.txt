@@ -1,0 +1,137 @@
+
+
+[START] 2026-02-28 01:10:46.744
+
+[OK] Stabilization detected, cut idx 2300 (≈ 23.0s)
+
+[END] 2026-02-28 01:10:49.313
+
+
+
+
+[START] 2026-02-28 01:10:49.331
+
+Detected accel unit in [m/s²]
+Selected g_world_unit: [ 0  0 -1]
+
+Best quasi static(start, end, length):  (41487, 43669, 2182)
+
+Suggested gyro_sigma:  0.48226806557261265
+Suggested acc_sigma:  0.6755995626475786
+
+[END] 2026-02-28 01:10:50.266
+
+
+
+
+[START] 2026-02-28 01:10:52.676
+
+tau=0.2 , K=0.04999389648446595 , quasi_static_score_mean_angle(rad)=0.0430051683723482
+tau=0.3 , K=0.0333292643229773 , quasi_static_score_mean_angle(rad)=0.04225915280473559
+tau=0.5 , K=0.01999755859378638 , quasi_static_score_mean_angle(rad)=0.04267781201326944
+tau=0.7 , K=0.01428397042413313 , quasi_static_score_mean_angle(rad)=0.04349236678781785
+tau=1.0 , K=0.00999877929689319 , quasi_static_score_mean_angle(rad)=0.04446262009161064
+tau=1.5 , K=0.00666585286459546 , quasi_static_score_mean_angle(rad)=0.04546907691316554
+tau=2.0 , K=0.004999389648446595 , quasi_static_score_mean_angle(rad)=0.04606170690028473
+tau=3.0 , K=0.00333292643229773 , quasi_static_score_mean_angle(rad)=0.04666377489613214
+
+chosen tau:  0.3 , K:  0.00333292643229773 
+
+[choosen value]
+tau= 0.3 K= 0.00333292643229773
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+
+[exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
+0.0019513050606020392 1.233005801414433 0.4678769554093243 0.6881944870604081
+
+[exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
+0.11180154451501617 70.64602853619272 26.807374876384895 39.43063959273193
+
+[END] 2026-02-28 01:12:49.648
+
+
+
+
+[START] 2026-02-28 01:12:49.671
+
+[choosing tau, K]
+tau=0.2 , K=0.04999389648446595 , quasi_static_score_mean_angle(rad)=0.04048742402448225
+tau=0.3 , K=0.0333292643229773 , quasi_static_score_mean_angle(rad)=0.040929832301111996
+tau=0.5 , K=0.01999755859378638 , quasi_static_score_mean_angle(rad)=0.04235688845287182
+tau=0.7 , K=0.01428397042413313 , quasi_static_score_mean_angle(rad)=0.04365939021478218
+tau=1.0 , K=0.00999877929689319 , quasi_static_score_mean_angle(rad)=0.045299837967797185
+tau=1.5 , K=0.00666585286459546 , quasi_static_score_mean_angle(rad)=0.04756207347180792
+tau=2.0 , K=0.004999389648446595 , quasi_static_score_mean_angle(rad)=0.049553830908765174
+tau=3.0 , K=0.00333292643229773 , quasi_static_score_mean_angle(rad)=0.052882019114148235
+
+chosen tau:  0.2 , K:  0.00333292643229773 
+
+[choosing acc_gate_sigma]
+scale=0.01 , acc_gate_sigma=0.0067560 , mean_err(rad)=0.5219719
+scale=1 , acc_gate_sigma=0.6755996 , mean_err(rad)=0.4841753
+scale=10 , acc_gate_sigma=6.7559956 , mean_err(rad)=0.4684798
+scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.4678770
+
+chosen sa=inf,  acc_gate_sigma=inf
+
+[choosen value]
+tau= 0.2 , K= 0.00333292643229773
+sa=inf,  acc_gate_sigma=inf
+gyro_gate_sigma=inf
+
+[exp 2-2] Gyro+Acc+Gating(Acc) angle error in rad — min/max/mean/p90
+0.0019513050606020392 1.233005801414433 0.4678769554093243 0.6881944870604081
+
+[exp 2-2] Gyro+Acc+Gating(Acc) angle error in deg — min/max/mean/p90
+0.11180154451501617 70.64602853619272 26.807374876384895 39.43063959273193
+
+[END] 2026-02-28 01:15:58.808
+
+
+
+
+[START] 2026-02-28 01:15:58.842
+
+[choosing tau, K]
+tau=0.2 , K=0.04999389648446595 , quasi_static_score_mean_angle(rad)=0.041625528170996365
+tau=0.3 , K=0.0333292643229773 , quasi_static_score_mean_angle(rad)=0.04310536957456862
+tau=0.5 , K=0.01999755859378638 , quasi_static_score_mean_angle(rad)=0.04560632838717663
+tau=0.7 , K=0.01428397042413313 , quasi_static_score_mean_angle(rad)=0.04741698468757595
+tau=1.0 , K=0.00999877929689319 , quasi_static_score_mean_angle(rad)=0.04949409676879708
+tau=1.5 , K=0.00666585286459546 , quasi_static_score_mean_angle(rad)=0.05225491258043539
+tau=2.0 , K=0.004999389648446595 , quasi_static_score_mean_angle(rad)=0.05445284587893883
+tau=3.0 , K=0.00333292643229773 , quasi_static_score_mean_angle(rad)=0.0574776546795931
+
+chosen tau:  0.2 , K:  0.00333292643229773 
+
+[choosing acc_gate_sigma]
+scale=0.01 , acc_gate_sigma=0.0067560 , mean_err(rad)=0.5219719
+scale=1 , acc_gate_sigma=0.6755996 , mean_err(rad)=0.4841753
+scale=10 , acc_gate_sigma=6.7559956 , mean_err(rad)=0.4684798
+scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.4678770
+
+chosen sa=inf,  acc_gate_sigma=inf
+
+[choosing gyro_gate_sigma]
+scale=0.01 , gyro_gate_sigma=0.0048227 , mean_err(rad)=0.5375391
+scale=1 , gyro_gate_sigma=0.4822681 , mean_err(rad)=0.4695164
+scale=10 , gyro_gate_sigma=4.8226807 , mean_err(rad)=0.4679522
+scale=inf , gyro_gate_sigma=inf , mean_err(rad)=0.4678770
+
+chosen sg=inf,  gyro_gate_sigma=inf
+
+[choosen value]
+tau= 0.2 , K= 0.00333292643229773
+sa=inf,  acc_gate_sigma=inf
+sg=inf,  gyro_gate_sigma=inf
+
+[exp 2-3] Gyro+Acc+Gating(Gyro/Acc) angle error in rad — min/max/mean/p90
+0.0019513050606020392 1.233005801414433 0.4678769554093243 0.6881944870604081
+
+[exp 2-3] Gyro+Acc+Gating(Gyro/Acc) angle error in deg — min/max/mean/p90
+0.11180154451501617 70.64602853619272 26.807374876384895 39.43063959273193
+
+[END] 2026-02-28 01:20:13.425
+
+

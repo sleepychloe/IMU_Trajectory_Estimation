@@ -14,7 +14,7 @@ def gyro_predict(q: Quat, w_avg: Vec3, dt: float) -> Quat:
 def integrate_gyro(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch) -> QuatBatch:
         q: Quat = q0.copy()
         res: QuatBatch = as_quat_batch(np.zeros((len(dt), 4)))
-        
+
         for i in range(len(dt)):
                 q: Quat = gyro_predict(q, w_avg[i], dt[i])
                 res[i] = q

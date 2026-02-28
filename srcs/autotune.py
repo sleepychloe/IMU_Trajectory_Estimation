@@ -31,9 +31,9 @@ def auto_setup_imu_frame(q_ref: QuatBatch, w: Vec3Batch, dt: ScalarBatch,
         g_world_unit: Vec3 = None
         for g_dir in g_world_dir_candidate:
                 q_tmp, _, _, _, _ = integrate_gyro_acc(
-                        q_ref[0].copy(), w[:2000], dt[:2000],
-                        (np.median(dt[:2000]) / 0.5), g0, g_dir,
-                        np.inf, np.inf, a_src[:2000])
+                                        q_ref[0].copy(), w[:2000], dt[:2000],
+                                        (np.median(dt[:2000]) / 0.5), g0, g_dir,
+                                        np.inf, np.inf, a_src[:2000])
                 err_tmp = np.mean(calc_angle_err(q_tmp[:2000], q_ref[:2000]))
                 if score_tmp > err_tmp:
                         score_tmp = err_tmp
@@ -94,7 +94,7 @@ def smooth_bool(mask: BoolBatch, win: int = 5) -> BoolBatch:
 def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float,
                           w_thr: float, a_thr: float,
                           min_duration_s: float, smooth_win: int,
-                          ) -> tuple[BoolBatch, tuple[int, int, int]]:
+                          ) -> tuple[int, int, int]:
         """
         Returns:
                 quasi_static_mask: (N,) BoolBatch
@@ -123,7 +123,7 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
                 best_quasi_static = None
                 print("Best quasi static not found")
         print("Best quasi static(start, end, length): ", best_quasi_static)
-        return quasi_static_mask, best_quasi_static
+        return best_quasi_static
 
 def suggest_gate_sigma(w: Vec3Batch, a: Vec3Batch, g0: float,
                        p_gyro: int, p_acc: int, sigma_floor: float,
@@ -202,7 +202,7 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
                 mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
                 dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
                 ang: ScalarBatch = np.arccos(dot)
-                score: float = float(np.mean(ang)) # lower is better
+                score: float = float(np.mean(ang))
 
                 print(f"tau={float(tau)}", f", K={K}", f", quasi_static_score_mean_angle(rad)={score}")
 
