@@ -18,6 +18,10 @@ Currently in progress
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 1-2] Initial stabilization trimmed](#exp-1-2) <br>
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Conclusion](#exp-1-conclusion) <br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 2 — Gyro + Accelerometer](#exp-2) <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 2-1] Gyro + Accel without gating](#exp-2-1) <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 2-2] Gyro + Accel with Accel gating](#exp-2-2) <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 2-3] Gyro + Accel with Gyro/Accel gating](#exp-2-3) <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Conclusion](#exp-2-conclusion) <br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 3 — Gyro + Accelerometer + Magnetometer](#exp-3) <br>
 
  * [Understanding Coordinate Systems and Sensors](#orientation) <br>
@@ -170,8 +174,8 @@ such as gyro bias/drift, gravity misinterpretation during translation, magnetic 
 Full experimental process and results:<br>
 
 - [Experiment 1](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp1.md)
-<!--- [Experiment 2]()
-- [Experiment 3]()-->
+- [Experiment 2](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp2.md)
+<!--- [Experiment 3]()-->
 
 <br>
 <br>
@@ -205,9 +209,6 @@ and orientation was propagated using pure gyro integration.<br>
 ##### [Observation]
 
 The orientation collapsed close to a 180° inversion.<br>
-
-<br>
-
 Once the error approaches π radians, the estimate becomes effectively flipped relative to the reference orientation.<br>
 
 <br>
@@ -226,7 +227,7 @@ This demonstrates:<br>
 Instead of cutting a fixed number of seconds, an automatic stabilization detector was applied.<br>
 <br>
 
-The detector perfoms:<br>
+Detector overview:<br>
 
 - Slide a 10-second window
 - Integrate gyro inside the window
@@ -261,8 +262,6 @@ Drift shows the expected gradual accumulation pattern:<br>
 
 #### Conculusion <a name="exp-1-conclusion">
 
-Experiment 1-1 and 1-2 shows that:<br>
-
 - Early transient misalignment can dominate global error statistics
 - Even after trimming, gyro-only estimation drifts steadily
 
@@ -281,13 +280,137 @@ This directly motivates Experiment 2 and Experiment 3.<br>
 <br>
 <br>
 
-<!--### Experiment 2 — Gyro + Accelerometer <a name="exp-2"></a>
+### Experiment 2 — Gyro + Accelerometer <a name="exp-2"></a>
+
+<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp2/data03_exp2_02.png" width="952" height="311">
+
+This dataset is a clean demostration of why gating matters.<br>
+Accelerometer correction helps overall, but blindly trusting accel can be unstable when linear accel is strong.<br>
+Gating improves robustness by suppressing bad accel updates.<br>
+
+<br>
+<br>
+
+#### [exp 2-1] Gyro + Accel without gating <a name="exp2-1"></a>
+
+In Experiment 2, gyro propagation and accelerometer are always enabled.<br>
+Accelerometer correction pulls the estimated gravity direction toward the measured acceleration direction.<br>
+
+<br>
+
+The correction strength is controlled by  `K (= dt_median / tau)`,<br>
+where `tau` is tuned using a quasi-static segment (gravity in body frame should be stable).
+<br>
+No gating is applied here, so accelerometer correction is applied uniformly across all segments.<br>
+
+<br>
+
+##### [Result]
+
+Best quasi static(start, end, length):  (41487, 43669, 2182)<br>
+
+<br>
+
+```
+[choosen value]
+tau= 0.3 K= 0.0333292643229773
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+```
+<br>
+
+| Unit  |  Mean error  |  p90 error   |
+|:-----:|-------------:|-------------:|
+|  rad  | 0.40981      | 0.75477      |
+|  deg  | 23.48033     | 43.24533     |
+
+<br>
+
+##### [Observation]
+
+With accelerometer correction, both mean error and p90 error are reduced compared to exp 1-2.<br>
+
+<br>
+<br>
+
+#### [exp 2-2] Gyro + Accel with Accel gating <a name="exp2-2"></a>
+
+Accelerometer gating is applied in this experiment.<br>
+The accelerometer correction weight is reduced when the measurement looks unreliable,<br>
+using a reliability proxy based on deviation from gravity ||norm_a𝑚𝑒𝑎𝑠 - g0||.<br>
+
+<br>
+
+##### [Result]
+
+```
+[choosen value]
+tau= 0.2 , K= 0.04999389648446595
+sa=1,  acc_gate_sigma=0.6755996
+gyro_gate_sigma=inf
+```
+
+<br>
+
+| Unit  |  Mean error  |  p90 error   |
+|:-----:|-------------:|-------------:|
+|  rad  | 0.37464      | 0.56815      |
+|  deg  | 21.46521     | 32.55285     |
+
+<br>
+
+##### [Observation]
+
+With accel gating, both mean and p90 improve compared to exp 2-1.<br>
+In particular, the plot shows a noticeable reduction in angle error around ~350–450 s.<br>
+
+<br>
+<br>
+
+#### [exp 2-3] Gyro + Accel with Gyro/Accel gating <a name="exp2-3"></a>
+
+Both gyroscope and accelerometer gating are enabled in this experiment.<br>
+In practice, this run selects accel gating but ends up not applying gyro gating (gyro_gate_sigma = inf).<br>
+
+<br>
+
+##### [Result]
+
+```
+tau= 0.2 , K= 0.04999389648446595
+sa=1,  acc_gate_sigma=0.6755996
+sg=inf,  gyro_gate_sigma=inf
+```
+
+<br>
+
+| Unit  |  Mean error  |  p90 error   |
+|:-----:|-------------:|-------------:|
+|  rad  | 0.37464      | 0.56815      |
+|  deg  | 21.46521     | 32.55285     |
+
+<br>
+
+##### [Observation]
+
+In this dataset, accel gating provides the benefit, while gyro gating is not selected.<br>
+
+<br>
+<br>
+
+#### Conclusion <a name="exp-2-conclusion"></a>
+
+Therefore:<br>
+
+- Accelerometer correction is essential for stabilizing roll/pitch, but it is only conditionally reliable
+- Gating acts like a trust controller: it can improve robustness under motion,
+but overly aggressive gating can degrade performance by rejecting useful accel updates.
 
 <br>
 <br>
 <br>
 
-### Experiment 3 — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
+<!--### Experiment 3 — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
 
 <br>
 <br>
