@@ -177,7 +177,7 @@ If quasi-static exists, statistics are computed on that segment, otherwise fallb
 <br>
 
 ```
-For gyro gating
+For gyro gating:
 	gyro_sigma = max(sigma_floor, percentile(||w||, p_gyro)) (or inf if disabled)
 
 For accel gating:
@@ -643,6 +643,8 @@ Experiment 2 confirms:<br>
 
 1. Accelerometer correction stabilizes roll/pitch by continuously correcting gyro drift
 2. Gating acts as a reliability controller that prevents incorrect tilt injections during dynamic motion
+
+<br>
 
 Next steps:<br>
 - Experiment 3: add magnetometer correction to constrain yaw drift
