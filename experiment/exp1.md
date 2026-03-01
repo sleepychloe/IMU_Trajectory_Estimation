@@ -203,8 +203,7 @@ def find_stable_start_idx(dt: ScalarBatch, w: Vec3Batch, q_ref: QuatBatch,
                 q0_tmp = q_ref[i].copy()
                 q_gyro_tmp: QuatBatch = integrate_gyro(q0_tmp, w_tmp, dt_tmp)
                 angle_err_tmp: ScalarBatch = calc_angle_err(q_gyro_tmp, q_ref_tmp)
-                p90: float = float(np.percentile(np.asarray(angle_err_tmp).reshape(-1), 90))
-
+                . . .
                 if p90 < threshold:
                         cons += 1
                         if cons >= consecutive:
