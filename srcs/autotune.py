@@ -170,7 +170,7 @@ class SweepBest:
 
 def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
                                  best_quasi_static: tuple[int, int, int] | None = None,
-                                 tau_candidates: tuple[float, ...] = (0.15, 0.2, 0.25, 0.35, 0.5, 0.75, 1),
+                                 tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
                                  runner_kwargs: dict[str, Any] = None,
                                  ) -> tuple[list[dict[str, Any]], float, float]:
         """
@@ -179,7 +179,7 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
                 best_tau: float
                 K: float
         """
-        dt_medean: float = float(np.median(dt))
+        dt_median: float = float(np.median(dt))
 
         if best_quasi_static is None:
                 s, e = 0, len(dt)
@@ -188,7 +188,7 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
 
         tau_table: list[dict[str, Any]] = []
         for tau in tau_candidates:
-                K = float(dt_medean / tau)
+                K = float(dt_median / tau)
 
                 _, extra = runner_func(K=K, **runner_kwargs)
                 g_body_est, _, _, _ = extra

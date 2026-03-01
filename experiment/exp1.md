@@ -547,7 +547,7 @@ Experiment 1 confirms:<br>
 Next steps:<br>
 
 - Experiment 2: add accelerometer correction to stabilize roll/pitch and reduce tilt drift
-- Experiment 3: add magnetometer correction to constrain yaw drift, with gating for robustness
+- Experiment 3: add magnetometer correction to constrain yaw drift
 
 <br>
 <br>

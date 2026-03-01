@@ -14,14 +14,9 @@ Currently in progress
 
  * [Experiment Result Shortcut](#exp) <br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 1 — Gyro-only propagation](#exp-1) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 1-1] No initial sample cut](#exp-1-1) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 1-2] Initial stabilization trimmed](#exp-1-2) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Conclusion](#exp-1-conclusion) <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Conclusion across all datasets](#exp-1-conclusion) <br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 2 — Gyro + Accelerometer](#exp-2) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 2-1] Gyro + Accel without gating](#exp-2-1) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 2-2] Gyro + Accel with Accel gating](#exp-2-2) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [[exp 2-3] Gyro + Accel with Gyro/Accel gating](#exp-2-3) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Conclusion](#exp-2-conclusion) <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Conclusion across all datasets](#exp-2-conclusion) <br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 3 — Gyro + Accelerometer + Magnetometer](#exp-3) <br>
 
  * [Understanding Coordinate Systems and Sensors](#orientation) <br>
@@ -188,72 +183,37 @@ This dataset clearly illustrates why initial stabilization trimming is necessary
 and why gyro-only orientation estimation is fundamentally unstable over long durations.<br>
 
 <br>
-<br>
 
-#### [exp 1-1] No initial sample cut <a name="exp-1-1"></a>
+##### [Trim decision]
 
-The initial quaternion was aligned with the reference at `t = 0 s`,<br>
-and orientation was propagated using pure gyro integration.<br>
-
-<br>
-
-##### [Result]
-
-| Unit  |  Mean error  |  p90 error   |
-|:-----:|-------------:|-------------:|
-|  rad  | 2.98634      | 3.12675      |
-|  deg  | 171.10485    | 179.14982    |
+- Stabilization satisfied early `t = 1 s`, but this is considered too early
+- Policy enforced (min cut = 10s)
 
 <br>
 
-##### [Observation]
+##### [Metrics]
 
-The orientation collapsed close to a 180° inversion.<br>
-Once the error approaches π radians, the estimate becomes effectively flipped relative to the reference orientation.<br>
-
-<br>
-<br>
-
-#### [exp 1-2] Initial stabilization trimmed <a name="exp-1-2"></a>
-
-Instead of cutting a fixed number of seconds, an automatic stabilization detector was applied.<br>
-
-For this dataset, stabilization detected at `t = 23 s`.<br>
-
-<br>
-
-##### [Result]
-
-| Unit  |  Mean error  |  p90 error   |
-|:-----:|-------------:|-------------:|
-|  rad  | 0.53778      | 0.81277      |
-|  deg  | 30.81266     | 46.56837     |
+|         |  Mean error  |  p90 error   |
+|:-------:|-------------:|-------------:|
+| exp 1-1 | <ul><li>0.54751 rad</li><li>31.37006 deg</li></ul> | <ul><li>0.62856 rad</li><li>36.01396 deg</li></ul> |
+| exp 1-2 | <ul><li>0.39107 rad</li><li>22.40684 deg</li></ul> | <ul><li>0.56630 rad</li><li>32.44667 deg</li></ul> |
 
 <br>
 
 ##### [Observation]
 
-Drift shows the expected gradual accumulation pattern.<br>
-Error grows slowly due to bias accumulation, without catastrophic 180° collapse<br>
+- The trimmed curve shows a cleaner drift trend
+- Early segment inflates metrics despite long-term behavior being similar
 
 <br>
 <br>
 
-#### Conclusion <a name="exp-1-conclusion"></a>
+#### Conclusion across all datasets <a name="exp-1-conclusion"></a>
 
-- Early transient misalignment can dominate global error statistics
-- Even after trimming, gyro-only estimation drifts steadily
+Experiment 1 confirms:<br>
 
-<br>
-
-Therefore:<br>
-
-- Initial trimming is necessary for fair evaluation
-- Sensor fusion (accelerometer + magnetometer correction) is required for long-term stability
-
-<br>
-
-This directly motivates Experiment 2 and Experiment 3.<br>
+1. Gyro-only integration is inherently unstable over time (drift is unavoidable)
+2. The initial stabilization period must be trimmed to avoid transient artifacts dominating results
 
 <br>
 <br>
@@ -268,151 +228,47 @@ Accelerometer correction helps overall, but blindly trusting accel can be unstab
 Gating improves robustness by suppressing bad accel updates.<br>
 
 <br>
-<br>
 
-#### [exp 2-1] Gyro + Accel without gating <a name="exp-2-1"></a>
+##### [Chosen parameters]
 
-In Experiment 2, gyro propagation and accelerometer correction are always enabled.<br>
-Accelerometer correction pulls the estimated gravity direction in the body frame toward the measured acceleration direction,<br>
-under the assumption that acceleration is dominated by gravity.<br>
-
-<br>
-
-The correction strength is controlled by  `K (= dt_median / tau)`,<br>
-where `tau` is tuned using a quasi-static segment (gravity in body frame should be stable).
-<br>
-No gating is applied here, so accelerometer correction is applied uniformly across all segments.<br>
+- quasi-static: (41487, 43669, 2182)
+- suggested σ_gyro: 0.4822681
+- suggested σ_acc : 0.6755996
 
 <br>
 
-##### [Result]
-
-Best quasi-static(start, end, length):  (41487, 43669, 2182)<br>
+|         |  tau  |         K         |       σ_gyro      |       σ_acc       |
+|:-------:|------:|------------------:|------------------:|------------------:|
+| exp 2-1 |  0.3  | 0.033329264322977 | inf (not applied) | inf (not applied) |
+| exp 2-2 |  0.2  | 0.049993896484466 | inf (not applied) |         0.6755996 |
+| exp 2-3 |  0.2  | 0.049993896484466 | inf (not applied) |         0.6755996 |
 
 <br>
 
-```
-[chosen value]
-tau= 0.3 K= 0.0333292643229773
-acc_gate_sigma=inf
-gyro_gate_sigma=inf
-```
-<br>
+##### [Metrics]
 
-| Unit  |  Mean error  |  p90 error   |
-|:-----:|-------------:|-------------:|
-|  rad  | 0.40981      | 0.75477      |
-|  deg  | 23.48033     | 43.24533     |
+|         |  Mean error  |  p90 error   |
+|:-------:|-------------:|-------------:|
+| exp 2-1 | <ul><li>0.40981 rad</li><li>23.48033 deg</li></ul> | <ul><li>0.75477 rad</li><li>43.24533 deg</li></ul> |
+| exp 2-2 | <ul><li>0.37464 rad</li><li>21.46521 deg</li></ul> | <ul><li>0.56815 rad</li><li>32.55285 deg</li></ul> |
+| exp 2-3 | <ul><li>0.37464 rad</li><li>21.46521 deg</li></ul> | <ul><li>0.56815 rad</li><li>32.55285 deg</li></ul> |
 
 <br>
 
 ##### [Observation]
 
-With accelerometer correction, both mean error and p90 error are reduced compared to exp 1-2.<br>
+- This is a clean gating matters case — p90 drops significantly because gating suppresses bad accel updates during dynamic segments
+- The reduced-error region aligns with periods where `||a||` deviates from `g0`
 
 <br>
 <br>
 
-#### [exp 2-2] Gyro + Accel with Accel gating <a name="exp-2-2"></a>
+#### Conclusion across all datasets <a name="exp-2-conclusion"></a>
 
-Accelerometer gating is applied in this experiment.<br>
-The accelerometer correction weight is reduced when the measurement looks unreliable,<br>
-using a reliability proxy based on deviation of measured acceleration magnitude from gravity, `| ||a𝑚𝑒𝑎𝑠|| - g0 |`.<br>
+Experiment 2 confirms:<br>
 
-<br>
-
-Also, the gating threshold was selected by minimizing mean error.<br>
-Using a tail-aware objective may further emphasize robustness gains.<br>
-In this experiment, `p_acc = 90`.<br>
-
-<br>
-
-##### [Result]
-
-```
-[chosen value]
-tau= 0.2 , K= 0.04999389648446595
-sa=1,  acc_gate_sigma=0.6755996
-gyro_gate_sigma=inf
-```
-
-<br>
-
-| Unit  |  Mean error  |  p90 error   |
-|:-----:|-------------:|-------------:|
-|  rad  | 0.37464      | 0.56815      |
-|  deg  | 21.46521     | 32.55285     |
-
-<br>
-
-##### [Observation]
-
-`tau` changed 0.3 to 0.2.<br>
-Since `tau` is selected independently per configuration using the quasi-static stability criterion, introducing gating slightly modifies the estimated gravity stability, which can shift the optimal `tau`.<br>
-
-<br>
-
-With accel gating, both mean and p90 improve compared to exp 2-1.<br>
-In particular, the plot above shows a noticeable reduction in angle error around ~350–450 s.<br>
-
-<br>
-<br>
-
-#### [exp 2-3] Gyro + Accel with Gyro/Accel gating <a name="exp-2-3"></a>
-
-Both gyroscope and accelerometer gating are enabled in this experiment.<br>
-
-The gating threshold was selected by minimizing mean error.<br>
-In this configuration, both `p_gyro = 90` and `p_acc = 90` were used.<br>
-
-<br>
-
-In practice, this run selects accel gating but ends up not applying gyro gating (`gyro_gate_sigma = inf`).<br>
-
-<br>
-
-##### [Result]
-
-```
-[chosen value]
-tau= 0.2 , K= 0.04999389648446595
-sa=1,  acc_gate_sigma=0.6755996
-sg=inf,  gyro_gate_sigma=inf
-```
-
-<br>
-
-| Unit  |  Mean error  |  p90 error   |
-|:-----:|-------------:|-------------:|
-|  rad  | 0.37464      | 0.56815      |
-|  deg  | 21.46521     | 32.55285     |
-
-<br>
-
-##### [Observation]
-
-In this dataset, accel gating provides the benefit, while gyro gating is not selected. (`gyro_gate_sigma = inf`)<br>
-The result is identical to exp 2-2.<br>
-
-<br>
-<br>
-
-#### Conclusion <a name="exp-2-conclusion"></a>
-
-- During dynamic motion (when `a ≠ g`), accelerometer correction can inject incorrect tilt updates
-- Gating reduces the accelerometer influence in those moments, preventing large error spikes and improving p90.
-
-Therefore:<br>
-
-- Accelerometer correction is essential for stabilizing roll/pitch, but it is only conditionally reliable
-- Gating acts like a trust controller: it can improve robustness under motion,
-but overly aggressive gating can degrade performance by rejecting useful accel updates.
-
-<br>
-<br>
-
-Note that improvements are dataset-dependent.<br>
-In other motion regimes, gating may provide marginal benefit or be rejected by the optimizer.<br>
+1. Accelerometer correction stabilizes roll/pitch by continuously correcting gyro drift
+2. Gating acts as a reliability controller that prevents incorrect tilt injections during dynamic motion
 
 <br>
 <br>
