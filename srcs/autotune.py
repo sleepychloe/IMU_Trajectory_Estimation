@@ -49,6 +49,21 @@ def stats_basic(x: float) -> tuple[float, ...]:
         return (np.min(x), np.max(x), np.mean(x),
                 np.percentile(x, 50), np.percentile(x, 90), np.percentile(x, 99))
 
+def smooth_bool(mask: BoolBatch, win: int = 5) -> BoolBatch:
+        """
+        Simple debouncing: True if majority True in a window.
+        """
+        if win <= 1:
+                return mask
+
+        # BoolBatch → Int8Batch for 0/1 majority vote
+        m: Int8Batch = as_int8_batch(mask.astype(np.int8, copy=False))
+        kernel: Int32Batch = np.ones(win, dtype=np.int32)
+
+        s: Int64Batch = np.convolve(m, kernel, mode="same")
+        res: BoolBatch = (s >= (win//2 + 1))
+        return as_bool_batch(res)
+
 def largest_true_run(mask: BoolBatch) -> tuple[int, int, int] | None:
         """
         Returns:
@@ -75,21 +90,6 @@ def largest_true_run(mask: BoolBatch) -> tuple[int, int, int] | None:
 
         i: int = int(np.argmax(length))
         return int(start[i]), int(end[i]), int(length[i])
-
-def smooth_bool(mask: BoolBatch, win: int = 5) -> BoolBatch:
-        """
-        Simple debouncing: True if majority True in a window.
-        """
-        if win <= 1:
-                return mask
-
-        # BoolBatch → Int8Batch for 0/1 majority vote
-        m: Int8Batch = as_int8_batch(mask.astype(np.int8, copy=False))
-        kernel: Int32Batch = np.ones(win, dtype=np.int32)
-
-        s: Int64Batch = np.convolve(m, kernel, mode="same")
-        res: BoolBatch = (s >= (win//2 + 1))
-        return as_bool_batch(res)
 
 def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float,
                           w_thr: float, a_thr: float,
@@ -127,7 +127,7 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
 
 def suggest_gate_sigma(w: Vec3Batch, a: Vec3Batch, g0: float,
                        p_gyro: int, p_acc: int, sigma_floor: float,
-                       best_quasi_static: tuple[float, float, float] = None
+                       best_quasi_static: tuple[int, int, int] = None
                        ) -> tuple[float, float]:
         """
         Returns:
@@ -179,7 +179,7 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
                 best_tau: float
                 K: float
         """
-        dt_midean: float = float(np.median(dt))
+        dt_medean: float = float(np.median(dt))
 
         if best_quasi_static is None:
                 s, e = 0, len(dt)
@@ -188,7 +188,7 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
 
         tau_table: list[dict[str, Any]] = []
         for tau in tau_candidates:
-                K = float(dt_midean / tau)
+                K = float(dt_medean / tau)
 
                 _, extra = runner_func(K=K, **runner_kwargs)
                 g_body_est, _, _, _ = extra
