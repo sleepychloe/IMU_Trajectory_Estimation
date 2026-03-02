@@ -171,7 +171,8 @@ class SweepBest:
 def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
                                  best_quasi_static: tuple[int, int, int] | None = None,
                                  tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
-                                 runner_kwargs: dict[str, Any] = None,
+                                 q_gyro: QuatBatch = None,
+                                 runner_kwargs: dict[str, Any] = {},
                                  ) -> tuple[list[dict[str, Any]], float, float]:
         """
         Returns:
@@ -179,38 +180,39 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
                 best_tau: float
                 K: float
         """
-        dt_median: float = float(np.median(dt))
-
-        if best_quasi_static is None:
-                s, e = 0, len(dt)
-        else:
+        if best_quasi_static is not None:
                 s, e, _ = best_quasi_static
-
+                dt_median = float(np.median(dt[s:e]))
+        else:
+                s, e = 0, len(dt)
+                dt_median = float(np.median(dt))
+        qs: Quat = q_gyro[s]
         tau_table: list[dict[str, Any]] = []
         for tau in tau_candidates:
                 K = float(dt_median / tau)
 
-                _, extra = runner_func(K=K, **runner_kwargs)
+                _, extra = runner_func(K=K, q0=qs, segment=best_quasi_static,
+                                       **runner_kwargs)
                 g_body_est, _, _, _ = extra
 
-                # In quasi_static segment, gravity in body frame should be stable.
-                # Use direction variance as a stability proxy.
-                gb = g_body_est[s:e]
+                # In quasi_static segment, gravity in body frame should be stable
+                burn = int(np.ceil(1 / max(np.median(dt[s:e]), EPS)))
+                gb = g_body_est[burn:]
+                #gb = g_body_est
                 gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
 
-                # score: average angular deviation from mean direction
                 mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
                 mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
                 dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
                 ang: ScalarBatch = np.arccos(dot)
                 score: float = float(np.mean(ang))
 
-                print(f"tau={float(tau)}", f", K={K}", f", quasi_static_score_mean_angle(rad)={score}")
+                print(f"tau={float(tau)}", f", K={K}", f", score={score}")
 
                 tau_table.append({
                         "tau": float(tau), "K": K,
-                        "quasi_static_score_mean_angle(rad)": score})
-        tau_table.sort(key=lambda d: d["quasi_static_score_mean_angle(rad)"])
+                        "score": score})
+        tau_table.sort(key=lambda d: d["score"])
         best_tau: float = tau_table[0]["tau"]
         best_K: float = tau_table[0]["K"]
         return tau_table, best_tau, best_K
@@ -221,9 +223,9 @@ def calc_sigma(base: float, scale: float) -> float:
         return base * scale
 
 def choose_best_by_sigma_scale(scales: tuple[float, ...],
-                               K: float, sigma_base: float, q_ref: QuatBatch,
+                               K: float, q0: Quat, sigma_base: float, q_ref: QuatBatch,
                                runner_func: Callable[[float], tuple[Any, ...]],
-                               sigma_kw: str,
+                               sigma_kw: str = {},
                                fixed_kwargs: dict[str, Any] = None
                                ) -> SweepBest:
         best: SweepBest = None
@@ -233,7 +235,7 @@ def choose_best_by_sigma_scale(scales: tuple[float, ...],
 
                 kwargs = dict(fixed_kwargs)
                 kwargs[sigma_kw] = sigma
-                q_est, extra = runner_func(K=K, **kwargs)
+                q_est, extra = runner_func(K=K, q0=q0, **kwargs)
 
                 angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
                 mean_err: float = float(np.mean(angle_err))
