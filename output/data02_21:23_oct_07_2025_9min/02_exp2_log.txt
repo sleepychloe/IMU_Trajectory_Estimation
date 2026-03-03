@@ -1,15 +1,15 @@
 
 
-[START] 2026-03-03 08:19:48.559
+[START] 2026-03-03 09:27:09.039
 
 [INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
 
-[END] 2026-03-03 08:19:49.654
+[END] 2026-03-03 09:27:09.857
 
 
 
 
-[START] 2026-03-03 08:19:49.671
+[START] 2026-03-03 09:27:09.867
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -19,13 +19,14 @@ Best quasi static(start, end, length):  (0, 1635, 1635)
 Suggested gyro_sigma:  0.6304230586083284
 Suggested acc_sigma:  2.5176966756605874
 
-[END] 2026-03-03 08:19:50.358
+[END] 2026-03-03 09:27:10.491
 
 
 
 
-[START] 2026-03-03 08:19:51.969
+[START] 2026-03-03 09:27:11.674
 
+[choosing tau, K] — no gating
 tau=0.2 , K=0.04999389648446595 , score=0.06541202516472325
 tau=0.3 , K=0.0333292643229773 , score=0.06215713800050853
 tau=0.5 , K=0.01999755859378638 , score=0.06035635811343465
@@ -36,6 +37,14 @@ tau=2.0 , K=0.004999389648446595 , score=0.06930422215397218
 tau=3.0 , K=0.00333292643229773 , score=0.07836416074239341
 
 chosen tau:  0.7 , K:  0.01428397042413313 
+
+
+[END] 2026-03-03 09:28:08.987
+
+
+
+
+[START] 2026-03-03 09:28:08.995
 
 [chosen value]
 tau= 0.7 K= 0.01428397042413313
@@ -48,52 +57,14 @@ gyro_gate_sigma=inf
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.3738849675846366 38.86390829714029 13.26359705609381 21.74952513104745
 
-[END] 2026-03-03 08:21:02.562
+[END] 2026-03-03 09:28:17.642
 
 
 
 
-[START] 2026-03-03 08:21:02.578
+[START] 2026-03-03 09:28:17.651
 
-[choosing tau, K]
-tau=0.2 , K=0.04999389648446595 , score=0.06355866183416203
-tau=0.3 , K=0.0333292643229773 , score=0.06117540234864144
-tau=0.5 , K=0.01999755859378638 , score=0.06060225674253047
-tau=0.7 , K=0.01428397042413313 , score=0.061079540896145944
-tau=1.0 , K=0.00999877929689319 , score=0.06298540746735688
-tau=1.5 , K=0.00666585286459546 , score=0.06814269179718445
-tau=2.0 , K=0.004999389648446595 , score=0.07396925307998875
-tau=3.0 , K=0.00333292643229773 , score=0.08326801498769304
-
-chosen tau:  0.5 , K:  0.01999755859378638 
-
-[choosing acc_gate_sigma]
-scale=0.01 , acc_gate_sigma=0.0251770 , mean_err(rad)=0.2970344
-scale=1 , acc_gate_sigma=2.5176967 , mean_err(rad)=0.2778198
-scale=10 , acc_gate_sigma=25.1769668 , mean_err(rad)=0.2134625
-scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.2110713
-
-chosen sa=inf,  acc_gate_sigma=inf
-
-[chosen value]
-tau= 0.5 , K= 0.01999755859378638
-sa=inf,  acc_gate_sigma=inf
-gyro_gate_sigma=inf
-
-[exp 2-2] Gyro+Acc+Gating(Acc) angle error in rad — min/max/mean/p90
-0.005011736195100535 0.6670413009297944 0.21107127007672222 0.3634665404316075
-
-[exp 2-2] Gyro+Acc+Gating(Acc) angle error in deg — min/max/mean/p90
-0.2871513320122144 38.218651304193095 12.093492951862126 20.825098760952205
-
-[END] 2026-03-03 08:22:43.154
-
-
-
-
-[START] 2026-03-03 08:22:43.169
-
-[choosing tau, K]
+[choosing tau, K] — gating
 tau=0.2 , K=0.04999389648446595 , score=0.06171476303397125
 tau=0.3 , K=0.0333292643229773 , score=0.06037887772583948
 tau=0.5 , K=0.01999755859378638 , score=0.0605762634108638
@@ -105,11 +76,40 @@ tau=3.0 , K=0.00333292643229773 , score=0.08643031992437054
 
 chosen tau:  0.3 , K:  0.0333292643229773 
 
+
+[END] 2026-03-03 09:29:19.020
+
+
+
+
+[START] 2026-03-03 09:29:19.031
+
 [choosing acc_gate_sigma]
 scale=0.01 , acc_gate_sigma=0.0251770 , mean_err(rad)=0.2813347
 scale=1 , acc_gate_sigma=2.5176967 , mean_err(rad)=0.2899215
 scale=10 , acc_gate_sigma=25.1769668 , mean_err(rad)=0.1641395
 scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.1623269
+
+chosen sa=inf,  acc_gate_sigma=inf
+
+[chosen value]
+tau= 0.3 , K= 0.0333292643229773
+sa=inf,  acc_gate_sigma=inf
+gyro_gate_sigma=inf
+
+[exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
+0.0026744437984058097 0.6576030554091132 0.16232690143638706 0.32539059191857556
+
+[exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
+0.15323434219358967 37.67787966984981 9.30064635374108 18.643507610198053
+
+[END] 2026-03-03 09:29:53.400
+
+
+
+
+[START] 2026-03-03 09:29:53.410
+
 
 chosen sa=inf,  acc_gate_sigma=inf
 
@@ -132,31 +132,19 @@ sg=inf,  gyro_gate_sigma=inf
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.15323434219358967 37.67787966984981 9.30064635374108 18.643507610198053
 
-[END] 2026-03-03 08:25:03.967
+[END] 2026-03-03 09:30:27.976
 
 
 
 
-[START] 2026-03-03 08:25:03.983
-
-[choosing tau, K]
-tau=0.2 , K=0.04999389648446595 , score=0.06171476303397125
-tau=0.3 , K=0.0333292643229773 , score=0.06037887772583948
-tau=0.5 , K=0.01999755859378638 , score=0.0605762634108638
-tau=0.7 , K=0.01428397042413313 , score=0.061729020986445345
-tau=1.0 , K=0.00999877929689319 , score=0.06475653157203197
-tau=1.5 , K=0.00666585286459546 , score=0.07156024139854651
-tau=2.0 , K=0.004999389648446595 , score=0.0780640500844068
-tau=3.0 , K=0.00333292643229773 , score=0.08643031992437054
-
-chosen tau:  0.3 , K:  0.0333292643229773 
+[START] 2026-03-03 09:30:27.988
 
 [suggesting time-varying gyro/acc gate_sigma]
-...
 done
 
 [chosen value]
-tau= 0.3 , K= 0.0333292643229773 
+tau= 0.3 , K= 0.0333292643229773
+acc_gate_sigma/gyro_gate_sigma = time-varying gate sigma
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
 0.006666712206210218 0.6288374468231976 0.30321945241744436 0.444363049530556
@@ -164,12 +152,21 @@ tau= 0.3 , K= 0.0333292643229773
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
 0.38197447264419526 36.02973170275156 17.37319488978745 25.460127309663616
 
-[END] 2026-03-03 08:26:22.879
+[END] 2026-03-03 09:30:37.126
 
 
 
 
-[START] 2026-03-03 08:26:35.777
+[START] 2026-03-03 09:30:40.315
+
+best: exp2-3
+
+[END] 2026-03-03 09:30:40.315
+
+
+
+
+[START] 2026-03-03 09:30:48.508
 
 [Gravity]
 RMSE norm: 0.6766599654644616
@@ -194,6 +191,6 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 [Consistency ratio]
 rmse_norm of (a_lin_est / g_est):  1.2637610191377864
 
-[END] 2026-03-03 08:26:36.576
+[END] 2026-03-03 09:30:49.118
 
 
