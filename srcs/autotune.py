@@ -113,8 +113,6 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
         raw_mask: BoolBatch = (w_norm < w_thr) & (acc_resid < a_thr)
         quasi_static_mask: BoolBatch = smooth_bool(raw_mask, win=smooth_win)
 
-        # enforce min duration
-        # convert duration to samples roughly using median dt
         dt_midean: float = np.median(dt)
         min_len: int = int(np.ceil(min_duration_s / max(dt_midean, EPS)))
 
@@ -124,40 +122,6 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
                 print("Best quasi static not found")
         print("Best quasi static(start, end, length): ", best_quasi_static)
         return best_quasi_static
-
-def suggest_gate_sigma(w: Vec3Batch, a: Vec3Batch, g0: float,
-                       p_gyro: int, p_acc: int, sigma_floor: float,
-                       best_quasi_static: tuple[int, int, int] = None
-                       ) -> tuple[float, float]:
-        """
-        Returns:
-                gyro_sigma: float
-                acc_sigma: float
-        """
-        if best_quasi_static is not None:
-                s, e, _ = best_quasi_static
-                w_use = w[s:e]
-                a_use = a[s:e]
-        else:
-                w_use = w
-                a_use = a
-
-        w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
-        a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
-        acc_resid: ScalarBatch = np.abs(a_norm - g0)
-
-        if p_gyro is None:
-                gyro_sigma = np.inf
-        else:
-                gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
-        
-        if p_acc is None:
-                acc_sigma = np.inf
-        else:
-                acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
-        print("Suggested gyro_sigma: ", gyro_sigma)
-        print("Suggested acc_sigma: ", acc_sigma)
-        return gyro_sigma, acc_sigma
 
 @dataclass
 class SweepBest:
@@ -171,8 +135,7 @@ class SweepBest:
 def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
                                  best_quasi_static: tuple[int, int, int] | None = None,
                                  tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
-                                 q_gyro: QuatBatch = None,
-                                 runner_kwargs: dict[str, Any] = {},
+                                 runner_kwargs: dict[str, Any] = None,
                                  ) -> tuple[list[dict[str, Any]], float, float]:
         """
         Returns:
@@ -180,25 +143,21 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
                 best_tau: float
                 K: float
         """
-        if best_quasi_static is not None:
-                s, e, _ = best_quasi_static
-                dt_median = float(np.median(dt[s:e]))
-        else:
+        dt_median: float = float(np.median(dt))
+
+        if best_quasi_static is None:
                 s, e = 0, len(dt)
-                dt_median = float(np.median(dt))
-        qs: Quat = q_gyro[s]
+        else:
+                s, e, _ = best_quasi_static
+
         tau_table: list[dict[str, Any]] = []
         for tau in tau_candidates:
                 K = float(dt_median / tau)
 
-                _, extra = runner_func(K=K, q0=qs, segment=best_quasi_static,
-                                       **runner_kwargs)
+                _, extra = runner_func(K=K, **runner_kwargs)
                 g_body_est, _, _, _ = extra
 
-                # In quasi_static segment, gravity in body frame should be stable
-                burn = int(np.ceil(1 / max(np.median(dt[s:e]), EPS)))
-                gb = g_body_est[burn:]
-                #gb = g_body_est
+                gb = g_body_est[s:e]
                 gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
 
                 mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
@@ -217,15 +176,52 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
         best_K: float = tau_table[0]["K"]
         return tau_table, best_tau, best_K
 
+def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float,
+                       p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
+                       best_quasi_static: tuple[int, int, int] = None
+                       ) -> tuple[float, float, float]:
+        if best_quasi_static is not None:
+                s, e, _ = best_quasi_static
+                w_use = w[s:e]
+                a_use = a[s:e]
+                #mag
+        else:
+                w_use = w
+                a_use = a
+                #mag
+
+        w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
+        a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
+        acc_resid: ScalarBatch = np.abs(a_norm - g0)
+	#mag
+
+        if p_gyro is None:
+                gyro_sigma: float = np.inf
+        else:
+                gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
+        
+        if p_acc is None:
+                acc_sigma: float = np.inf
+        else:
+                acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
+
+        if p_mag is None:
+                mag_sigma: float = np.inf
+        #else
+
+        print("Suggested gyro_sigma: ", gyro_sigma)
+        print("Suggested acc_sigma: ", acc_sigma)
+        return gyro_sigma, acc_sigma, mag_sigma
+
 def calc_sigma(base: float, scale: float) -> float:
         if np.isinf(base) or np.isinf(scale):
                 return np.inf
         return base * scale
 
 def choose_best_by_sigma_scale(scales: tuple[float, ...],
-                               K: float, q0: Quat, sigma_base: float, q_ref: QuatBatch,
+                               K: float, sigma_base: float, q_ref: QuatBatch,
                                runner_func: Callable[[float], tuple[Any, ...]],
-                               sigma_kw: str = {},
+                               sigma_kw: str,
                                fixed_kwargs: dict[str, Any] = None
                                ) -> SweepBest:
         best: SweepBest = None
@@ -235,7 +231,7 @@ def choose_best_by_sigma_scale(scales: tuple[float, ...],
 
                 kwargs = dict(fixed_kwargs)
                 kwargs[sigma_kw] = sigma
-                q_est, extra = runner_func(K=K, q0=q0, **kwargs)
+                q_est, extra = runner_func(K=K, **kwargs)
 
                 angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
                 mean_err: float = float(np.mean(angle_err))
@@ -245,3 +241,55 @@ def choose_best_by_sigma_scale(scales: tuple[float, ...],
                 if best is None or mean_err < best.mean_err:
                         best = SweepBest(s, sigma, angle_err, mean_err, q_est, extra)
         return best
+
+def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
+                                   dt: ScalarBatch, g0: float,
+                                   p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
+                                   win_s: float, update_s: float, ema_alpha: float
+                                   ) -> tuple[ScalarBatch, ScalarBatch, ScalarBatch]:
+        w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w, axis=1))
+        a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a, axis=1))
+        acc_resid: ScalarBatch = np.abs(a_norm - g0)
+
+        dt_median: float = float(np.median(dt))
+        window_size: int = max(1, int(np.ceil(win_s / max(dt_median, EPS))))
+        update_period: int = max(1, int(np.ceil(update_s / max(dt_median, EPS))))
+
+        batch_gyro_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), np.inf))
+        batch_acc_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), np.inf))
+        batch_mag_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), np.inf))
+
+        gyro_sigma: float = np.inf
+        acc_sigma: float = np.inf
+        mag_sigma: float = np.inf
+        if p_gyro is not None:
+                gyro_sigma = max(sigma_floor, float(np.percentile(w_norm[:min(len(dt), window_size)], p_gyro)))
+
+        if p_acc is not None:
+                acc_sigma = max(sigma_floor, float(np.percentile(acc_resid[:min(len(dt), window_size)], p_acc)))
+        #if p_mag is not None:
+                #mag
+
+        for i in range(len(dt)):
+                if i % update_period == 0:
+                        low: int = max(0, i - window_size)
+                        high: int = i + 1
+
+                        if p_gyro is not None:
+                                gyro_tmp: float = max(sigma_floor, float(np.percentile(w_norm[low:high], p_gyro)))
+                                if np.isinf(gyro_sigma):
+                                        gyro_sigma = gyro_tmp
+                                else:
+                                        gyro_sigma = (1 - ema_alpha) * gyro_sigma + ema_alpha * gyro_tmp
+                        if p_acc is not None:
+                                acc_tmp: float = max(sigma_floor, float(np.percentile(acc_resid[low:high], p_acc)))
+                                if np.isinf(acc_sigma):
+                                        acc_sigma = acc_tmp
+                                else:
+                                        acc_sigma = (1 - ema_alpha) * acc_sigma + ema_alpha * acc_tmp
+                        #if p_mag is not None:
+
+                batch_gyro_sigma[i] = gyro_sigma
+                batch_acc_sigma[i] = acc_sigma
+                #mag
+        return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma

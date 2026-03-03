@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 from my_types import Quat, ScalarBatch, Vec3Batch, QuatBatch
 from my_types import as_scalar_batch, as_vec3_batch
 import lib_quat as libq
-from pipelines import safe_unit
+
+EPS: float = 1e-9
 
 """
 Calculating relative rotation (error quaternion)
@@ -20,7 +21,7 @@ def calc_angle_err(q_est: QuatBatch, q_ref: QuatBatch) -> ScalarBatch:
         w_err: ScalarBatch = as_scalar_batch(np.empty(len(q_est)))
         for i in range(len(q_est)):
                 q_err: Quat = libq.quat_mul(libq.quat_conj(q_est[i]), q_ref[i])
-                w_err[i] = np.clip(np.abs(q_err[0]), 0.0, 1.0)
+                w_err[i] = np.clip(np.abs(q_err[0]), 0, 1)
         return as_scalar_batch(2 * np.arccos(w_err))
 
 def print_err_status(label: str, err: ScalarBatch) -> None:
@@ -97,10 +98,10 @@ def plot_quasi_static_diagnostic(t: ScalarBatch, w: Vec3Batch, a: Vec3Batch, g0:
 
 def plot_err_colored_by_weight(t: ScalarBatch, err: ScalarBatch,
                                w_acc: ScalarBatch, w_gyro: ScalarBatch, w_total: ScalarBatch,
-                               save_path: Path = None) -> None:
+                               title: str, save_path: Path = None) -> None:
         fig, axs = plt.subplots(3, 1, sharex=True, figsize=(12, 6), height_ratios=[1, 1, 1])
 
-        axs[0].set_title("[exp 2-3] Error colored by weight")
+        axs[0].set_title(title + "Error colored by weight")
         sc_t = axs[0].scatter(t, err, c=w_total, s=6)
         fig.colorbar(sc_t, ax=axs[0]).set_label("weight_total")
         axs[0].plot(t, err, alpha=0.5)
@@ -156,9 +157,13 @@ def save_estimated_vec3_csv(path: Path, t: ScalarBatch, vec3_batch: Vec3Batch) -
 	})
         df.to_csv(path, index=False)
 
+def safe_unit_batch(v: Vec3Batch) -> Vec3Batch:
+        n = np.linalg.norm(v, axis=1, keepdims=True)
+        return v / np.maximum(n, EPS)
+
 def calc_vec3_direction_angle_err(est: Vec3Batch, ref: Vec3Batch) -> ScalarBatch:
-        norm_est: Vec3Batch = safe_unit(est)
-        norm_ref: Vec3Batch = safe_unit(ref)
+        norm_est: Vec3Batch = safe_unit_batch(est)
+        norm_ref: Vec3Batch = safe_unit_batch(ref)
 
         dot: ScalarBatch = np.sum(norm_est * norm_ref, axis=1)
         dot = np.clip(dot, -1, 1)

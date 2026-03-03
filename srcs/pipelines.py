@@ -20,13 +20,13 @@ def integrate_gyro(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch) -> QuatBatch:
                 res[i] = q
         return res
 
-def safe_unit(v: Vec3) -> Vec3:
+def safe_unit_vec3(v: Vec3) -> Vec3:
         norm: float = float(np.linalg.norm(v))
         return v / max(norm, EPS)
 
 def predict_gravity_body_frame(q_pred: Quat, g_world_unit: Vec3) -> Vec3:
        g_pred: Vec3 = libq.rotate_world_to_body(q_pred, g_world_unit)
-       return safe_unit(g_pred)
+       return safe_unit_vec3(g_pred)
 
 def small_angle_correction_quat(K_eff: float, e_axis: Vec3) -> Quat:
         dq_corr: Quat = as_quat(np.array([
@@ -60,7 +60,7 @@ def calc_gyro_gating(gyro_sigma: float, w: Vec3) -> float:
 
 def integrate_gyro_acc(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
                        K: float, g0: float, g_world_unit: Vec3,
-                       acc_gate_sigma: float, gyro_gate_sigma: float, a_src: Vec3Batch
+                       acc_gate_sigma: float | ScalarBatch, gyro_gate_sigma: float | ScalarBatch, a_src: Vec3Batch
                        ) -> tuple[QuatBatch, Vec3Batch, Vec3Batch, ScalarBatch, ScalarBatch]:
         """
         Returns:
@@ -71,21 +71,27 @@ def integrate_gyro_acc(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
                 weight_gyro: (N,) ScalarBatch
         """
         q: Quat = q0.copy()
+
         res: QuatBatch = as_quat_batch(np.zeros((len(dt), 4)))
         g_body_est: Vec3Batch = as_vec3_batch(np.zeros((len(dt), 3)))
         a_lin_est: Vec3Batch = as_vec3_batch(np.zeros((len(dt), 3)))
         weight_acc: ScalarBatch = as_scalar_batch(np.zeros((len(dt),)))
         weight_gyro: ScalarBatch = as_scalar_batch(np.zeros((len(dt),)))
 
+        if not isinstance(acc_gate_sigma, np.ndarray):
+                acc_gate_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), acc_gate_sigma))
+        if not isinstance(gyro_gate_sigma, np.ndarray):
+                gyro_gate_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), gyro_gate_sigma))
+
         for i in range(len(dt)):
                 q_pred: Quat = gyro_predict(q, w_avg[i], dt[i])
 
                 g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
                 a_meas: Vec3 = select_acc_measurement(a_src[i].copy(), g_pred.copy())
-                a_unit: Vec3 = safe_unit(a_meas)
+                a_unit: Vec3 = safe_unit_vec3(a_meas)
 
-                weight_acc[i] = calc_acc_gating(g0, acc_gate_sigma, a_meas)
-                weight_gyro[i] = calc_gyro_gating(gyro_gate_sigma, w_avg[i])
+                weight_acc[i] = calc_acc_gating(g0, acc_gate_sigma[i], a_meas)
+                weight_gyro[i] = calc_gyro_gating(gyro_gate_sigma[i], w_avg[i])
 
                 e_axis: Vec3 = np.cross(g_pred, a_unit)
                 dq_corr: Quat = small_angle_correction_quat(K*(weight_acc[i]*weight_gyro[i]), e_axis)
@@ -117,7 +123,7 @@ def calc_mag_gating(m0: float, gate_sigma: float, m_meas: Vec3,
         if m_norm < EPS:
                 return 0, as_vec3(np.array([0, 0, 0]))
 
-        m_unit: Vec3 = safe_unit(m_meas)
+        m_unit: Vec3 = safe_unit_vec3(m_meas)
 
         # gate by magnitude deviation
         dev: float = abs(m_norm - m0)
@@ -125,13 +131,13 @@ def calc_mag_gating(m0: float, gate_sigma: float, m_meas: Vec3,
         weight_mag : float = np.exp(-0.5 * (dev / gate_sigma) ** 2)
 
         # tilt compensation: keep only horizontal component (remove along gravity)
-        m_body_h: Vec3 = safe_unit(m_unit - np.dot(m_unit, g_pred) * g_pred)
+        m_body_h: Vec3 = safe_unit_vec3(m_unit - np.dot(m_unit, g_pred) * g_pred)
         if np.linalg.norm(m_body_h) < 0.2:
                 return 0, as_vec3(np.array([0, 0, 0]))
 
         # predicted horizontal mag in body
         m_pred: Vec3 = libq.rotate_world_to_body(q_pred, m_world_h_unit)
-        m_pred_h: Vec3 = safe_unit(m_pred - np.dot(m_pred, g_pred) * g_pred)
+        m_pred_h: Vec3 = safe_unit_vec3(m_pred - np.dot(m_pred, g_pred) * g_pred)
         e_axis_mag: Vec3 = np.cross(m_body_h, m_pred_h)
         #e_axis_mag: Vec3 = np.cross(m_pred_h, m_body_h)
         return weight_mag, e_axis_mag
@@ -164,7 +170,7 @@ def calc_mag_gating(m0: float, gate_sigma: float, m_meas: Vec3,
 
 #                g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
 #                a_meas: Vec3 = select_acc_measurement(a_src[i].copy(), g_pred.copy())
-#                a_unit: Vec3 = safe_unit(a_meas)
+#                a_unit: Vec3 = safe_unit_vec3(a_meas)
 
 #                dev: float = abs(float(np.linalg.norm(a_meas)) - g0)
 #                weight_acc = float(np.exp(-(dev / acc_gate_sigma)**4))
@@ -229,7 +235,7 @@ def integrate_gyro_acc_mag(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
 
                 g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
                 a_meas: Vec3 = select_acc_measurement(a_src[i].copy(), g_pred.copy())
-                a_unit: Vec3 = safe_unit(a_meas)
+                a_unit: Vec3 = safe_unit_vec3(a_meas)
 
                 dev: float = abs(float(np.linalg.norm(a_meas)) - g0)
 
