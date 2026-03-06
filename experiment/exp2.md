@@ -319,7 +319,7 @@ Each plot compares:<br>
 <br>
 
 ```
-[START] 2026-03-03 09:24:46.022
+[START] 2026-03-06 22:05:46.594
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -329,7 +329,7 @@ Best quasi static(start, end, length):  (2523, 3540, 1017)
 Suggested gyro_sigma:  0.44791971689543864
 Suggested acc_sigma:  2.908568806018301
 
-[END] 2026-03-03 09:24:46.672
+[END] 2026-03-06 22:05:47.221
 ```
 
 <br>
@@ -349,7 +349,7 @@ Suggested acc_sigma:  2.908568806018301
 <br>
 
 ```
-[START] 2026-03-03 09:25:18.174
+[START] 2026-03-06 22:06:14.676
 . . .
 [exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
 0.0028253656890090757 1.4041137225284805 0.3414149857047015 0.5148755033035524
@@ -357,11 +357,11 @@ Suggested acc_sigma:  2.908568806018301
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.16188152956129193 80.44979025728507 19.56163774339873 29.500193313967625
 
-[END] 2026-03-03 09:25:23.091
+[END] 2026-03-06 22:06:18.545
 
 
 
-[START] 2026-03-03 09:25:57.228
+[START] 2026-03-06 22:06:47.570
 . . .
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
 0.0028007213045730187 1.4022353056038215 0.3401972619552348 0.5136400057527237
@@ -369,11 +369,11 @@ Suggested acc_sigma:  2.908568806018301
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.16046951034440796 80.34216489533617 19.491867311941444 29.429404518706395
 
-[END] 2026-03-03 09:26:15.764
+[END] 2026-03-06 22:07:03.835
 
 
 
-[START] 2026-03-03 09:26:15.775
+[START] 2026-03-06 22:07:03.844
 . . .
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in rad — min/max/mean/p90
 0.002782597463724189 1.4018972772745735 0.33908843712552167 0.5123973023219879
@@ -381,11 +381,11 @@ Suggested acc_sigma:  2.908568806018301
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.15943109075520323 80.32279729871439 19.42833632897957 29.358202856938803
 
-[END] 2026-03-03 09:26:35.554
+[END] 2026-03-06 22:07:20.440
 
 
 
-[START] 2026-03-03 09:26:35.565
+[START] 2026-03-06 22:07:20.450
 . . .
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
 0.0027410136353430113 1.4015576507916865 0.3384643527738604 0.5120866094986346
@@ -393,15 +393,15 @@ Suggested acc_sigma:  2.908568806018301
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
 0.1570485128929654 80.3033381346341 19.39257892956922 29.340401469435655
 
-[END] 2026-03-03 09:26:40.807
+[END] 2026-03-06 22:07:24.677
 
 
 
-[START] 2026-03-03 09:26:42.126
+[START] 2026-03-06 22:07:25.749
 
 best: exp2-4
 
-[END] 2026-03-03 09:26:42.127
+[END] 2026-03-06 22:07:25.749
 ```
 
 <br>
@@ -422,7 +422,7 @@ These checks support that Experiment 2 is physically consistent and the orientat
 <br>
 
 ```
-[START] 2026-03-03 09:26:47.193
+[START] 2026-03-06 22:07:29.906
 
 [Gravity]
 RMSE norm: 0.1989648675156791
@@ -443,7 +443,7 @@ Linear accel est/ref angle error in rad — min/max/mean/p90
 Linear accel est/ref angle error in deg — min/max/mean/p90
 0.01671514758089104 169.07353752967 8.221922479515042 18.079952991178295
 . . .
-[END] 2026-03-03 09:26:47.626
+[END] 2026-03-06 22:07:30.241
 ```
 <br>
 
