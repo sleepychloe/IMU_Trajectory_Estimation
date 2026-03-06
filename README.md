@@ -147,8 +147,9 @@ such as gyro bias/drift, gravity misinterpretation during translation, magnetic 
 #### Experiment 2 — Gyro + Accelerometer (roll/pitch correction) <a name="project-exp-2"></a>
 
 - [exp 2-1] No gating (always trust accelerometer)
-- [exp 2-2] Accelerometer gating (trust gravity only when ||a|| ≈ g0)
-- [exp 2-3] Gyro + Accelerometer gating (stationary-aware weighting)
+- [exp 2-2] Accelerometer gating (trust gravity only when ||a|| ≈ g0) — fixed sigma
+- [exp 2-3] Gyro + Accelerometer gating (stationary-aware weighting) — fixed sigma
+- [exp 2-4] Gyro + Accelerometer gating — time-varying sigma
 
 <br>
 <br>
@@ -156,8 +157,8 @@ such as gyro bias/drift, gravity misinterpretation during translation, magnetic 
 #### Experiment 3 — Gyro + Accelerometer + Magnetometer (yaw correction) <a name="project-exp-3"></a>
 
 - [exp 3-1] No gating (always trust magnetometer)
-- [exp 3-2] Gyro + Accelerometer gating
-- [exp 3-3] Gyro + Accelerometer + Magnetometer gating (norm + innovation gating)
+- [exp 3-2] Gyro + Accelerometer + Magnetometer gating — fixed sigma
+- [exp 3-3] Gyro + Accelerometer + Magnetometer gating — time-varying sigma
 
 <br>
 <br>
@@ -241,11 +242,12 @@ Gating improves robustness by suppressing bad accel updates.<br>
 
 <br>
 
-|         |  tau  |         K         |       σ_gyro      |       σ_acc       |
-|:-------:|------:|------------------:|------------------:|------------------:|
-| exp 2-1 |  0.3  | 0.033329264322977 | inf (not applied) | inf (not applied) |
-| exp 2-2 |  0.2  | 0.049993896484466 | inf (not applied) |         0.6755996 |
-| exp 2-3 |  0.2  | 0.049993896484466 | inf (not applied) |         0.6755996 |
+|         |  tau  |         K         |       σ_gyro       |        σ_acc       |
+|:-------:|------:|------------------:|-------------------:|-------------------:|
+| exp 2-1 |  0.3  | 0.033329264322977 |  inf (not applied) |  inf (not applied) |
+| exp 2-2 |  0.2  | 0.049993896484466 |  inf (not applied) |          0.6755996 |
+| exp 2-3 |  0.2  | 0.049993896484466 |  inf (not applied) |          0.6755996 |
+| exp 2-3 |  0.2  | 0.049993896484466 | time-varying sigma | time-varying sigma |
 
 ** Note: suggested sigmas are reported for reference. the selected run may disable gating (σ=inf) when it does not improve the score<br>
 
@@ -259,15 +261,25 @@ Gating improves robustness by suppressing bad accel updates.<br>
 | exp 2-1 | <ul><li>0.40981 rad</li><li>23.48033 deg</li></ul> | <ul><li>0.75477 rad</li><li>43.24533 deg</li></ul> |
 | exp 2-2 | <ul><li>0.37464 rad</li><li>21.46521 deg</li></ul> | <ul><li>0.56815 rad</li><li>32.55285 deg</li></ul> |
 | exp 2-3 | <ul><li>0.37464 rad</li><li>21.46521 deg</li></ul> | <ul><li>0.56815 rad</li><li>32.55285 deg</li></ul> |
+| exp 2-4 | <ul><li>0.20511 rad</li><li>11.75182 deg</li></ul> | <ul><li>0.35550 rad</li><li>20.36846 deg</li></ul> |
 
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
 
 <br>
 
+#### [Secondary validation — Gravity & Linear Accel]
+
+Gravity direction error remains low (mean/p90 ≈ 2.81° / 4.71°), indicating a stable tilt estimate.<br>
+Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.89° / 23.83°).<br>
+
+<br>
+
 ##### [Observation]
 
-- This is a clean gating matters case — p90 drops significantly because gating suppresses bad accel updates during dynamic segments
-- The reduced-error region aligns with periods where `||a||` deviates from `g0`
+- This dataset is a clean “gating matters” case — fixed gating reduces large error regions and significantly tightens the error distribution
+- The best result is obtained with time-varying sigma (exp 2-4), indicating that reliability conditions change over time and a fixed sigma cannot balance all segments equally well
+- The reduced-error region aligns with periods where `||a||` deviates from g0, supporting the interpretation that gating suppresses incorrect tilt injections during dynamic motion
+- Compared with fixed gating, adaptive sigma improves both average error and the tail behavior, suggesting better segment-wise trade-offs (strictness during dynamic motion, permissiveness when stable)
 
 <br>
 <br>
@@ -278,6 +290,9 @@ Experiment 2 confirms:<br>
 
 1. Accelerometer correction stabilizes roll/pitch by continuously correcting gyro drift
 2. Gating acts as a reliability controller that prevents incorrect tilt injections during dynamic motion
+3. Time-varying gating tends to help when fixed gating already demonstrates a clear advantage, suggesting that the proxy captures meaningful reliability structure in the data
+4. When fixed gating is not selected by the sigma sweep (`best sigma = inf`), adaptive gating often provides limited benefit and can degrade performance by suppressing valid corrections
+<br>
 
 <br>
 <br>

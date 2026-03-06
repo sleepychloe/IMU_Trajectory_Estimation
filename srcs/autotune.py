@@ -199,7 +199,7 @@ def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float
                 gyro_sigma: float = np.inf
         else:
                 gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
-        
+
         if p_acc is None:
                 acc_sigma: float = np.inf
         else:
