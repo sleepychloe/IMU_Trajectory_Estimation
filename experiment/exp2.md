@@ -936,14 +936,14 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 ### Cross-dataset Summary <a name="exp-2-data-sum"></a>
 
-| Dataset | best exp2 | exp 1-2 Mean   | best exp2 Mean | exp 1-2 p90    | best exp2 p90  |
-|:--------|----------:|---------------:|---------------:|---------------:|---------------:|
-| data 01 | exp2-4    | 22.40684 deg   | 19.39258 deg   | 32.44667 deg   | 29.34040 deg   |
-| data 02 | exp2-3    | 21.99183 deg   | 9.30065 deg    | 31.17450 deg   | 18.64351 deg   |
-| data 03 | exp2-4    | 30.81266 deg   | 11.75182 deg   | 46.56837 deg   | 20.36846 deg   |
-| data 04 | exp2-3    | 50.88316 deg   | 49.23849 deg   | 116.70718 deg  | 114.68462 deg  |
+| Dataset | best   | exp 1-2 Mean  | best Mean     | exp 1-2 p90   | best p90      | best grav Mean | best acc Mean  |
+|:--------|-------:|--------------:|--------------:|--------------:|--------------:|---------------:|---------------:|
+| data 01 | exp2-4 | 22.40684 deg  | 19.39258 deg  | 32.44667 deg  | 29.34040 deg  | 1.04598 deg    | 8.22192 deg    |
+| data 02 | exp2-3 | 21.99183 deg  | 9.30065 deg   | 31.17450 deg  | 18.64351 deg  | 3.20236 deg    | 15.14620 deg   |
+| data 03 | exp2-4 | 30.81266 deg  | 11.75182 deg  | 46.56837 deg  | 20.36846 deg  | 2.81006 deg    | 11.88533 deg   |
+| data 04 | exp2-3 | 50.88316 deg  | 49.23849 deg  | 116.70718 deg | 114.68462 deg | 1.44894 deg    | 20.03528 deg   |
 
-** best exp2 = minimum mean error among exp 2-3, 2-4 (per dataset)<br>
+** best = minimum mean error among exp 2-3, 2-4 (per dataset)<br>
 
 <br>
 
