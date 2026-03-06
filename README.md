@@ -8,9 +8,6 @@ Currently in progress
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Why a reference is needed — Sensor Logger orientation as REF)](#project-ref) <br>
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Why trimming the initial seconds matters — Fair Comparison](#project-fair-comparison) <br>
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experimental roadmap (progressive complexity)](#project-exp) <br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Experiment 1 — Gyro-only propagation](#project-exp-1) <br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Experiment 2 — Gyro + Accelerometer](#project-exp-2) <br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⋅ [Experiment 3 — Gyro + Accelerometer + Magnetometer](#project-exp-3) <br>
 
  * [Experiment Result Shortcut](#exp) <br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 1 — Gyro-only propagation](#exp-1) <br>
@@ -132,33 +129,6 @@ Each stage is evaluated using the same error pipeline against REF.<br>
 
 This progression makes it possible to separate and understand each error source,<br>
 such as gyro bias/drift, gravity misinterpretation during translation, magnetic disturbances indoors, and the interaction between tilt estimation and yaw correction.<br>
-
-<br>
-<br>
-
-#### Experiment 1 — Gyro-only propagation <a name="project-exp-1"></a>
-
-- [exp 1-1] No initial sample cut
-- [exp 1-2] Initial stabilization trimmed
-
-<br>
-<br>
-
-#### Experiment 2 — Gyro + Accelerometer (roll/pitch correction) <a name="project-exp-2"></a>
-
-- [exp 2-1] No gating (always trust accelerometer)
-- [exp 2-2] Accelerometer gating (trust gravity only when ||a|| ≈ g0) — fixed sigma
-- [exp 2-3] Gyro + Accelerometer gating (stationary-aware weighting) — fixed sigma
-- [exp 2-4] Gyro + Accelerometer gating — time-varying sigma
-
-<br>
-<br>
-
-#### Experiment 3 — Gyro + Accelerometer + Magnetometer (yaw correction) <a name="project-exp-3"></a>
-
-- [exp 3-1] No gating (always trust magnetometer)
-- [exp 3-2] Gyro + Accelerometer + Magnetometer gating — fixed sigma
-- [exp 3-3] Gyro + Accelerometer + Magnetometer gating — time-varying sigma
 
 <br>
 <br>

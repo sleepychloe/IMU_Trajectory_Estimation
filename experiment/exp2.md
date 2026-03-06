@@ -38,8 +38,7 @@ Four runs are compared (same dataset, same trimmed start):<br>
 <br>
 
 Key hypothesis:<br>
-The correction term counteracts accumulated gyro bias<br>
-so the correction is expected to counteract accumulated gyro drift, making improvements more visible over longer sequences.<br>
+The correction is expected to counteract accumulated gyro drift, making improvements more visible over longer sequences.<br>
 
 <br>
 <br>
