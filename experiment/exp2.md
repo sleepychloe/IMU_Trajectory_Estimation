@@ -214,18 +214,18 @@ Setting `scale = inf` disables gating (`sigma = inf`).<br>
 ```py
 # autotune.py
 
-def choose_best_by_sigma_scale(scales: tuple[float, ...],
-                               K: float, sigma_base: float, q_ref: QuatBatch,
+def choose_best_by_scale(scale: tuple[float, ...],
+                               K: float, base: float, q_ref: QuatBatch,
                                runner_func: Callable[[float], tuple[Any, ...]],
-                               sigma_kw: str,
+                               keyword: str,
                                fixed_kwargs: dict[str, Any] = None
                                ) -> SweepBest:
         best: SweepBest = None
-        for s in scales:
-                sigma: float = calc_sigma(sigma_base, s)
-		. . .
+        for s in scale:
+                res: float = calc_scale(base, s)
+                . . .
                 if best is None or mean_err < best.mean_err:
-                        best = SweepBest(s, sigma, angle_err, mean_err, q_est, extra)
+                        best = SweepBest(s, res, angle_err, mean_err, q_est, extra)
         return best
 ```
 

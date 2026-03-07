@@ -175,13 +175,14 @@ def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float
                 s, e, _ = best_quasi_static
                 w_use = w[s:e]
                 a_use = a[s:e]
-                if m is not None:
-                        m_use = m[s:e]
+                #if m is not None:
+                #        m_use = m[s:e]
         else:
                 w_use = w
                 a_use = a
-                if m is not None:
-                        m_use = m
+                #if m is not None:
+                #        m_use = m
+        m_use = m
 
         w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
         a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
@@ -217,36 +218,36 @@ def calc_scale(base: float, scale: float) -> float:
         return base * scale
 
 @dataclass
-class SweepBestSigma:
+class SweepBest:
         scale: float
-        sigma: float
+        res: float
         angle_err: ScalarBatch
         mean_err: float
         q_est: QuatBatch
         extra: tuple[Any, ...]
 
-def choose_best_by_sigma_scale(scales: tuple[float, ...],
-                               K: float, sigma_base: float, q_ref: QuatBatch,
+def choose_best_by_scale(scale: tuple[float, ...],
+                               K: float, base: float, q_ref: QuatBatch,
                                runner_func: Callable[[float], tuple[Any, ...]],
-                               sigma_kw: str,
+                               keyword: str,
                                fixed_kwargs: dict[str, Any] = None
-                               ) -> SweepBestSigma:
-        best: SweepBestSigma = None
+                               ) -> SweepBest:
+        best: SweepBest = None
 
-        for s in scales:
-                sigma: float = calc_scale(sigma_base, s)
+        for s in scale:
+                res: float = calc_scale(base, s)
 
                 kwargs = dict(fixed_kwargs)
-                kwargs[sigma_kw] = sigma
+                kwargs[keyword] = res
                 q_est, extra = runner_func(K=K, **kwargs)
 
                 angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
                 mean_err: float = float(np.mean(angle_err))
 
-                print(f"scale={s}", f", {sigma_kw}={sigma:.7f}", f", mean_err(rad)={mean_err:.7f}")
+                print(f"scale={s}", f", {keyword}={res:.7f}", f", mean_err(rad)={mean_err:.7f}")
 
                 if best is None or mean_err < best.mean_err:
-                        best = SweepBestSigma(s, sigma, angle_err, mean_err, q_est, extra)
+                        best = SweepBest(s, res, angle_err, mean_err, q_est, extra)
         return best
 
 def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
@@ -300,33 +301,3 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                 batch_acc_sigma[i] = acc_sigma
                 #mag
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
-
-@dataclass
-class SweepBestGain:
-        scale: float
-        gain: float
-        angle_err: ScalarBatch
-        mean_err: float
-        q_est: QuatBatch
-        extra: tuple[Any, ...]
-
-def choose_best_by_gain_scale(scales: tuple[float, ...],
-                               gain_base: float, q_ref: QuatBatch,
-                               runner_func: Callable[[float], tuple[Any, ...]],
-                               fixed_kwargs: dict[str, Any] = None
-                               ) -> SweepBestGain:
-        best: SweepBestGain = None
-
-        for s in scales:
-                gain: float = calc_scale(gain_base, s)
-
-                kwargs = dict(fixed_kwargs)
-                q_est, extra = runner_func(mag_gain=gain, **kwargs)
-
-                angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
-                mean_err: float = float(np.mean(angle_err))
-                print(f"scale={s}", f", mag_gain={gain}", f", mean_err(rad)={mean_err:.7f}")
-
-                if best is None or mean_err < best.mean_err:
-                        best = SweepBestGain(s, gain, angle_err, mean_err, q_est, extra)
-        return best

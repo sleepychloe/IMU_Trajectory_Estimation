@@ -1,15 +1,15 @@
 
 
-[START] 2026-03-07 03:41:08.294
+[START] 2026-03-07 22:27:47.138
 
 [INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
 
-[END] 2026-03-07 03:41:08.829
+[END] 2026-03-07 22:27:47.603
 
 
 
 
-[START] 2026-03-07 03:41:08.841
+[START] 2026-03-07 22:27:47.615
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -21,14 +21,14 @@ Best quasi static(start, end, length):  (2523, 3540, 1017)
 
 Suggested gyro_sigma:  0.44791971689543864
 Suggested acc_sigma:  2.908568806018301
-Suggested mag_sigma:  2.87814905008711
+Suggested mag_sigma:  6.850455808768257
 
-[END] 2026-03-07 03:41:09.597
-
-
+[END] 2026-03-07 22:27:48.410
 
 
-[START] 2026-03-07 03:41:09.618
+
+
+[START] 2026-03-07 22:27:48.434
 
 [choosing tau, K] — no gating
 tau=0.2 , K=0.049993896484394895 , score=0.0453472834175563
@@ -43,34 +43,34 @@ tau=3.0 , K=0.003332926432292993 , score=0.029962505648007294
 chosen tau:  3.0 , K:  0.003332926432292993 
 
 
-[END] 2026-03-07 03:42:00.871
+[END] 2026-03-07 22:28:42.220
 
 
 
 
-[START] 2026-03-07 03:42:00.881
+[START] 2026-03-07 22:28:42.228
 
 [choosing mag_gain] — no gating
-scale=0.01 , mag_gain=0.01 , mean_err(rad)=0.2401219
-scale=0.1 , mag_gain=0.1 , mean_err(rad)=0.0967644
-scale=0.5 , mag_gain=0.5 , mean_err(rad)=0.0741453
-scale=1 , mag_gain=1 , mean_err(rad)=0.0599474
-scale=1.5 , mag_gain=1.5 , mean_err(rad)=0.0526291
-scale=2 , mag_gain=2 , mean_err(rad)=0.0490925
-scale=2.5 , mag_gain=2.5 , mean_err(rad)=0.0487491
-scale=3 , mag_gain=3 , mean_err(rad)=0.0507921
-scale=5 , mag_gain=5 , mean_err(rad)=0.0724950
-scale=10 , mag_gain=10 , mean_err(rad)=0.0851882
+scale=0.01 , mag_gain=0.0100000 , mean_err(rad)=0.2403983
+scale=0.1 , mag_gain=0.1000000 , mean_err(rad)=0.0966577
+scale=0.5 , mag_gain=0.5000000 , mean_err(rad)=0.0740021
+scale=1 , mag_gain=1.0000000 , mean_err(rad)=0.0592428
+scale=1.5 , mag_gain=1.5000000 , mean_err(rad)=0.0509909
+scale=2 , mag_gain=2.0000000 , mean_err(rad)=0.0464522
+scale=2.5 , mag_gain=2.5000000 , mean_err(rad)=0.0450537
+scale=3 , mag_gain=3.0000000 , mean_err(rad)=0.0459450
+scale=5 , mag_gain=5.0000000 , mean_err(rad)=0.0578496
+scale=10 , mag_gain=10.0000000 , mean_err(rad)=0.0841853
 
 chosen s=2.5,  mag_gain=2.5
 
 
-[END] 2026-03-07 03:43:12.616
+[END] 2026-03-07 22:29:55.589
 
 
 
 
-[START] 2026-03-07 03:43:12.626
+[START] 2026-03-07 22:29:55.600
 
 [chosen value]
 tau= 3.0 K= 0.003332926432292993
@@ -78,13 +78,14 @@ mag_gain= 2.5
 acc_gate_sigma=inf
 gyro_gate_sigma=inf
 mag_gate_sigma=inf
+mag_err_sigma=inf
 
 [exp 3-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
-0.002833765926700803 1.0107797549750435 0.04874909393221423 0.0866849806317926
+0.002833765926700803 0.6886964956083688 0.0450536618618268 0.08652930621645906
 
 [exp 3-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
-0.16236282772793462 57.91341397733746 2.793117337402686 4.966683537375
+0.16236282772793462 39.45940256380956 2.581384676292194 4.957764050398222
 
-[END] 2026-03-07 03:43:19.593
+[END] 2026-03-07 22:30:03.212
 
 
