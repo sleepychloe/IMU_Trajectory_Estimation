@@ -406,7 +406,7 @@ best: exp2-4
 
 <br>
 
-#### [Secondary validation — Gravity & Linear Accel]
+#### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
 Estimated gravity and linear acceleration are compared against reference signals as a sanity check.<br>
 
@@ -573,7 +573,7 @@ best: exp2-3
 
 <br>
 
-#### [Secondary validation — Gravity & Linear Accel]
+#### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
 Gravity direction error remains low (mean/p90 ≈ 3.20° / 5.43°), indicating a stable tilt estimate.<br>
 Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 15.15° / 30.52°).<br>
@@ -732,7 +732,7 @@ best: exp2-4
 
 <br>
 
-#### [Secondary validation — Gravity & Linear Accel]
+#### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
 Gravity direction error remains low (mean/p90 ≈ 2.81° / 4.71°), indicating a stable tilt estimate.<br>
 Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.89° / 23.83°).<br>
@@ -889,7 +889,7 @@ best: exp2-3
 
 <br>
 
-#### [Secondary validation — Gravity & Linear Accel]
+#### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
 Gravity direction error remains low (mean/p90 ≈ 1.45° / 3.42°), indicating a stable tilt estimate.<br>
 Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 20.04° / 49.35°).<br>

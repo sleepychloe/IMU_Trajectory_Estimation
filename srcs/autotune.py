@@ -123,15 +123,6 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
         print("Best quasi static(start, end, length): ", best_quasi_static)
         return best_quasi_static
 
-@dataclass
-class SweepBest:
-        scale: float
-        sigma: float
-        angle_err: ScalarBatch
-        mean_err: float
-        q_est: QuatBatch
-        extra: tuple[Any, ...]
-
 def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
                                  best_quasi_static: tuple[int, int, int] | None = None,
                                  tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
@@ -155,7 +146,7 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
                 K = float(dt_median / tau)
 
                 _, extra = runner_func(K=K, **runner_kwargs)
-                g_body_est, _, _, _ = extra
+                g_body_est, _, _, _, _ = extra
 
                 gb = g_body_est[s:e]
                 gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
@@ -184,16 +175,20 @@ def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float
                 s, e, _ = best_quasi_static
                 w_use = w[s:e]
                 a_use = a[s:e]
-                #mag
+                if m is not None:
+                        m_use = m[s:e]
         else:
                 w_use = w
                 a_use = a
-                #mag
+                if m is not None:
+                        m_use = m
 
         w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
         a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
         acc_resid: ScalarBatch = np.abs(a_norm - g0)
-	#mag
+        if m is not None:
+                m_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(m_use, axis=1))
+                mag_resid: ScalarBatch = np.abs(m_norm - np.median(m_norm))
 
         if p_gyro is None:
                 gyro_sigma: float = np.inf
@@ -207,27 +202,39 @@ def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float
 
         if p_mag is None:
                 mag_sigma: float = np.inf
-        #else
+        else:
+                mag_sigma: float = max(sigma_floor, float(np.percentile(mag_resid, p_mag)))
 
         print("Suggested gyro_sigma: ", gyro_sigma)
         print("Suggested acc_sigma: ", acc_sigma)
+        if m is not None:
+                print("Suggested mag_sigma: ", mag_sigma)
         return gyro_sigma, acc_sigma, mag_sigma
 
-def calc_sigma(base: float, scale: float) -> float:
+def calc_scale(base: float, scale: float) -> float:
         if np.isinf(base) or np.isinf(scale):
                 return np.inf
         return base * scale
+
+@dataclass
+class SweepBestSigma:
+        scale: float
+        sigma: float
+        angle_err: ScalarBatch
+        mean_err: float
+        q_est: QuatBatch
+        extra: tuple[Any, ...]
 
 def choose_best_by_sigma_scale(scales: tuple[float, ...],
                                K: float, sigma_base: float, q_ref: QuatBatch,
                                runner_func: Callable[[float], tuple[Any, ...]],
                                sigma_kw: str,
                                fixed_kwargs: dict[str, Any] = None
-                               ) -> SweepBest:
-        best: SweepBest = None
+                               ) -> SweepBestSigma:
+        best: SweepBestSigma = None
 
         for s in scales:
-                sigma: float = calc_sigma(sigma_base, s)
+                sigma: float = calc_scale(sigma_base, s)
 
                 kwargs = dict(fixed_kwargs)
                 kwargs[sigma_kw] = sigma
@@ -239,7 +246,7 @@ def choose_best_by_sigma_scale(scales: tuple[float, ...],
                 print(f"scale={s}", f", {sigma_kw}={sigma:.7f}", f", mean_err(rad)={mean_err:.7f}")
 
                 if best is None or mean_err < best.mean_err:
-                        best = SweepBest(s, sigma, angle_err, mean_err, q_est, extra)
+                        best = SweepBestSigma(s, sigma, angle_err, mean_err, q_est, extra)
         return best
 
 def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
@@ -293,3 +300,33 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                 batch_acc_sigma[i] = acc_sigma
                 #mag
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
+
+@dataclass
+class SweepBestGain:
+        scale: float
+        gain: float
+        angle_err: ScalarBatch
+        mean_err: float
+        q_est: QuatBatch
+        extra: tuple[Any, ...]
+
+def choose_best_by_gain_scale(scales: tuple[float, ...],
+                               gain_base: float, q_ref: QuatBatch,
+                               runner_func: Callable[[float], tuple[Any, ...]],
+                               fixed_kwargs: dict[str, Any] = None
+                               ) -> SweepBestGain:
+        best: SweepBestGain = None
+
+        for s in scales:
+                gain: float = calc_scale(gain_base, s)
+
+                kwargs = dict(fixed_kwargs)
+                q_est, extra = runner_func(mag_gain=gain, **kwargs)
+
+                angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
+                mean_err: float = float(np.mean(angle_err))
+                print(f"scale={s}", f", mag_gain={gain}", f", mean_err(rad)={mean_err:.7f}")
+
+                if best is None or mean_err < best.mean_err:
+                        best = SweepBestGain(s, gain, angle_err, mean_err, q_est, extra)
+        return best

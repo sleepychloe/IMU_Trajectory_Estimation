@@ -1,0 +1,90 @@
+
+
+[START] 2026-03-07 03:41:08.294
+
+[INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
+
+[END] 2026-03-07 03:41:08.829
+
+
+
+
+[START] 2026-03-07 03:41:08.841
+
+Detected accel unit in [m/s²]
+Selected g_world_unit: [ 0  0 -1]
+
+m0:  42.354857914622926
+m_ref_world_unit:  [0.00604763 0.99998171 0.        ] 
+
+Best quasi static(start, end, length):  (2523, 3540, 1017)
+
+Suggested gyro_sigma:  0.44791971689543864
+Suggested acc_sigma:  2.908568806018301
+Suggested mag_sigma:  2.87814905008711
+
+[END] 2026-03-07 03:41:09.597
+
+
+
+
+[START] 2026-03-07 03:41:09.618
+
+[choosing tau, K] — no gating
+tau=0.2 , K=0.049993896484394895 , score=0.0453472834175563
+tau=0.3 , K=0.03332926432292993 , score=0.03706716993476759
+tau=0.5 , K=0.019997558593757958 , score=0.03127072144959298
+tau=0.7 , K=0.014283970424112828 , score=0.030268340351771967
+tau=1.0 , K=0.009998779296878979 , score=0.03065495906772654
+tau=1.5 , K=0.006665852864585986 , score=0.031313599345832714
+tau=2.0 , K=0.0049993896484394895 , score=0.031135931826132664
+tau=3.0 , K=0.003332926432292993 , score=0.029962505648007294
+
+chosen tau:  3.0 , K:  0.003332926432292993 
+
+
+[END] 2026-03-07 03:42:00.871
+
+
+
+
+[START] 2026-03-07 03:42:00.881
+
+[choosing mag_gain] — no gating
+scale=0.01 , mag_gain=0.01 , mean_err(rad)=0.2401219
+scale=0.1 , mag_gain=0.1 , mean_err(rad)=0.0967644
+scale=0.5 , mag_gain=0.5 , mean_err(rad)=0.0741453
+scale=1 , mag_gain=1 , mean_err(rad)=0.0599474
+scale=1.5 , mag_gain=1.5 , mean_err(rad)=0.0526291
+scale=2 , mag_gain=2 , mean_err(rad)=0.0490925
+scale=2.5 , mag_gain=2.5 , mean_err(rad)=0.0487491
+scale=3 , mag_gain=3 , mean_err(rad)=0.0507921
+scale=5 , mag_gain=5 , mean_err(rad)=0.0724950
+scale=10 , mag_gain=10 , mean_err(rad)=0.0851882
+
+chosen s=2.5,  mag_gain=2.5
+
+
+[END] 2026-03-07 03:43:12.616
+
+
+
+
+[START] 2026-03-07 03:43:12.626
+
+[chosen value]
+tau= 3.0 K= 0.003332926432292993
+mag_gain= 2.5
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+
+[exp 3-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.002833765926700803 1.0107797549750435 0.04874909393221423 0.0866849806317926
+
+[exp 3-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.16236282772793462 57.91341397733746 2.793117337402686 4.966683537375
+
+[END] 2026-03-07 03:43:19.593
+
+

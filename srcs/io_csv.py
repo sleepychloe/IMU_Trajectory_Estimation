@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import re
 
 from my_types import ScalarBatch, Vec3, Vec3Batch, QuatBatch
 from my_types import as_scalar_batch, as_vec3_batch, as_quat_batch
@@ -98,7 +99,7 @@ def load_acc_lin_ref(csv_path: Path, t_new: ScalarBatch) -> Vec3Batch:
 
 def load_mag(csv_path: Path, t_new: ScalarBatch) -> Vec3Batch:
         """
-         Returns:
+        Returns:
                 m_src_interp: (N-1,) interpolated magnetometer (Vec3Batch)
         """
         df: pd.DataFrame = load_sorted_frame(csv_path,
@@ -109,3 +110,14 @@ def load_mag(csv_path: Path, t_new: ScalarBatch) -> Vec3Batch:
 
         m_src_interp: Vec3Batch = as_vec3_batch(resample_batch(t_new, t_src, m_src))
         return m_src_interp
+
+def read_best_exp2_from_log(log_path: Path) -> str:
+        """
+        Returns: '2-3' or '2-4'
+        """
+        text = log_path.read_text(errors="ignore")
+        matches = re.findall(r"^\s*best:\s*(exp2-([0-9]+))\s*$", text, flags=re.IGNORECASE | re.MULTILINE)
+        if not matches:
+                raise ValueError(f"'best: exp2-*' not found in log: {log_path}")
+        k = matches[-1][1]
+        return f"2-{k}"

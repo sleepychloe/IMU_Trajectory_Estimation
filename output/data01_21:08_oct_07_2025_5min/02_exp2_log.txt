@@ -1,15 +1,15 @@
 
 
-[START] 2026-03-06 22:05:46.094
+[START] 2026-03-07 03:09:07.573
 
 [INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
 
-[END] 2026-03-06 22:05:46.585
+[END] 2026-03-07 03:09:08.012
 
 
 
 
-[START] 2026-03-06 22:05:46.594
+[START] 2026-03-07 03:09:08.020
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -19,12 +19,12 @@ Best quasi static(start, end, length):  (2523, 3540, 1017)
 Suggested gyro_sigma:  0.44791971689543864
 Suggested acc_sigma:  2.908568806018301
 
-[END] 2026-03-06 22:05:47.221
+[END] 2026-03-07 03:09:08.651
 
 
 
 
-[START] 2026-03-06 22:05:47.916
+[START] 2026-03-07 03:09:09.427
 
 [choosing tau, K] — no gating
 tau=0.2 , K=0.049993896484394895 , score=0.0453472834175563
@@ -39,12 +39,12 @@ tau=3.0 , K=0.003332926432292993 , score=0.029962505648007294
 chosen tau:  3.0 , K:  0.003332926432292993 
 
 
-[END] 2026-03-06 22:06:14.668
+[END] 2026-03-07 03:09:38.992
 
 
 
 
-[START] 2026-03-06 22:06:14.676
+[START] 2026-03-07 03:09:39.001
 
 [chosen value]
 tau= 3.0 K= 0.003332926432292993
@@ -57,12 +57,12 @@ gyro_gate_sigma=inf
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.16188152956129193 80.44979025728507 19.56163774339873 29.500193313967625
 
-[END] 2026-03-06 22:06:18.545
+[END] 2026-03-07 03:09:44.574
 
 
 
 
-[START] 2026-03-06 22:06:18.553
+[START] 2026-03-07 03:09:44.582
 
 [choosing tau, K] — gating
 tau=0.2 , K=0.049993896484394895 , score=0.03943992605456148
@@ -77,12 +77,12 @@ tau=3.0 , K=0.003332926432292993 , score=0.028151859762228833
 chosen tau:  3.0 , K:  0.003332926432292993 
 
 
-[END] 2026-03-06 22:06:47.562
+[END] 2026-03-07 03:10:22.315
 
 
 
 
-[START] 2026-03-06 22:06:47.570
+[START] 2026-03-07 03:10:22.324
 
 [choosing acc_gate_sigma]
 scale=0.01 , acc_gate_sigma=0.0290857 , mean_err(rad)=0.3636687
@@ -103,12 +103,12 @@ gyro_gate_sigma=inf
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.16046951034440796 80.34216489533617 19.491867311941444 29.429404518706395
 
-[END] 2026-03-06 22:07:03.835
+[END] 2026-03-07 03:10:41.808
 
 
 
 
-[START] 2026-03-06 22:07:03.844
+[START] 2026-03-07 03:10:41.818
 
 
 chosen sa=1,  acc_gate_sigma=2.9085688
@@ -132,12 +132,12 @@ sg=1,  gyro_gate_sigma=0.4479197
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.15943109075520323 80.32279729871439 19.42833632897957 29.358202856938803
 
-[END] 2026-03-06 22:07:20.440
+[END] 2026-03-07 03:11:02.797
 
 
 
 
-[START] 2026-03-06 22:07:20.450
+[START] 2026-03-07 03:11:02.806
 
 [suggesting time-varying gyro/acc gate_sigma]
 done
@@ -152,21 +152,21 @@ acc_gate_sigma/gyro_gate_sigma = time-varying gate sigma
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
 0.1570485128929654 80.3033381346341 19.39257892956922 29.340401469435655
 
-[END] 2026-03-06 22:07:24.677
+[END] 2026-03-07 03:11:08.609
 
 
 
 
-[START] 2026-03-06 22:07:25.749
+[START] 2026-03-07 03:11:10.078
 
 best: exp2-4
 
-[END] 2026-03-06 22:07:25.749
+[END] 2026-03-07 03:11:10.079
 
 
 
 
-[START] 2026-03-06 22:07:29.906
+[START] 2026-03-07 03:11:15.421
 
 [Gravity]
 RMSE norm: 0.1989648675156791
@@ -191,6 +191,6 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 [Consistency ratio]
 rmse_norm of (a_lin_est / g_est):  3.693210614919845
 
-[END] 2026-03-06 22:07:30.241
+[END] 2026-03-07 03:11:15.761
 
 
