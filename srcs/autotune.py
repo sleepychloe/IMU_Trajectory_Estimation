@@ -167,47 +167,52 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
         best_K: float = tau_table[0]["K"]
         return tau_table, best_tau, best_K
 
-def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float,
-                       p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
-                       best_quasi_static: tuple[int, int, int] = None
-                       ) -> tuple[float, float, float]:
+def suggest_fixed_gyro_gate_sigma(w: Vec3Batch, p_gyro: int, sigma_floor: float,
+                                  best_quasi_static: tuple[int, int, int] = None) -> float:
+        if w is None or p_gyro is None:
+                return np.inf
         if best_quasi_static is not None:
                 s, e, _ = best_quasi_static
-                w_use = w[s:e]
-                a_use = a[s:e]
-                #if m is not None:
-                #        m_use = m[s:e]
-        else:
-                w_use = w
-                a_use = a
-                #if m is not None:
-                #        m_use = m
-        m_use = m
-
+                w_use: Vec3Batch = w[s:e]
         w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
+        gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
+        return gyro_sigma
+
+def suggest_fixed_acc_gate_sigma(a: Vec3Batch, g0: float, p_acc: int, sigma_floor: float,
+                                 best_quasi_static: tuple[int, int, int] = None) -> float:
+        if a is None or p_acc is None:
+                return np.inf
+        if best_quasi_static is not None:
+                s, e, _ = best_quasi_static
+                a_use = Vec3Bach = a[s:e]
         a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
         acc_resid: ScalarBatch = np.abs(a_norm - g0)
-        if m is not None:
-                m_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(m_use, axis=1))
-                mag_resid: ScalarBatch = np.abs(m_norm - np.median(m_norm))
+        acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
+        return acc_sigma
 
-        if p_gyro is None:
-                gyro_sigma: float = np.inf
-        else:
-                gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
+def suggest_fixed_mag_gate_sigma(m: Vec3Batch, m0: float, p_mag: int, sigma_floor: float
+                                 ) -> float:
+        if m is None or p_mag is None:
+                return np.inf
+        m_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(m, axis=1))
+        mag_resid: ScalarBatch = np.abs(m_norm - np.median(m_norm))
+        mag_sigma: float = max(sigma_floor, float(np.percentile(mag_resid, p_mag)))
+        return mag_sigma
 
-        if p_acc is None:
-                acc_sigma: float = np.inf
-        else:
-                acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
+def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
+                             g0: float, m0: float,
+                             p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
+                             best_quasi_static: tuple[int, int, int] = None
+                             ) -> tuple[float, float, float]:
+        gyro_sigma: float = suggest_fixed_gyro_gate_sigma(w, p_gyro, sigma_floor, best_quasi_static)
+        if w is not None:
+                print("Suggested gyro_sigma: ", gyro_sigma)
 
-        if p_mag is None:
-                mag_sigma: float = np.inf
-        else:
-                mag_sigma: float = max(sigma_floor, float(np.percentile(mag_resid, p_mag)))
+        acc_sigma: float = suggest_fixed_acc_gate_sigma(a, g0, p_acc, sigma_floor, best_quasi_static)
+        if a is not None:
+                print("Suggested acc_sigma: ", acc_sigma)
 
-        print("Suggested gyro_sigma: ", gyro_sigma)
-        print("Suggested acc_sigma: ", acc_sigma)
+        mag_sigma: float = suggest_fixed_mag_gate_sigma(m, m0, p_mag, sigma_floor)
         if m is not None:
                 print("Suggested mag_sigma: ", mag_sigma)
         return gyro_sigma, acc_sigma, mag_sigma

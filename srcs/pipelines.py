@@ -105,17 +105,26 @@ def integrate_gyro_acc(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
 
 def generate_m_ref_world_h_unit(g0: float, g_world_unit: Vec3, sample_length: int,
                              q_ref: QuatBatch, a_src: Vec3Batch, m_src: Vec3Batch) -> Vec3:
-        mask: ScalarBatch = as_scalar_batch(
-                        (np.abs(np.linalg.norm(a_src, axis=1) - g0 < EPS)) & (np.linalg.norm(m_src, axis=1) > EPS))
+        a_norm: Vec3Batch = np.linalg.norm(a_src, axis=1)
+        m_norm: Vec3Batch = np.linalg.norm(m_src, axis=1)
+
+        mask = (np.abs(a_norm - g0) < 0.5) & (m_norm > 0.1)
         mask = mask[:sample_length]
+
         res: Vec3 = as_vec3(np.zeros(3))
-        for i in range(sample_length):
+        cnt: int = 0
+        for i in range(min(sample_length, len(mask))):
+                if not mask[i]:
+                        continue
                 m_unit: Vec3 = safe_unit_vec3(m_src[i])
                 m_world: Vec3 = libq.rotate_body_to_world(q_ref[i], m_unit)
                 m_world_h: Vec3 = m_world - np.dot(m_world, g_world_unit) * g_world_unit
                 n: float = np.linalg.norm(m_world_h)
                 if n > EPS:
                         res += (m_world_h / n)
+                        cnt += 1
+        if cnt == 0:
+                return as_vec3(np.array([1, 0, 0]))
         return safe_unit_vec3(res)
 
 def calc_mag_gating(m0: float, mag_sigma: float, m_meas: Vec3) -> float:
@@ -125,7 +134,8 @@ def calc_mag_gating(m0: float, mag_sigma: float, m_meas: Vec3) -> float:
         weight_mag : float = np.exp(-0.5 * (dev / mag_sigma) ** 2)
         return weight_mag
 
-def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float, threshold: float = 0.4) -> float:
+def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float,
+                               threshold: float = 0.5) -> float:
         if not np.isfinite(mag_err_sigma) or mag_err_sigma <= 0:
                 return 1
         e_axis_norm: float = float(np.linalg.norm(e_axis_mag))
@@ -134,14 +144,18 @@ def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float, threshold
         weight_mag_innov: float = np.exp(-0.5 * (e_axis_norm / mag_err_sigma) ** 2)
         return weight_mag_innov
 
-def calc_mag_err_axis(q_pred: Quat, g_pred: Vec3, m_unit: Vec3, m_world_h_unit: Vec3) -> Vec3:
+def calc_mag_err_axis(q_pred: Quat, g_pred: Vec3, m_unit: Vec3, m_world_h_unit: Vec3,
+                      threshold: float = 0.2) -> Vec3:
         m_body_h: Vec3 = m_unit - np.dot(m_unit, g_pred) * g_pred
-        if np.linalg.norm(m_body_h) < 0.2:
+        if np.linalg.norm(m_body_h) < threshold:
                 return as_vec3(np.array([0, 0, 0]))
         m_body_h_unit: Vec3 = safe_unit_vec3(m_body_h)
 
         m_pred: Vec3 = libq.rotate_world_to_body(q_pred, m_world_h_unit)
-        m_pred_h_unit: Vec3 = safe_unit_vec3(m_pred - np.dot(m_pred, g_pred) * g_pred)
+        m_pred_h: Vec3 = m_pred - np.dot(m_pred, g_pred) * g_pred
+        if np.linalg.norm(m_pred_h) < threshold:
+                return as_vec3(np.array([0, 0, 0]))
+        m_pred_h_unit: Vec3 = safe_unit_vec3(m_pred_h)
 
         mag_err_axis: Vec3 = np.cross(m_body_h_unit, m_pred_h_unit)
         mag_err_axis = np.dot(mag_err_axis, g_pred) * g_pred

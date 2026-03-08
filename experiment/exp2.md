@@ -186,15 +186,30 @@ If a quasi-static segment exists, statistics are computed on that segment, other
 ```py
 # autotune.py
 
-def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch, g0: float,
-                       p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
-                       best_quasi_static: tuple[int, int, int] = None
-                       ) -> tuple[float, float, float]:
-	. . .
+def suggest_fixed_gyro_gate_sigma(w: Vec3Batch, p_gyro: int, sigma_floor: float,
+                                  best_quasi_static: tuple[int, int, int] = None) -> float:
+        . . .
+        w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
         gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
-	. . .
+        return gyro_sigma
+
+def suggest_fixed_acc_gate_sigma(a: Vec3Batch, g0: float, p_acc: int, sigma_floor: float,
+                                 best_quasi_static: tuple[int, int, int] = None) -> float:
+        . . .
+        a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
+        acc_resid: ScalarBatch = np.abs(a_norm - g0)
         acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
-	. . .
+        return acc_sigma
+
+def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
+                             g0: float, m0: float,
+                             p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
+                             best_quasi_static: tuple[int, int, int] = None
+                             ) -> tuple[float, float, float]:
+        gyro_sigma: float = suggest_fixed_gyro_gate_sigma(w, p_gyro, sigma_floor, best_quasi_static)
+        . . .
+        acc_sigma: float = suggest_fixed_acc_gate_sigma(a, g0, p_acc, sigma_floor, best_quasi_static)
+        . . .
         return gyro_sigma, acc_sigma, mag_sigma
 ```
 <br>

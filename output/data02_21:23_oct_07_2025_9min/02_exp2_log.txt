@@ -47,7 +47,7 @@ chosen tau:  0.7 , K:  0.01428397042413313
 [START] 2026-03-03 09:28:08.995
 
 [chosen value]
-tau= 0.7 K= 0.01428397042413313
+tau= 0.7 , K= 0.01428397042413313
 acc_gate_sigma=inf
 gyro_gate_sigma=inf
 
