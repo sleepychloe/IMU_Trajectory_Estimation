@@ -184,7 +184,7 @@ def suggest_fixed_acc_gate_sigma(a: Vec3Batch, g0: float, p_acc: int, sigma_floo
                 return np.inf
         if best_quasi_static is not None:
                 s, e, _ = best_quasi_static
-                a_use = Vec3Bach = a[s:e]
+                a_use: Vec3Batch = a[s:e]
         a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
         acc_resid: ScalarBatch = np.abs(a_norm - g0)
         acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
@@ -263,6 +263,8 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
         w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w, axis=1))
         a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a, axis=1))
         acc_resid: ScalarBatch = np.abs(a_norm - g0)
+        if m is not None:
+                m_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(m, axis=1))
 
         dt_median: float = float(np.median(dt))
         window_size: int = max(1, int(np.ceil(win_s / max(dt_median, EPS))))
@@ -276,12 +278,12 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
         acc_sigma: float = np.inf
         mag_sigma: float = np.inf
         if p_gyro is not None:
-                gyro_sigma = max(sigma_floor, float(np.percentile(w_norm[:min(len(dt), window_size)], p_gyro)))
-
+                gyro_sigma = max(sigma_floor, float(np.percentile(w_norm[:window_size], p_gyro)))
         if p_acc is not None:
-                acc_sigma = max(sigma_floor, float(np.percentile(acc_resid[:min(len(dt), window_size)], p_acc)))
-        #if p_mag is not None:
-                #mag
+                acc_sigma = max(sigma_floor, float(np.percentile(acc_resid[:window_size], p_acc)))
+        if p_mag is not None and m is not None:
+                mag_resid_init: float = np.abs(m_norm[:window_size] - np.median(m_norm[:window_size]))
+                mag_sigma = max(sigma_floor, float(np.percentile(mag_resid_init, p_mag)))
 
         for i in range(len(dt)):
                 if i % update_period == 0:
@@ -300,9 +302,16 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                                         acc_sigma = acc_tmp
                                 else:
                                         acc_sigma = (1 - ema_alpha) * acc_sigma + ema_alpha * acc_tmp
-                        #if p_mag is not None:
+                        if p_mag is not None and m is not None:
+                                local_median: float = np.median(m_norm[low:high])
+                                mag_resid_window: float = np.abs(m_norm[low:high] - local_median)
+                                mag_tmp: float = max(sigma_floor, float(np.percentile(mag_resid_window[low:high], p_mag)))
+                                if np.isinf(mag_sigma):
+                                        mag_sigma = mag_tmp
+                                else:
+                                        mag_sigma = (1 - ema_alpha) * mag_sigma + ema_alpha * mag_tmp
 
                 batch_gyro_sigma[i] = gyro_sigma
                 batch_acc_sigma[i] = acc_sigma
-                #mag
+                batch_mag_sigma[i] = mag_sigma
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma

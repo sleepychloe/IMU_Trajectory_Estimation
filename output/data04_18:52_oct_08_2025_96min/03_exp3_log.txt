@@ -1,0 +1,50 @@
+
+
+[START] 2026-03-09 05:21:53.558
+
+[INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
+
+[END] 2026-03-09 05:21:58.659
+
+
+
+
+[START] 2026-03-09 05:21:58.681
+
+Detected accel unit in [g] → converting to [m/s²]
+Selected g_world_unit: [0 0 1]
+
+m0:  48.54251849112647
+m_ref_world_unit:  [ 0.98386665 -0.17890335  0.        ] 
+
+Best quasi static(start, end, length):  (252162, 310194, 58032)
+
+Suggested gyro_sigma:  0.27528854262917185
+Suggested acc_sigma:  0.507068924693965
+Suggested mag_sigma:  190.98333381383583
+
+[END] 2026-03-09 05:21:59.569
+
+
+
+
+[START] 2026-03-09 05:21:59.610
+
+[tmp] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.0034718326822051563 3.1415853361576667 0.9652383943338664 2.3257889127961433
+
+[tmp] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.19892135986593984 179.9995807420223 55.30408621931482 133.2578887415393
+
+[END] 2026-03-09 05:24:56.696
+
+
+
+
+[START] 2026-03-09 05:25:09.818
+
+[choosing tau, K] — no gating
+
+[END] 2026-03-09 05:26:21.533
+
+

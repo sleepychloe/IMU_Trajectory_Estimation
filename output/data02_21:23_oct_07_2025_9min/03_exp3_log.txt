@@ -1,0 +1,260 @@
+
+
+[START] 2026-03-08 09:25:11.141
+
+[INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
+
+[END] 2026-03-08 09:25:12.250
+
+
+
+
+[START] 2026-03-08 09:25:12.264
+
+Detected accel unit in [m/s²]
+Selected g_world_unit: [ 0  0 -1]
+
+m0:  42.52383370158138
+m_ref_world_unit:  [9.87237959e-04 9.99999513e-01 0.00000000e+00] 
+
+Best quasi static(start, end, length):  (0, 1635, 1635)
+
+Suggested gyro_sigma:  0.6304230586083284
+Suggested acc_sigma:  2.5176966756605874
+Suggested mag_sigma:  5.051061836028509
+
+[END] 2026-03-08 09:25:12.976
+
+
+
+
+[START] 2026-03-08 09:25:13.015
+
+[choosing tau, K] — no gating
+tau=0.2 , K=0.04999389648446595 , score=0.06541202516472325
+tau=0.3 , K=0.0333292643229773 , score=0.06215713800050853
+tau=0.5 , K=0.01999755859378638 , score=0.06035635811343465
+tau=0.7 , K=0.01428397042413313 , score=0.06028516081907137
+tau=1.0 , K=0.00999877929689319 , score=0.06109290802002645
+tau=1.5 , K=0.00666585286459546 , score=0.06459530373052245
+tau=2.0 , K=0.004999389648446595 , score=0.06930422215397218
+tau=3.0 , K=0.00333292643229773 , score=0.07836416074239341
+
+chosen tau:  0.7 , K:  0.01428397042413313 
+
+[choosing mag_gain] — no gating
+scale=0.01 , mag_gain=0.0100000 , mean_err(rad)=0.1273350
+scale=0.1 , mag_gain=0.1000000 , mean_err(rad)=0.0879084
+scale=0.5 , mag_gain=0.5000000 , mean_err(rad)=0.0634005
+scale=1 , mag_gain=1.0000000 , mean_err(rad)=0.0641771
+scale=1.5 , mag_gain=1.5000000 , mean_err(rad)=0.0678919
+scale=2 , mag_gain=2.0000000 , mean_err(rad)=0.0709696
+scale=2.5 , mag_gain=2.5000000 , mean_err(rad)=0.0734223
+scale=3 , mag_gain=3.0000000 , mean_err(rad)=0.0753949
+scale=5 , mag_gain=5.0000000 , mean_err(rad)=0.0805788
+scale=10 , mag_gain=10.0000000 , mean_err(rad)=0.0863369
+
+chosen s=0.5,  mag_gain=0.5
+
+
+[END] 2026-03-08 09:29:17.589
+
+
+
+
+[START] 2026-03-08 09:29:17.603
+
+[chosen value]
+tau= 0.7 , K= 0.01428397042413313
+mag_gain= 0.5
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 3-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.0016096499070825648 0.4073883079306854 0.06340051240023975 0.11215761815525566
+
+[exp 3-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.09222614616945608 23.34163066740424 3.6325817795005784 6.426158160536007
+
+[END] 2026-03-08 09:29:31.678
+
+
+
+
+[START] 2026-03-08 09:29:31.694
+
+[choosing tau, K] — gating
+tau=0.2 , K=0.04999389648446595 , score=0.06171476303397119
+tau=0.3 , K=0.0333292643229773 , score=0.060378877725839476
+tau=0.5 , K=0.01999755859378638 , score=0.06057626341086698
+tau=0.7 , K=0.01428397042413313 , score=0.061729020986445345
+tau=1.0 , K=0.00999877929689319 , score=0.06475653157203197
+tau=1.5 , K=0.00666585286459546 , score=0.07156024139854651
+tau=2.0 , K=0.004999389648446595 , score=0.0780640500844068
+tau=3.0 , K=0.00333292643229773 , score=0.08643031992437052
+
+chosen tau:  0.3 , K:  0.0333292643229773 
+
+[choosing mag_gain] — gating
+scale=0.01 , mag_gain=0.0100000 , mean_err(rad)=0.1231570
+scale=0.1 , mag_gain=0.1000000 , mean_err(rad)=0.0918228
+scale=0.5 , mag_gain=0.5000000 , mean_err(rad)=0.0694254
+scale=1 , mag_gain=1.0000000 , mean_err(rad)=0.0682256
+scale=1.5 , mag_gain=1.5000000 , mean_err(rad)=0.0699628
+scale=2 , mag_gain=2.0000000 , mean_err(rad)=0.0719365
+scale=2.5 , mag_gain=2.5000000 , mean_err(rad)=0.0737553
+scale=3 , mag_gain=3.0000000 , mean_err(rad)=0.0753417
+scale=5 , mag_gain=5.0000000 , mean_err(rad)=0.0799196
+scale=10 , mag_gain=10.0000000 , mean_err(rad)=0.0857194
+
+chosen s=1,  mag_gain=1
+
+
+[END] 2026-03-08 09:33:52.712
+
+
+
+
+[START] 2026-03-08 09:33:52.734
+
+[choosing acc_gate_sigma]
+scale=0.01 , acc_gate_sigma=0.0251770 , mean_err(rad)=0.0999711
+scale=1 , acc_gate_sigma=2.5176967 , mean_err(rad)=0.0850844
+scale=10 , acc_gate_sigma=25.1769668 , mean_err(rad)=0.0888194
+scale=inf , acc_gate_sigma=inf , mean_err(rad)=0.0889779
+
+chosen sa=1,  acc_gate_sigma=2.5176967
+
+[choosing gyro_gate_sigma]
+scale=0.01 , gyro_gate_sigma=0.0063042 , mean_err(rad)=0.3836102
+scale=1 , gyro_gate_sigma=0.6304231 , mean_err(rad)=0.0702326
+scale=10 , gyro_gate_sigma=6.3042306 , mean_err(rad)=0.0845908
+scale=inf , gyro_gate_sigma=inf , mean_err(rad)=0.0850844
+
+chosen sg=1,  gyro_gate_sigma=0.6304231
+
+[choosing mag_gate_sigma]
+scale=0.01 , mag_gate_sigma=0.0505106 , mean_err(rad)=0.1124727
+scale=0.5 , mag_gate_sigma=2.5255309 , mean_err(rad)=0.0740830
+scale=1 , mag_gate_sigma=5.0510618 , mean_err(rad)=0.0682256
+scale=1.5 , mag_gate_sigma=7.5765928 , mean_err(rad)=0.0684763
+scale=2 , mag_gate_sigma=10.1021237 , mean_err(rad)=0.0690831
+scale=2.5 , mag_gate_sigma=12.6276546 , mean_err(rad)=0.0694624
+scale=3 , mag_gate_sigma=15.1531855 , mean_err(rad)=0.0696868
+scale=5 , mag_gate_sigma=25.2553092 , mean_err(rad)=0.0700313
+scale=10 , mag_gate_sigma=50.5106184 , mean_err(rad)=0.0701819
+scale=inf , mag_gate_sigma=inf , mean_err(rad)=0.0702326
+
+chosen sm=1,  mag_gate_sigma=5.0510618
+
+[reselecting mag_gain]
+scale=0.01 , mag_gain=0.0100000 , mean_err(rad)=0.1231570
+scale=0.1 , mag_gain=0.1000000 , mean_err(rad)=0.0918228
+scale=0.5 , mag_gain=0.5000000 , mean_err(rad)=0.0694254
+scale=1 , mag_gain=1.0000000 , mean_err(rad)=0.0682256
+scale=1.5 , mag_gain=1.5000000 , mean_err(rad)=0.0699628
+scale=2 , mag_gain=2.0000000 , mean_err(rad)=0.0719365
+scale=2.5 , mag_gain=2.5000000 , mean_err(rad)=0.0737553
+scale=3 , mag_gain=3.0000000 , mean_err(rad)=0.0753417
+scale=5 , mag_gain=5.0000000 , mean_err(rad)=0.0799196
+scale=10 , mag_gain=10.0000000 , mean_err(rad)=0.0857194
+
+chosen s=1,  mag_gain=1
+
+[reselecting tau, K]
+tau=0.2 , K=0.04999389648446595 , score=0.061724441804527616
+tau=0.3 , K=0.0333292643229773 , score=0.060387317710753285
+tau=0.5 , K=0.01999755859378638 , score=0.06058359233008496
+tau=0.7 , K=0.01428397042413313 , score=0.061735623232432396
+tau=1.0 , K=0.00999877929689319 , score=0.0647621656332238
+tau=1.5 , K=0.00666585286459546 , score=0.07156421151207427
+tau=2.0 , K=0.004999389648446595 , score=0.07806634472764526
+tau=3.0 , K=0.00333292643229773 , score=0.08643066247775019
+
+chosen tau:  0.3 , K:  0.0333292643229773 
+
+[chosen value]
+tau= 0.3 , K= 0.0333292643229773
+mag_gain= 1
+sa=1,  acc_gate_sigma=2.5176967
+sg=1,  gyro_gate_sigma=0.6304231
+sm=1,  mag_gate_sigma=5.0510618
+mag_err_sigma=inf
+
+[exp 3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag) angle error in rad — min/max/mean/p90
+0.0038333230771377663 0.44489852425966087 0.06822560687139842 0.11573970395799846
+
+[exp 3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag) angle error in deg — min/max/mean/p90
+0.21963323383009573 25.490807751677234 3.9090393284498783 6.631396558886901
+
+[END] 2026-03-08 09:42:53.533
+
+
+
+
+[START] 2026-03-08 09:42:53.553
+
+
+chosen sa=1,  acc_gate_sigma=2.5176967
+
+chosen sg=1,  gyro_gate_sigma=0.6304231
+
+chosen sm=1,  mag_gate_sigma=5.0510618
+
+[choosing mag_err_sigma — innovation gating]
+scale=0.05 , mag_err_sigma=0.0500000 , mean_err(rad)=0.1821797
+scale=0.1 , mag_err_sigma=0.1000000 , mean_err(rad)=0.0888799
+scale=0.2 , mag_err_sigma=0.2000000 , mean_err(rad)=0.0771165
+scale=0.3 , mag_err_sigma=0.3000000 , mean_err(rad)=0.0730318
+scale=0.5 , mag_err_sigma=0.5000000 , mean_err(rad)=0.0697012
+scale=0.7 , mag_err_sigma=0.7000000 , mean_err(rad)=0.0694071
+scale=1.0 , mag_err_sigma=1.0000000 , mean_err(rad)=0.0692959
+scale=inf , mag_err_sigma=inf , mean_err(rad)=0.0682256
+
+chosen s=inf,  mag_err_sigma=inf
+
+[reselecting mag_gain]
+scale=0.01 , mag_gain=0.0100000 , mean_err(rad)=0.1231570
+scale=0.1 , mag_gain=0.1000000 , mean_err(rad)=0.0918228
+scale=0.5 , mag_gain=0.5000000 , mean_err(rad)=0.0694254
+scale=1 , mag_gain=1.0000000 , mean_err(rad)=0.0682256
+scale=1.5 , mag_gain=1.5000000 , mean_err(rad)=0.0699628
+scale=2 , mag_gain=2.0000000 , mean_err(rad)=0.0719365
+scale=2.5 , mag_gain=2.5000000 , mean_err(rad)=0.0737553
+scale=3 , mag_gain=3.0000000 , mean_err(rad)=0.0753417
+scale=5 , mag_gain=5.0000000 , mean_err(rad)=0.0799196
+scale=10 , mag_gain=10.0000000 , mean_err(rad)=0.0857194
+
+chosen s=1,  mag_gain=1
+
+[reselecting tau, K]
+tau=0.2 , K=0.04999389648446595 , score=0.061724441804527616
+tau=0.3 , K=0.0333292643229773 , score=0.060387317710753285
+tau=0.5 , K=0.01999755859378638 , score=0.06058359233008496
+tau=0.7 , K=0.01428397042413313 , score=0.061735623232432396
+tau=1.0 , K=0.00999877929689319 , score=0.0647621656332238
+tau=1.5 , K=0.00666585286459546 , score=0.07156421151207427
+tau=2.0 , K=0.004999389648446595 , score=0.07806634472764526
+tau=3.0 , K=0.00333292643229773 , score=0.08643066247775019
+
+chosen tau:  0.3 , K:  0.0333292643229773 
+
+[chosen value]
+tau= 0.3 , K= 0.0333292643229773
+mag_gain= 1
+sa=1,  acc_gate_sigma=2.5176967
+sg=1,  gyro_gate_sigma=0.6304231
+sm=1,  mag_gate_sigma=5.0510618
+mag_err_sigma=inf
+
+[exp 3-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag+Mag_innov) angle error in rad — min/max/mean/p90
+0.0038333230771377663 0.44489852425966087 0.06822560687139842 0.11573970395799846
+
+[exp 3-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag+Mag_innov) angle error in deg — min/max/mean/p90
+0.21963323383009573 25.490807751677234 3.9090393284498783 6.631396558886901
+
+[END] 2026-03-08 09:49:36.362
+
+

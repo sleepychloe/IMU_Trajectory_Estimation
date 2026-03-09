@@ -96,10 +96,13 @@ def plot_quasi_static_diagnostic(t: ScalarBatch, w: Vec3Batch, a: Vec3Batch, g0:
         plt.show()
         plt.close()
 
-def plot_err_colored_by_weight(t: ScalarBatch, err: ScalarBatch,
-                               w_acc: ScalarBatch, w_gyro: ScalarBatch, w_total: ScalarBatch,
+def plot_err_colored_by_weight(flag: int, t: ScalarBatch, err: ScalarBatch,
+                               w_acc: ScalarBatch, w_gyro: ScalarBatch, w_mag: ScalarBatch, w_total: ScalarBatch,
                                title: str, save_path: Path = None) -> None:
-        fig, axs = plt.subplots(3, 1, sharex=True, figsize=(12, 6), height_ratios=[1, 1, 1])
+        if flag == 2:
+                fig, axs = plt.subplots(3, 1, sharex=True, figsize=(12, 6), height_ratios=[1, 1, 1])
+        elif flag == 3:
+                fig, axs = plt.subplots(4, 1, sharex=True, figsize=(12, 8), height_ratios=[1, 1, 1, 1])
 
         axs[0].set_title(title + "Error colored by weight")
         sc_t = axs[0].scatter(t, err, c=w_total, s=6)
@@ -114,12 +117,21 @@ def plot_err_colored_by_weight(t: ScalarBatch, err: ScalarBatch,
         axs[1].set_ylabel("angle error (rad)")
         axs[1].grid(True, alpha=0.3)
 
-        axs[2].set_xlabel("seconds_elapsed (s)")
+        if flag == 2:
+                axs[2].set_xlabel("seconds_elapsed (s)")
         sc_g = axs[2].scatter(t, err, c=w_gyro, s=6)
         fig.colorbar(sc_g, ax=axs[2]).set_label("weight_gyro")
         axs[2].plot(t, err, alpha=0.5)
         axs[2].set_ylabel("angle error (rad)")
         axs[2].grid(True, alpha=0.3)
+
+        if flag == 3:
+                axs[3].set_xlabel("seconds_elapsed (s)")
+                sc_g = axs[3].scatter(t, err, c=w_mag, s=6)
+                fig.colorbar(sc_g, ax=axs[3]).set_label("weight_mag")
+                axs[3].plot(t, err, alpha=0.5)
+                axs[3].set_ylabel("angle error (rad)")
+                axs[3].grid(True, alpha=0.3)
 
         save_path.parent.mkdir(parents=True, exist_ok=True)
         plt.tight_layout()
