@@ -48,8 +48,6 @@ def calc_acc_gating(g0: float, acc_sigma: float, a_meas: Vec3, g_pred: Vec3) -> 
         a_unit: Vec3 = safe_unit_vec3(a_meas)
         g_unit: Vec3 = safe_unit_vec3(g_pred)
         theta: float = np.arccos(np.clip(np.dot(a_unit, g_unit), -1, 1))
-        #if theta > np.deg2rad(30):
-        #        return 0
         weight_acc : float = np.exp(-0.5 * (theta / acc_sigma) ** 2)
         return weight_acc
 

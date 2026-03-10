@@ -305,7 +305,7 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                         if p_mag is not None and m is not None:
                                 local_median: float = np.median(m_norm[low:high])
                                 mag_resid_window: float = np.abs(m_norm[low:high] - local_median)
-                                mag_tmp: float = max(sigma_floor, float(np.percentile(mag_resid_window[low:high], p_mag)))
+                                mag_tmp: float = max(sigma_floor, float(np.percentile(mag_resid_window, p_mag)))
                                 if np.isinf(mag_sigma):
                                         mag_sigma = mag_tmp
                                 else:
@@ -315,3 +315,38 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                 batch_acc_sigma[i] = acc_sigma
                 batch_mag_sigma[i] = mag_sigma
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
+
+@dataclass
+class BestParam:
+        score: float
+        p: int
+        win_s: float
+        update_s: float
+        ema: float
+
+def choose_best_timevarying_sigma(K: float, q_ref: QuatBatch,
+                                  p_candidates: list[int],
+                                  win_s_candidates: list[float],
+                                  update_s_candidates: list[float],
+                                  ema_candidates: list[float],
+                                  runner_func: Callable[..., tuple[Any, ...]]
+                                  ) -> BestParam:
+        best: BestParam = None
+
+        for p in p_candidates:
+                for win in win_s_candidates:
+                        for update in update_s_candidates:
+                                for ema in ema_candidates:
+                                        q_est, _ = runner_func(K=K,
+                                                                   p_gyro=p-10, p_acc=p, p_mag=p,
+                                                                   win_s=win,
+                                                                   update_s=update,
+                                                                   ema_alpha=ema)
+                                        angle_err = calc_angle_err(q_est, q_ref)
+                                        score = np.mean(angle_err) + 0.2 * np.percentile(angle_err, 90)
+                                        print(f"score={score:.7f}", f" | p={p}", f", win_s={win}",
+                                              f", update_s={update}", f", ema_alpha={ema}")
+
+                                        if best is None or score < best.score:
+                                                best = BestParam(score, p, win, update, ema)
+        return best
