@@ -134,20 +134,16 @@ def calc_mag_gating(m0: float, mag_sigma: float, m_meas: Vec3) -> float:
         weight_mag : float = np.exp(-0.5 * (dev / mag_sigma) ** 2)
         return weight_mag
 
-def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float,
-                        #       threshold: float = 0.5) -> float:
-                                threshold: float = 0.3) -> float:
+def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float) -> float:
         if not np.isfinite(mag_err_sigma) or mag_err_sigma <= 0:
                 return 1
         e_axis_norm: float = float(np.linalg.norm(e_axis_mag))
-        if e_axis_norm > threshold:
+        if e_axis_norm > 5 * mag_err_sigma:
                 return 0
-        weight_mag_innov: float = np.exp(-0.5 * (e_axis_norm / mag_err_sigma) ** 2)
-        return weight_mag_innov
+        return 1
 
 def calc_mag_err_axis(q_pred: Quat, g_pred: Vec3, m_unit: Vec3, m_world_h_unit: Vec3,
-                #      threshold: float = 0.2) -> Vec3:
-                       threshold: float = 0.1) -> Vec3:
+                      threshold: float = 0.2) -> Vec3:
         m_body_h: Vec3 = m_unit - np.dot(m_unit, g_pred) * g_pred
         if np.linalg.norm(m_body_h) < threshold:
                 return as_vec3(np.array([0, 0, 0]))
@@ -213,8 +209,8 @@ def integrate_gyro_acc_mag(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
                 weight_mag_innov: float = calc_mag_innovation_gating(e_axis_mag, mag_err_sigma)
                 weight_mag[i] = weight_mag[i] * weight_mag_innov
 
-                e_axis: Vec3 = (weight_acc[i] * e_axis_acc
-                                + mag_gain * weight_mag[i] * weight_gyro[i] * e_axis_mag)
+                e_axis: Vec3 = (weight_acc[i] * weight_gyro[i] * e_axis_acc
+                                + mag_gain * weight_mag[i] * e_axis_mag)
                 dq_corr: Quat = small_angle_correction_quat(K, e_axis)
 
                 q = libq.quat_norm(libq.quat_mul(q_pred, dq_corr))

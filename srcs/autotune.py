@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Any, Callable
 from dataclasses import dataclass
+import optuna
 
 from my_types import Vec3, Quat, ScalarBatch, Vec3Batch, QuatBatch, BoolBatch, Int8Batch, Int32Batch, Int64Batch
 from my_types import as_vec3, as_scalar_batch, as_bool_batch, as_int8_batch
@@ -123,17 +124,98 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
         print("Best quasi static(start, end, length): ", best_quasi_static)
         return best_quasi_static
 
-def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
-                                 best_quasi_static: tuple[int, int, int] | None = None,
-                                 tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
-                                 runner_kwargs: dict[str, Any] = None,
-                                 ) -> tuple[list[dict[str, Any]], float, float]:
-        """
-        Returns:
-                tau_table: dict[str, Any]
-                best_tau: float
-                K: float
-        """
+#def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
+#                                 best_quasi_static: tuple[int, int, int] | None = None,
+#                                 tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
+#                                 runner_kwargs: dict[str, Any] = None,
+#                                 ) -> tuple[list[dict[str, Any]], float, float]:
+#        """
+#        Returns:
+#                tau_table: dict[str, Any]
+#                best_tau: float
+#                K: float
+#        """
+#        dt_median: float = float(np.median(dt))
+
+#        if best_quasi_static is None:
+#                s, e = 0, len(dt)
+#        else:
+#                s, e, _ = best_quasi_static
+
+#        tau_table: list[dict[str, Any]] = []
+#        for tau in tau_candidates:
+#                K = float(dt_median / tau)
+
+#                _, extra = runner_func(K=K, **runner_kwargs)
+#                g_body_est, _, _, _, _ = extra
+
+#                gb = g_body_est[s:e]
+#                gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
+
+#                mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
+#                mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
+#                dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
+#                ang: ScalarBatch = np.arccos(dot)
+#                score: float = float(np.mean(ang))
+
+#                print(f"tau={float(tau)}", f", K={K}", f", score={score}")
+
+#                tau_table.append({
+#                        "tau": float(tau), "K": K,
+#                        "score": score})
+#        tau_table.sort(key=lambda d: d["score"])
+#        best_tau: float = tau_table[0]["tau"]
+#        best_K: float = tau_table[0]["K"]
+#        return tau_table, best_tau, best_K
+
+def score_angle_err(angle_err: ScalarBatch) -> float:
+        mean: float = np.mean(angle_err)
+        p95: float = np.percentile(angle_err, 95)
+        p99: float = np.percentile(angle_err, 99)
+
+        l: int = len(angle_err)
+        drift: float = abs(np.mean(angle_err[int(0.9*l):]) - np.mean(angle_err[:int(0.1*l)]))
+
+        score: float = (0.4 * mean
+                        + 0.3 * p95
+                        + 0.2 * p99
+                        + 0.1 * drift)
+        return score
+
+#def score_tau_quasi_static(tau: float, dt: ScalarBatch,
+#                           runner_func: Callable[[float], tuple[Any, ...]],
+#                           best_quasi_static: tuple[int, int, int] | None = None,
+#                           runner_kwargs: dict[str, Any] = None,
+#                           ) -> float:
+
+#        dt_median: float = float(np.median(dt))
+
+#        if best_quasi_static is None:
+#                s, e = 0, len(dt)
+#        else:
+#                s, e, _ = best_quasi_static
+
+#        K: float = float(dt_median / tau)
+#        _, extra = runner_func(K=K, **runner_kwargs)
+#        g_body_est, _, _, _, _ = extra
+
+#        gb = g_body_est[s:e]
+#        gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
+
+#        mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
+#        mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
+#        dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
+#        ang: ScalarBatch = np.arccos(dot)
+
+#        score: float = score_angle_err(ang)
+#        return score
+
+def score_tau_total(tau: float, dt: ScalarBatch, q_ref: QuatBatch,
+                    runner_func: Callable[[float], tuple[Any, ...]],
+                    best_quasi_static: tuple[int, int, int] | None = None,
+                    runner_kwargs: dict[str, Any] = None,
+                    ) -> float:
+
         dt_median: float = float(np.median(dt))
 
         if best_quasi_static is None:
@@ -141,31 +223,21 @@ def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float],
         else:
                 s, e, _ = best_quasi_static
 
-        tau_table: list[dict[str, Any]] = []
-        for tau in tau_candidates:
-                K = float(dt_median / tau)
+        K: float = float(dt_median / tau)
+        q_est, extra = runner_func(K=K, **runner_kwargs)
+        g_body_est, _, _, _, _ = extra
 
-                _, extra = runner_func(K=K, **runner_kwargs)
-                g_body_est, _, _, _, _ = extra
+        gb = g_body_est[s:e]
+        gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
 
-                gb = g_body_est[s:e]
-                gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
+        mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
+        mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
+        dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
+        ang: ScalarBatch = np.arccos(dot)
 
-                mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
-                mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
-                dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
-                ang: ScalarBatch = np.arccos(dot)
-                score: float = float(np.mean(ang))
-
-                print(f"tau={float(tau)}", f", K={K}", f", score={score}")
-
-                tau_table.append({
-                        "tau": float(tau), "K": K,
-                        "score": score})
-        tau_table.sort(key=lambda d: d["score"])
-        best_tau: float = tau_table[0]["tau"]
-        best_K: float = tau_table[0]["K"]
-        return tau_table, best_tau, best_K
+        quasi_score: float = score_angle_err(ang)
+        score: float = score_angle_err(calc_angle_err(q_est, q_ref))
+        return quasi_score + score
 
 def suggest_fixed_gyro_gate_sigma(w: Vec3Batch, p_gyro: int, sigma_floor: float,
                                   best_quasi_static: tuple[int, int, int] = None) -> float:
@@ -222,38 +294,38 @@ def calc_scale(base: float, scale: float) -> float:
                 return np.inf
         return base * scale
 
-@dataclass
-class SweepBest:
-        scale: float
-        res: float
-        angle_err: ScalarBatch
-        mean_err: float
-        q_est: QuatBatch
-        extra: tuple[Any, ...]
+#@dataclass
+#class SweepBest:
+#        scale: float
+#        res: float
+#        angle_err: ScalarBatch
+#        mean_err: float
+#        q_est: QuatBatch
+#        extra: tuple[Any, ...]
 
-def choose_best_by_scale(scale: tuple[float, ...],
-                               K: float, base: float, q_ref: QuatBatch,
-                               runner_func: Callable[[float], tuple[Any, ...]],
-                               keyword: str,
-                               fixed_kwargs: dict[str, Any] = None
-                               ) -> SweepBest:
-        best: SweepBest = None
+#def choose_best_by_scale(scale: tuple[float, ...],
+#                               K: float, base: float, q_ref: QuatBatch,
+#                               runner_func: Callable[[float], tuple[Any, ...]],
+#                               keyword: str,
+#                               fixed_kwargs: dict[str, Any] = None
+#                               ) -> SweepBest:
+#        best: SweepBest = None
 
-        for s in scale:
-                res: float = calc_scale(base, s)
+#        for s in scale:
+#                res: float = calc_scale(base, s)
 
-                kwargs = dict(fixed_kwargs)
-                kwargs[keyword] = res
-                q_est, extra = runner_func(K=K, **kwargs)
+#                kwargs = dict(fixed_kwargs)
+#                kwargs[keyword] = res
+#                q_est, extra = runner_func(K=K, **kwargs)
 
-                angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
-                mean_err: float = float(np.mean(angle_err))
+#                angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
+#                mean_err: float = float(np.mean(angle_err))
 
-                print(f"scale={s}", f", {keyword}={res:.7f}", f", mean_err(rad)={mean_err:.7f}")
+#                print(f"scale={s}", f", {keyword}={res:.7f}", f", mean_err(rad)={mean_err:.7f}")
 
-                if best is None or mean_err < best.mean_err:
-                        best = SweepBest(s, res, angle_err, mean_err, q_est, extra)
-        return best
+#                if best is None or mean_err < best.mean_err:
+#                        best = SweepBest(s, res, angle_err, mean_err, q_est, extra)
+#        return best
 
 def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                                    dt: ScalarBatch, g0: float,
@@ -316,37 +388,3 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                 batch_mag_sigma[i] = mag_sigma
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
 
-@dataclass
-class BestParam:
-        score: float
-        p: int
-        win_s: float
-        update_s: float
-        ema: float
-
-def choose_best_timevarying_sigma(K: float, q_ref: QuatBatch,
-                                  p_candidates: list[int],
-                                  win_s_candidates: list[float],
-                                  update_s_candidates: list[float],
-                                  ema_candidates: list[float],
-                                  runner_func: Callable[..., tuple[Any, ...]]
-                                  ) -> BestParam:
-        best: BestParam = None
-
-        for p in p_candidates:
-                for win in win_s_candidates:
-                        for update in update_s_candidates:
-                                for ema in ema_candidates:
-                                        q_est, _ = runner_func(K=K,
-                                                                   p_gyro=p-10, p_acc=p, p_mag=p,
-                                                                   win_s=win,
-                                                                   update_s=update,
-                                                                   ema_alpha=ema)
-                                        angle_err = calc_angle_err(q_est, q_ref)
-                                        score = np.mean(angle_err) + 0.2 * np.percentile(angle_err, 90)
-                                        print(f"score={score:.7f}", f" | p={p}", f", win_s={win}",
-                                              f", update_s={update}", f", ema_alpha={ema}")
-
-                                        if best is None or score < best.score:
-                                                best = BestParam(score, p, win, update, ema)
-        return best
