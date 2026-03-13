@@ -1,15 +1,15 @@
 
 
-[START] 2026-03-09 12:45:36.692
+[START] 2026-03-13 11:24:39.328
 
 [OK] Stabilization detected, cut idx 2300 (≈ 23.0s)
 
-[END] 2026-03-09 12:45:39.840
+[END] 2026-03-13 11:24:42.179
 
 
 
 
-[START] 2026-03-09 12:45:39.860
+[START] 2026-03-13 11:24:42.196
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -19,316 +19,120 @@ Best quasi static(start, end, length):  (41487, 43669, 2182)
 Suggested gyro_sigma:  0.48226806557261265
 Suggested acc_sigma:  0.6755995626475786
 
-[END] 2026-03-09 12:45:41.086
+[END] 2026-03-13 11:24:43.093
 
 
 
 
-[START] 2026-03-09 12:45:44.076
+[START] 2026-03-13 11:24:45.353
 
-[choosing tau, K] — no gating
-tau=0.2 , K=0.04999389648446595 , score=0.0430051683723482
-tau=0.3 , K=0.0333292643229773 , score=0.04225915280473559
-tau=0.5 , K=0.01999755859378638 , score=0.04267781201326944
-tau=0.7 , K=0.01428397042413313 , score=0.04349236678781785
-tau=1.0 , K=0.00999877929689319 , score=0.04446262009161064
-tau=1.5 , K=0.00666585286459546 , score=0.04546907691316554
-tau=2.0 , K=0.004999389648446595 , score=0.04606170690028473
-tau=3.0 , K=0.00333292643229773 , score=0.04666377489613214
-
-chosen tau:  0.3 , K:  0.0333292643229773 
-
-
-[END] 2026-03-09 12:47:42.844
-
-
-
-
-[START] 2026-03-09 12:47:42.860
 
 [chosen value]
-tau= 0.3 , K= 0.0333292643229773
+tau= 0.453005680968125 , K= 0.022072083677901463
 acc_gate_sigma=inf
 gyro_gate_sigma=inf
 
 [exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
-0.005370781710236194 1.1276601890042688 0.4098091184475541 0.7547733170837478
+0.0023010167845991885 0.8546969557518133 0.2109661793309616 0.434937591051269
 
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
-0.30772312468258817 64.61016955486933 23.480332893021696 43.24532555798819
+0.13183855034629674 48.97052832725857 12.08747169566416 24.920088318824675
 
-[END] 2026-03-09 12:47:59.894
-
-
-
-
-[START] 2026-03-09 12:47:59.910
-
-[choosing tau, K] — gating
-tau=0.2 , K=0.04999389648446595 , score=0.04925435383076987
-tau=0.3 , K=0.0333292643229773 , score=0.049354316871941174
-tau=0.5 , K=0.01999755859378638 , score=0.04943651758590915
-tau=0.7 , K=0.01428397042413313 , score=0.04947236344137109
-tau=1.0 , K=0.00999877929689319 , score=0.04949949343780686
-tau=1.5 , K=0.00666585286459546 , score=0.049520740981088995
-tau=2.0 , K=0.004999389648446595 , score=0.049531413002043605
-tau=3.0 , K=0.00333292643229773 , score=0.04954211728361679
-
-chosen tau:  0.2 , K:  0.04999389648446595 
-
-
-[END] 2026-03-09 12:50:34.205
+[END] 2026-03-13 11:28:32.603
 
 
 
 
-[START] 2026-03-09 12:50:34.220
+[START] 2026-03-13 11:28:32.621
 
-[choosing acc_gate_sigma]
-scale=0.01 , acc_gate_sigma=0.0067560 , mean_err(rad)=0.5377823
-scale=1 , acc_gate_sigma=0.6755996 , mean_err(rad)=0.5135379
-scale=10 , acc_gate_sigma=6.7559956 , mean_err(rad)=0.8716220
-scale=inf , acc_gate_sigma=inf , mean_err(rad)=1.0667068
-
-chosen sa=1,  acc_gate_sigma=0.6755996
 
 [chosen value]
-tau= 0.2 , K= 0.04999389648446595
-sa=1,  acc_gate_sigma=0.6755996
+tau= 0.44681340111488216 , K= 0.02237797539631619
+acc_gate_sigma=5.0150649
 gyro_gate_sigma=inf
 
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.008190017264852138 1.2735370932367476 0.5135378598413219 0.7536009268519422
+0.001982023039254552 0.9026891165486662 0.25264463112089824 0.4727583396816166
 
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.4692534234153056 72.96830049582445 29.423551989088555 43.17815254576336
+0.11356155504697812 51.72027659063145 14.475471079867003 27.087057593368783
 
-[END] 2026-03-09 12:51:41.346
-
-
+[END] 2026-03-13 11:35:49.807
 
 
-[START] 2026-03-09 12:51:41.360
 
 
-chosen sa=1,  acc_gate_sigma=0.6755996
+[START] 2026-03-13 11:35:49.824
 
-[choosing gyro_gate_sigma]
-scale=0.01 , gyro_gate_sigma=0.0048227 , mean_err(rad)=0.5377820
-scale=1 , gyro_gate_sigma=0.4822681 , mean_err(rad)=0.5264647
-scale=10 , gyro_gate_sigma=4.8226807 , mean_err(rad)=0.5138317
-scale=inf , gyro_gate_sigma=inf , mean_err(rad)=0.5135379
-
-chosen sg=inf,  gyro_gate_sigma=inf
 
 [chosen value]
-tau= 0.2 , K= 0.04999389648446595
-sa=1,  acc_gate_sigma=0.6755996
-sg=inf,  gyro_gate_sigma=inf
+tau= 0.3622814174314122 , K= 0.027599481551620512
+acc_gate_sigma=2.2768915
+gyro_gate_sigma=1.8991067
 
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.008190017264852138 1.2735370932367476 0.5135378598413219 0.7536009268519422
+0.002750463050283641 1.1087489285889127 0.38659997999537876 0.576193216248023
 
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.4692534234153056 72.96830049582445 29.423551989088555 43.17815254576336
+0.15758992448793135 63.5266341477966 22.15054721357726 33.01343947508049
 
-[END] 2026-03-09 12:52:49.957
-
-
+[END] 2026-03-13 11:45:10.029
 
 
-[START] 2026-03-09 12:52:49.985
 
-[suggesting time-varying gyro/acc gate_sigma]
-score=0.3641443  | p=60 , win_s=5 , update_s=1 , ema_alpha=0.05
-score=0.3633988  | p=60 , win_s=5 , update_s=1 , ema_alpha=0.07
-score=0.3625376  | p=60 , win_s=5 , update_s=1 , ema_alpha=0.1
-score=0.3659234  | p=60 , win_s=5 , update_s=1.5 , ema_alpha=0.05
-score=0.3654508  | p=60 , win_s=5 , update_s=1.5 , ema_alpha=0.07
-score=0.3646744  | p=60 , win_s=5 , update_s=1.5 , ema_alpha=0.1
-score=0.3647640  | p=60 , win_s=5 , update_s=2 , ema_alpha=0.05
-score=0.3645673  | p=60 , win_s=5 , update_s=2 , ema_alpha=0.07
-score=0.3641604  | p=60 , win_s=5 , update_s=2 , ema_alpha=0.1
-score=0.3653393  | p=60 , win_s=6 , update_s=1 , ema_alpha=0.05
-score=0.3643483  | p=60 , win_s=6 , update_s=1 , ema_alpha=0.07
-score=0.3633289  | p=60 , win_s=6 , update_s=1 , ema_alpha=0.1
-score=0.3662125  | p=60 , win_s=6 , update_s=1.5 , ema_alpha=0.05
-score=0.3653248  | p=60 , win_s=6 , update_s=1.5 , ema_alpha=0.07
-score=0.3642639  | p=60 , win_s=6 , update_s=1.5 , ema_alpha=0.1
-score=0.3665752  | p=60 , win_s=6 , update_s=2 , ema_alpha=0.05
-score=0.3659006  | p=60 , win_s=6 , update_s=2 , ema_alpha=0.07
-score=0.3650444  | p=60 , win_s=6 , update_s=2 , ema_alpha=0.1
-score=0.3666812  | p=60 , win_s=7 , update_s=1 , ema_alpha=0.05
-score=0.3654615  | p=60 , win_s=7 , update_s=1 , ema_alpha=0.07
-score=0.3642741  | p=60 , win_s=7 , update_s=1 , ema_alpha=0.1
-score=0.3683186  | p=60 , win_s=7 , update_s=1.5 , ema_alpha=0.05
-score=0.3670448  | p=60 , win_s=7 , update_s=1.5 , ema_alpha=0.07
-score=0.3656928  | p=60 , win_s=7 , update_s=1.5 , ema_alpha=0.1
-score=0.3686380  | p=60 , win_s=7 , update_s=2 , ema_alpha=0.05
-score=0.3675635  | p=60 , win_s=7 , update_s=2 , ema_alpha=0.07
-score=0.3663581  | p=60 , win_s=7 , update_s=2 , ema_alpha=0.1
-score=0.3674003  | p=60 , win_s=8 , update_s=1 , ema_alpha=0.05
-score=0.3661097  | p=60 , win_s=8 , update_s=1 , ema_alpha=0.07
-score=0.3648688  | p=60 , win_s=8 , update_s=1 , ema_alpha=0.1
-score=0.3694000  | p=60 , win_s=8 , update_s=1.5 , ema_alpha=0.05
-score=0.3680184  | p=60 , win_s=8 , update_s=1.5 , ema_alpha=0.07
-score=0.3665872  | p=60 , win_s=8 , update_s=1.5 , ema_alpha=0.1
-score=0.3693078  | p=60 , win_s=8 , update_s=2 , ema_alpha=0.05
-score=0.3679945  | p=60 , win_s=8 , update_s=2 , ema_alpha=0.07
-score=0.3665696  | p=60 , win_s=8 , update_s=2 , ema_alpha=0.1
-score=0.3677941  | p=60 , win_s=10 , update_s=1 , ema_alpha=0.05
-score=0.3664729  | p=60 , win_s=10 , update_s=1 , ema_alpha=0.07
-score=0.3652265  | p=60 , win_s=10 , update_s=1 , ema_alpha=0.1
-score=0.3695737  | p=60 , win_s=10 , update_s=1.5 , ema_alpha=0.05
-score=0.3681449  | p=60 , win_s=10 , update_s=1.5 , ema_alpha=0.07
-score=0.3666701  | p=60 , win_s=10 , update_s=1.5 , ema_alpha=0.1
-score=0.3699083  | p=60 , win_s=10 , update_s=2 , ema_alpha=0.05
-score=0.3685864  | p=60 , win_s=10 , update_s=2 , ema_alpha=0.07
-score=0.3671132  | p=60 , win_s=10 , update_s=2 , ema_alpha=0.1
-score=0.2964570  | p=70 , win_s=5 , update_s=1 , ema_alpha=0.05
-score=0.2973439  | p=70 , win_s=5 , update_s=1 , ema_alpha=0.07
-score=0.2982531  | p=70 , win_s=5 , update_s=1 , ema_alpha=0.1
-score=0.2956018  | p=70 , win_s=5 , update_s=1.5 , ema_alpha=0.05
-score=0.2966509  | p=70 , win_s=5 , update_s=1.5 , ema_alpha=0.07
-score=0.2975993  | p=70 , win_s=5 , update_s=1.5 , ema_alpha=0.1
-score=0.2944387  | p=70 , win_s=5 , update_s=2 , ema_alpha=0.05
-score=0.2957286  | p=70 , win_s=5 , update_s=2 , ema_alpha=0.07
-score=0.2969123  | p=70 , win_s=5 , update_s=2 , ema_alpha=0.1
-score=0.2954715  | p=70 , win_s=6 , update_s=1 , ema_alpha=0.05
-score=0.2965980  | p=70 , win_s=6 , update_s=1 , ema_alpha=0.07
-score=0.2976538  | p=70 , win_s=6 , update_s=1 , ema_alpha=0.1
-score=0.2937346  | p=70 , win_s=6 , update_s=1.5 , ema_alpha=0.05
-score=0.2951642  | p=70 , win_s=6 , update_s=1.5 , ema_alpha=0.07
-score=0.2964167  | p=70 , win_s=6 , update_s=1.5 , ema_alpha=0.1
-score=0.2922899  | p=70 , win_s=6 , update_s=2 , ema_alpha=0.05
-score=0.2939653  | p=70 , win_s=6 , update_s=2 , ema_alpha=0.07
-score=0.2954810  | p=70 , win_s=6 , update_s=2 , ema_alpha=0.1
-score=0.2961699  | p=70 , win_s=7 , update_s=1 , ema_alpha=0.05
-score=0.2969935  | p=70 , win_s=7 , update_s=1 , ema_alpha=0.07
-score=0.2978237  | p=70 , win_s=7 , update_s=1 , ema_alpha=0.1
-score=0.2950316  | p=70 , win_s=7 , update_s=1.5 , ema_alpha=0.05
-score=0.2960688  | p=70 , win_s=7 , update_s=1.5 , ema_alpha=0.07
-score=0.2969447  | p=70 , win_s=7 , update_s=1.5 , ema_alpha=0.1
-score=0.2940737  | p=70 , win_s=7 , update_s=2 , ema_alpha=0.05
-score=0.2952903  | p=70 , win_s=7 , update_s=2 , ema_alpha=0.07
-score=0.2963992  | p=70 , win_s=7 , update_s=2 , ema_alpha=0.1
-score=0.2966703  | p=70 , win_s=8 , update_s=1 , ema_alpha=0.05
-score=0.2972697  | p=70 , win_s=8 , update_s=1 , ema_alpha=0.07
-score=0.2979141  | p=70 , win_s=8 , update_s=1 , ema_alpha=0.1
-score=0.2959033  | p=70 , win_s=8 , update_s=1.5 , ema_alpha=0.05
-score=0.2966592  | p=70 , win_s=8 , update_s=1.5 , ema_alpha=0.07
-score=0.2973426  | p=70 , win_s=8 , update_s=1.5 , ema_alpha=0.1
-score=0.2948643  | p=70 , win_s=8 , update_s=2 , ema_alpha=0.05
-score=0.2957481  | p=70 , win_s=8 , update_s=2 , ema_alpha=0.07
-score=0.2965563  | p=70 , win_s=8 , update_s=2 , ema_alpha=0.1
-score=0.2970113  | p=70 , win_s=10 , update_s=1 , ema_alpha=0.05
-score=0.2974131  | p=70 , win_s=10 , update_s=1 , ema_alpha=0.07
-score=0.2978504  | p=70 , win_s=10 , update_s=1 , ema_alpha=0.1
-score=0.2965781  | p=70 , win_s=10 , update_s=1.5 , ema_alpha=0.05
-score=0.2970461  | p=70 , win_s=10 , update_s=1.5 , ema_alpha=0.07
-score=0.2975072  | p=70 , win_s=10 , update_s=1.5 , ema_alpha=0.1
-score=0.2958990  | p=70 , win_s=10 , update_s=2 , ema_alpha=0.05
-score=0.2964191  | p=70 , win_s=10 , update_s=2 , ema_alpha=0.07
-score=0.2969253  | p=70 , win_s=10 , update_s=2 , ema_alpha=0.1
-score=0.3356685  | p=80 , win_s=5 , update_s=1 , ema_alpha=0.05
-score=0.3379725  | p=80 , win_s=5 , update_s=1 , ema_alpha=0.07
-score=0.3405363  | p=80 , win_s=5 , update_s=1 , ema_alpha=0.1
-score=0.3318506  | p=80 , win_s=5 , update_s=1.5 , ema_alpha=0.05
-score=0.3339871  | p=80 , win_s=5 , update_s=1.5 , ema_alpha=0.07
-score=0.3365393  | p=80 , win_s=5 , update_s=1.5 , ema_alpha=0.1
-score=0.3318226  | p=80 , win_s=5 , update_s=2 , ema_alpha=0.05
-score=0.3335098  | p=80 , win_s=5 , update_s=2 , ema_alpha=0.07
-score=0.3357464  | p=80 , win_s=5 , update_s=2 , ema_alpha=0.1
-score=0.3355452  | p=80 , win_s=6 , update_s=1 , ema_alpha=0.05
-score=0.3377698  | p=80 , win_s=6 , update_s=1 , ema_alpha=0.07
-score=0.3402706  | p=80 , win_s=6 , update_s=1 , ema_alpha=0.1
-score=0.3332070  | p=80 , win_s=6 , update_s=1.5 , ema_alpha=0.05
-score=0.3351731  | p=80 , win_s=6 , update_s=1.5 , ema_alpha=0.07
-score=0.3375757  | p=80 , win_s=6 , update_s=1.5 , ema_alpha=0.1
-score=0.3316273  | p=80 , win_s=6 , update_s=2 , ema_alpha=0.05
-score=0.3332141  | p=80 , win_s=6 , update_s=2 , ema_alpha=0.07
-score=0.3353173  | p=80 , win_s=6 , update_s=2 , ema_alpha=0.1
-score=0.3351828  | p=80 , win_s=7 , update_s=1 , ema_alpha=0.05
-score=0.3374411  | p=80 , win_s=7 , update_s=1 , ema_alpha=0.07
-score=0.3399428  | p=80 , win_s=7 , update_s=1 , ema_alpha=0.1
-score=0.3320513  | p=80 , win_s=7 , update_s=1.5 , ema_alpha=0.05
-score=0.3341112  | p=80 , win_s=7 , update_s=1.5 , ema_alpha=0.07
-score=0.3366055  | p=80 , win_s=7 , update_s=1.5 , ema_alpha=0.1
-score=0.3314570  | p=80 , win_s=7 , update_s=2 , ema_alpha=0.05
-score=0.3331578  | p=80 , win_s=7 , update_s=2 , ema_alpha=0.07
-score=0.3352992  | p=80 , win_s=7 , update_s=2 , ema_alpha=0.1
-score=0.3348027  | p=80 , win_s=8 , update_s=1 , ema_alpha=0.05
-score=0.3371161  | p=80 , win_s=8 , update_s=1 , ema_alpha=0.07
-score=0.3397096  | p=80 , win_s=8 , update_s=1 , ema_alpha=0.1
-score=0.3315944  | p=80 , win_s=8 , update_s=1.5 , ema_alpha=0.05
-score=0.3336607  | p=80 , win_s=8 , update_s=1.5 , ema_alpha=0.07
-score=0.3361698  | p=80 , win_s=8 , update_s=1.5 , ema_alpha=0.1
-score=0.3308197  | p=80 , win_s=8 , update_s=2 , ema_alpha=0.05
-score=0.3326161  | p=80 , win_s=8 , update_s=2 , ema_alpha=0.07
-score=0.3347962  | p=80 , win_s=8 , update_s=2 , ema_alpha=0.1
-score=0.3341571  | p=80 , win_s=10 , update_s=1 , ema_alpha=0.05
-score=0.3364835  | p=80 , win_s=10 , update_s=1 , ema_alpha=0.07
-score=0.3391950  | p=80 , win_s=10 , update_s=1 , ema_alpha=0.1
-score=0.3312714  | p=80 , win_s=10 , update_s=1.5 , ema_alpha=0.05
-score=0.3333906  | p=80 , win_s=10 , update_s=1.5 , ema_alpha=0.07
-score=0.3359251  | p=80 , win_s=10 , update_s=1.5 , ema_alpha=0.1
-score=0.3300025  | p=80 , win_s=10 , update_s=2 , ema_alpha=0.05
-score=0.3318761  | p=80 , win_s=10 , update_s=2 , ema_alpha=0.07
-score=0.3341110  | p=80 , win_s=10 , update_s=2 , ema_alpha=0.1
 
-[best param] 
-best_p_gyro= 60 , best_p_acc= 70
-best_win_s= 6 , best_update= 2 , best_ema_alpha= 0.05
+[START] 2026-03-13 11:45:10.048
+
 
 [chosen value]
-tau= 0.2 , K= 0.04999389648446595
+tau= 0.12369854227572163 , K= 0.08083182803081145
 acc_gate_sigma/gyro_gate_sigma = time-varying gate sigma
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
-0.001741600347259256 0.8383690809766035 0.20873138672702637 0.4177927413831056
+0.0028007306816260897 0.7646791553411859 0.22423905189069704 0.37871055020362776
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
-0.09978634949647393 48.03501001422093 11.95942751137162 23.937760792452643
+0.16047004760997322 43.812888282678614 12.847951275352003 21.69851618374515
 
-[END] 2026-03-09 13:40:02.208
-
-
+[END] 2026-03-13 12:00:07.518
 
 
-[START] 2026-03-09 13:40:07.954
+
+
+[START] 2026-03-13 12:00:12.711
 
 best: exp2-4
 
-[END] 2026-03-09 13:40:07.956
+[END] 2026-03-13 12:00:12.731
 
 
 
 
-[START] 2026-03-09 13:40:24.840
+[START] 2026-03-13 12:00:27.534
 
 [Gravity]
-RMSE norm: 0.5605914694650614
+RMSE norm: 0.58826201419886
 
 Gravity est/ref angle error in rad — min/max/mean/p90
-0.00026802748916245035 0.2779949953387689 0.04979085537526603 0.08242345118085329
+0.000193176660327385 0.2780163334028131 0.052199035533544845 0.08687272306133978
 
 Gravity est/ref angle error in deg — min/max/mean/p90
-0.015356843922496817 15.927939958670452 2.852805871349012 4.722515885565475
+0.011068207337191448 15.929162539683166 2.990784430725535 4.977440386223586
 
 
 [Linear accel]
-RMSE norm: 0.7960311447442451
+RMSE norm: 0.8193491927937331
 
 Linear accel est/ref angle error in rad — min/max/mean/p90
-0.0004061539811666869 2.794659747563723 0.2086264972161948 0.4161135040163428
+0.00088633539798877 2.839164140271552 0.21626762427804563 0.4284493053913586
 
 Linear accel est/ref angle error in deg — min/max/mean/p90
-0.02327090895328708 160.12220871049738 11.953417785085781 23.84154757853647
+0.050783277537804636 162.67212258244876 12.391222116453033 24.548336934236556
 
 
 [Consistency ratio]
-rmse_norm of (a_lin_est / g_est):  1.4199844059415487
+rmse_norm of (a_lin_est / g_est):  1.3928303596307934
 
-[END] 2026-03-09 13:40:26.338
+[END] 2026-03-13 12:00:28.758
 
 

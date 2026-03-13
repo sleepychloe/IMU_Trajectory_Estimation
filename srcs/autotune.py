@@ -1,12 +1,10 @@
 import numpy as np
 from typing import Any, Callable
-from dataclasses import dataclass
-import optuna
 
-from my_types import Vec3, Quat, ScalarBatch, Vec3Batch, QuatBatch, BoolBatch, Int8Batch, Int32Batch, Int64Batch
+from my_types import Vec3, ScalarBatch, Vec3Batch, QuatBatch, BoolBatch, Int8Batch, Int32Batch, Int64Batch
 from my_types import as_vec3, as_scalar_batch, as_bool_batch, as_int8_batch
 from pipelines import integrate_gyro_acc
-from evaluation import calc_angle_err
+from evaluation import calc_angle_err, score_angle_err
 
 EPS: float = 1e-6
 DELTA: float = 1e-12
@@ -41,6 +39,56 @@ def auto_setup_imu_frame(q_ref: QuatBatch, w: Vec3Batch, dt: ScalarBatch,
                         g_world_unit = g_dir
         print("Selected g_world_unit:", g_world_unit)
         return a_src, g_world_unit
+
+def suggest_fixed_gyro_gate_sigma(w: Vec3Batch, p_gyro: int, sigma_floor: float,
+                                  best_quasi_static: tuple[int, int, int] = None) -> float:
+        if w is None or p_gyro is None:
+                return np.inf
+        if best_quasi_static is not None:
+                s, e, _ = best_quasi_static
+                w_use: Vec3Batch = w[s:e]
+        w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
+        gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
+        return gyro_sigma
+
+def suggest_fixed_acc_gate_sigma(a: Vec3Batch, g0: float, p_acc: int, sigma_floor: float,
+                                 best_quasi_static: tuple[int, int, int] = None) -> float:
+        if a is None or p_acc is None:
+                return np.inf
+        if best_quasi_static is not None:
+                s, e, _ = best_quasi_static
+                a_use: Vec3Batch = a[s:e]
+        a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
+        acc_resid: ScalarBatch = np.abs(a_norm - g0)
+        acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
+        return acc_sigma
+
+def suggest_fixed_mag_gate_sigma(m: Vec3Batch, m0: float, p_mag: int, sigma_floor: float
+                                 ) -> float:
+        if m is None or p_mag is None:
+                return np.inf
+        m_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(m, axis=1))
+        mag_resid: ScalarBatch = np.abs(m_norm - np.median(m_norm))
+        mag_sigma: float = max(sigma_floor, float(np.percentile(mag_resid, p_mag)))
+        return mag_sigma
+
+def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
+                             g0: float, m0: float,
+                             p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
+                             best_quasi_static: tuple[int, int, int] = None
+                             ) -> tuple[float, float, float]:
+        gyro_sigma: float = suggest_fixed_gyro_gate_sigma(w, p_gyro, sigma_floor, best_quasi_static)
+        if w is not None:
+                print("Suggested gyro_sigma: ", gyro_sigma)
+
+        acc_sigma: float = suggest_fixed_acc_gate_sigma(a, g0, p_acc, sigma_floor, best_quasi_static)
+        if a is not None:
+                print("Suggested acc_sigma: ", acc_sigma)
+
+        mag_sigma: float = suggest_fixed_mag_gate_sigma(m, m0, p_mag, sigma_floor)
+        if m is not None:
+                print("Suggested mag_sigma: ", mag_sigma)
+        return gyro_sigma, acc_sigma, mag_sigma
 
 def stats_basic(x: float) -> tuple[float, ...]:
         """
@@ -124,97 +172,39 @@ def quasi_static_detector(w: Vec3Batch, a: Vec3Batch, dt: ScalarBatch, g0: float
         print("Best quasi static(start, end, length): ", best_quasi_static)
         return best_quasi_static
 
-#def choose_tau_from_quasi_static(dt: ScalarBatch, runner_func: Callable[[float], tuple[Any, ...]],
-#                                 best_quasi_static: tuple[int, int, int] | None = None,
-#                                 tau_candidates: tuple[float, ...] = (0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3),
-#                                 runner_kwargs: dict[str, Any] = None,
-#                                 ) -> tuple[list[dict[str, Any]], float, float]:
-#        """
-#        Returns:
-#                tau_table: dict[str, Any]
-#                best_tau: float
-#                K: float
-#        """
-#        dt_median: float = float(np.median(dt))
+def calc_score_quasi(tau: float, dt: ScalarBatch,
+                     runner_func: Callable[[float], tuple[Any, ...]],
+                     best_quasi_static: tuple[int, int, int] | None = None,
+                     runner_kwargs: dict[str, Any] = None,
+                     ) -> float:
 
-#        if best_quasi_static is None:
-#                s, e = 0, len(dt)
-#        else:
-#                s, e, _ = best_quasi_static
+        dt_median: float = float(np.median(dt))
 
-#        tau_table: list[dict[str, Any]] = []
-#        for tau in tau_candidates:
-#                K = float(dt_median / tau)
+        if best_quasi_static is None:
+                s, e = 0, len(dt)
+        else:
+                s, e, _ = best_quasi_static
 
-#                _, extra = runner_func(K=K, **runner_kwargs)
-#                g_body_est, _, _, _, _ = extra
+        K: float = float(dt_median / tau)
+        _, extra = runner_func(K=K, **runner_kwargs)
+        g_body_est, _, _, _, _ = extra
 
-#                gb = g_body_est[s:e]
-#                gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
+        gb = g_body_est[s:e]
+        gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
 
-#                mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
-#                mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
-#                dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
-#                ang: ScalarBatch = np.arccos(dot)
-#                score: float = float(np.mean(ang))
+        mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
+        mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
+        dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
+        ang: ScalarBatch = np.arccos(dot)
 
-#                print(f"tau={float(tau)}", f", K={K}", f", score={score}")
+        quasi_score: float = score_angle_err(ang)
+        return quasi_score
 
-#                tau_table.append({
-#                        "tau": float(tau), "K": K,
-#                        "score": score})
-#        tau_table.sort(key=lambda d: d["score"])
-#        best_tau: float = tau_table[0]["tau"]
-#        best_K: float = tau_table[0]["K"]
-#        return tau_table, best_tau, best_K
-
-def score_angle_err(angle_err: ScalarBatch) -> float:
-        mean: float = np.mean(angle_err)
-        p95: float = np.percentile(angle_err, 95)
-        p99: float = np.percentile(angle_err, 99)
-
-        l: int = len(angle_err)
-        drift: float = abs(np.mean(angle_err[int(0.9*l):]) - np.mean(angle_err[:int(0.1*l)]))
-
-        score: float = (0.4 * mean
-                        + 0.3 * p95
-                        + 0.2 * p99
-                        + 0.1 * drift)
-        return score
-
-#def score_tau_quasi_static(tau: float, dt: ScalarBatch,
-#                           runner_func: Callable[[float], tuple[Any, ...]],
-#                           best_quasi_static: tuple[int, int, int] | None = None,
-#                           runner_kwargs: dict[str, Any] = None,
-#                           ) -> float:
-
-#        dt_median: float = float(np.median(dt))
-
-#        if best_quasi_static is None:
-#                s, e = 0, len(dt)
-#        else:
-#                s, e, _ = best_quasi_static
-
-#        K: float = float(dt_median / tau)
-#        _, extra = runner_func(K=K, **runner_kwargs)
-#        g_body_est, _, _, _, _ = extra
-
-#        gb = g_body_est[s:e]
-#        gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
-
-#        mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
-#        mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
-#        dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
-#        ang: ScalarBatch = np.arccos(dot)
-
-#        score: float = score_angle_err(ang)
-#        return score
-
-def score_tau_total(tau: float, dt: ScalarBatch, q_ref: QuatBatch,
-                    runner_func: Callable[[float], tuple[Any, ...]],
-                    best_quasi_static: tuple[int, int, int] | None = None,
-                    runner_kwargs: dict[str, Any] = None,
-                    ) -> float:
+def calc_score_quasi_ori(tau: float, dt: ScalarBatch, q_ref: QuatBatch,
+                         runner_func: Callable[[float], tuple[Any, ...]],
+                         best_quasi_static: tuple[int, int, int] | None = None,
+                         runner_kwargs: dict[str, Any] = None,
+                         ) -> float:
 
         dt_median: float = float(np.median(dt))
 
@@ -236,96 +226,8 @@ def score_tau_total(tau: float, dt: ScalarBatch, q_ref: QuatBatch,
         ang: ScalarBatch = np.arccos(dot)
 
         quasi_score: float = score_angle_err(ang)
-        score: float = score_angle_err(calc_angle_err(q_est, q_ref))
-        return quasi_score + score
-
-def suggest_fixed_gyro_gate_sigma(w: Vec3Batch, p_gyro: int, sigma_floor: float,
-                                  best_quasi_static: tuple[int, int, int] = None) -> float:
-        if w is None or p_gyro is None:
-                return np.inf
-        if best_quasi_static is not None:
-                s, e, _ = best_quasi_static
-                w_use: Vec3Batch = w[s:e]
-        w_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(w_use, axis=1))
-        gyro_sigma: float = max(sigma_floor, float(np.percentile(w_norm, p_gyro)))
-        return gyro_sigma
-
-def suggest_fixed_acc_gate_sigma(a: Vec3Batch, g0: float, p_acc: int, sigma_floor: float,
-                                 best_quasi_static: tuple[int, int, int] = None) -> float:
-        if a is None or p_acc is None:
-                return np.inf
-        if best_quasi_static is not None:
-                s, e, _ = best_quasi_static
-                a_use: Vec3Batch = a[s:e]
-        a_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(a_use, axis=1))
-        acc_resid: ScalarBatch = np.abs(a_norm - g0)
-        acc_sigma: float = max(sigma_floor, float(np.percentile(acc_resid, p_acc)))
-        return acc_sigma
-
-def suggest_fixed_mag_gate_sigma(m: Vec3Batch, m0: float, p_mag: int, sigma_floor: float
-                                 ) -> float:
-        if m is None or p_mag is None:
-                return np.inf
-        m_norm: ScalarBatch = as_scalar_batch(np.linalg.norm(m, axis=1))
-        mag_resid: ScalarBatch = np.abs(m_norm - np.median(m_norm))
-        mag_sigma: float = max(sigma_floor, float(np.percentile(mag_resid, p_mag)))
-        return mag_sigma
-
-def suggest_fixed_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
-                             g0: float, m0: float,
-                             p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,
-                             best_quasi_static: tuple[int, int, int] = None
-                             ) -> tuple[float, float, float]:
-        gyro_sigma: float = suggest_fixed_gyro_gate_sigma(w, p_gyro, sigma_floor, best_quasi_static)
-        if w is not None:
-                print("Suggested gyro_sigma: ", gyro_sigma)
-
-        acc_sigma: float = suggest_fixed_acc_gate_sigma(a, g0, p_acc, sigma_floor, best_quasi_static)
-        if a is not None:
-                print("Suggested acc_sigma: ", acc_sigma)
-
-        mag_sigma: float = suggest_fixed_mag_gate_sigma(m, m0, p_mag, sigma_floor)
-        if m is not None:
-                print("Suggested mag_sigma: ", mag_sigma)
-        return gyro_sigma, acc_sigma, mag_sigma
-
-def calc_scale(base: float, scale: float) -> float:
-        if np.isinf(base) or np.isinf(scale):
-                return np.inf
-        return base * scale
-
-#@dataclass
-#class SweepBest:
-#        scale: float
-#        res: float
-#        angle_err: ScalarBatch
-#        mean_err: float
-#        q_est: QuatBatch
-#        extra: tuple[Any, ...]
-
-#def choose_best_by_scale(scale: tuple[float, ...],
-#                               K: float, base: float, q_ref: QuatBatch,
-#                               runner_func: Callable[[float], tuple[Any, ...]],
-#                               keyword: str,
-#                               fixed_kwargs: dict[str, Any] = None
-#                               ) -> SweepBest:
-#        best: SweepBest = None
-
-#        for s in scale:
-#                res: float = calc_scale(base, s)
-
-#                kwargs = dict(fixed_kwargs)
-#                kwargs[keyword] = res
-#                q_est, extra = runner_func(K=K, **kwargs)
-
-#                angle_err: Vec3Batch = calc_angle_err(q_est, q_ref)
-#                mean_err: float = float(np.mean(angle_err))
-
-#                print(f"scale={s}", f", {keyword}={res:.7f}", f", mean_err(rad)={mean_err:.7f}")
-
-#                if best is None or mean_err < best.mean_err:
-#                        best = SweepBest(s, res, angle_err, mean_err, q_est, extra)
-#        return best
+        ori_score: float = score_angle_err(calc_angle_err(q_est, q_ref))
+        return quasi_score + ori_score
 
 def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                                    dt: ScalarBatch, g0: float,
@@ -387,4 +289,3 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                 batch_acc_sigma[i] = acc_sigma
                 batch_mag_sigma[i] = mag_sigma
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
-

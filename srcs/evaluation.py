@@ -31,6 +31,20 @@ def print_err_status(label: str, err: ScalarBatch) -> None:
         print(np.rad2deg(err.min()), np.rad2deg(err.max()),
               np.rad2deg(err.mean()), np.rad2deg(np.percentile(err, 90)))
 
+def score_angle_err(angle_err: ScalarBatch) -> float:
+        mean: float = np.mean(angle_err)
+        p95: float = np.percentile(angle_err, 95)
+        p99: float = np.percentile(angle_err, 99)
+
+        l: int = len(angle_err)
+        drift: float = abs(np.mean(angle_err[int(0.9*l):]) - np.mean(angle_err[:int(0.1*l)]))
+
+        score: float = (0.4 * mean
+                        + 0.3 * p95
+                        + 0.2 * p99
+                        + 0.1 * drift)
+        return score
+
 def save_err_csv(path: Path, t: ScalarBatch, err: ScalarBatch) -> None:
         df: pd.DataFrame = pd.DataFrame({
                 "seconds_elapsed": t.astype(np.float64),
