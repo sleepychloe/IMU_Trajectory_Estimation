@@ -25,7 +25,7 @@ def exp_2_1(dt: ScalarBatch,
                                                                "gyro_gate_sigma": np.inf})
                 return score
 
-        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=0))
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
         study.optimize(objective, n_trials=n_trials)
         best = study.best_params
 
@@ -56,7 +56,7 @@ def exp_2_2(dt: ScalarBatch, q_ref: QuatBatch,
                                                                    "gyro_gate_sigma": np.inf})
                 return score
 
-        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=0))
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
         study.optimize(objective, n_trials=n_trials)
         best = study.best_params
 
@@ -90,7 +90,7 @@ def exp_2_3(dt: ScalarBatch, q_ref: QuatBatch,
                                                                    "gyro_gate_sigma": gyro_gate_sigma})
                 return score
 
-        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=0))
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
         study.optimize(objective, n_trials=n_trials)
         best = study.best_params
 
@@ -109,7 +109,7 @@ def exp_2_4(dt: ScalarBatch, q_ref: QuatBatch,
             p_candidate: list[int],
             win_s_candidate: list[float],
             update_ratio_candidate: list[float],
-            ema_scale_candidate: list[float],
+            ema_candidate: list[float],
             runner_func: Callable[[float], tuple[Any, ...]],
             n_trials: int
             ) -> tuple[Any, ...]:
@@ -121,19 +121,17 @@ def exp_2_4(dt: ScalarBatch, q_ref: QuatBatch,
 
         def objective_sigma(trial):
                 tau: float = trial.suggest_float("tau", tau_candidate[0], tau_candidate[1])
-                p_gyro: int = trial.suggest_int("p_gyro", p_candidate[0]-10, p_candidate[1]-10)
-                p_acc: int = trial.suggest_int("p_acc", p_candidate[0], p_candidate[1])
+                p: int = trial.suggest_int("p", p_candidate[0], p_candidate[1])
                 win: float = trial.suggest_float("win_s", win_s_candidate[0], win_s_candidate[1], log=True)
                 update_ratio: float = trial.suggest_float("update_ratio", update_ratio_candidate[0], update_ratio_candidate[1])
                 update: float = win * update_ratio
-                ema_scale: float = trial.suggest_float("ema_scale", ema_scale_candidate[0], ema_scale_candidate[1])
-                ema: float = ema_scale * (dt_median / (win + dt_median))
+                ema: float = trial.suggest_float("ema_alpha", ema_candidate[0], ema_candidate[1])
 
                 [timevarying_gyro_sigma,
                  timevarying_acc_sigma, _] = suggest_timevarying_gate_sigma(
                                                 w=w, a=a, m=None,
                                                 dt=dt, g0=g0,
-                                                p_gyro=p_gyro, p_acc=p_acc, p_mag=None, sigma_floor=sigma_floor,
+                                                p_gyro=p-10, p_acc=p, p_mag=None, sigma_floor=sigma_floor,
                                                 win_s=win, update_s=update, ema_alpha=ema)
 
                 score: float = calc_score_quasi_ori(tau, dt, q_ref,
@@ -143,20 +141,19 @@ def exp_2_4(dt: ScalarBatch, q_ref: QuatBatch,
                                                                    "gyro_gate_sigma": timevarying_gyro_sigma})
                 return score
 
-        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=0))
+        study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
         study.optimize(objective_sigma, n_trials=n_trials)
         best = study.best_params
         best_tau: float = best["tau"]
         best_K: float = float(dt_median / best_tau)
-        best_p_gyro: int = best["p_gyro"]
-        best_p_acc: int = best["p_acc"]
+        best_p: int = best["p"]
         best_win: float = best["win_s"]
         best_update: float = best_win * best["update_ratio"]
-        best_ema: float = best["ema_scale"] * (dt_median / best_win + dt_median)
+        best_ema: float = best["ema_alpha"]
         [timevarying_gyro_sigma,
          timevarying_acc_sigma, _] = suggest_timevarying_gate_sigma(
                                         w=w, a=a, m=None,
                                         dt=dt, g0=g0,
-                                        p_gyro=best_p_gyro, p_acc=best_p_acc, p_mag=None, sigma_floor=sigma_floor,
+                                        p_gyro=best_p-10, p_acc=best_p, p_mag=None, sigma_floor=sigma_floor,
                                         win_s=best_win, update_s=best_update, ema_alpha=best_ema)
         return best_tau, best_K, timevarying_acc_sigma, timevarying_gyro_sigma
