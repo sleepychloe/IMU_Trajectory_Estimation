@@ -28,14 +28,6 @@ def predict_gravity_body_frame(q_pred: Quat, g_world_unit: Vec3) -> Vec3:
        g_pred: Vec3 = libq.rotate_world_to_body(q_pred, g_world_unit)
        return safe_unit_vec3(g_pred)
 
-def small_angle_correction_quat(K_eff: float, e_axis: Vec3) -> Quat:
-        dq_corr: Quat = as_quat(np.array([
-                1,
-                0.5 * K_eff * e_axis[0],
-                0.5 * K_eff * e_axis[1],
-                0.5 * K_eff * e_axis[2]]))
-        return libq.quat_norm(dq_corr)
-
 def select_acc_measurement(a_src: Vec3, g_pred: Vec3) -> Vec3:
         a_meas_norm: float = float(np.linalg.norm(a_src))
         if a_meas_norm < EPS:
@@ -57,6 +49,14 @@ def calc_gyro_gating(gyro_sigma: float, w: Vec3) -> float:
         w_norm: float = float(np.linalg.norm(w))
         weight_gyro: float = np.exp(-0.5 * (w_norm / gyro_sigma) ** 2)
         return weight_gyro
+
+def small_angle_correction_quat(K_eff: float, e_axis: Vec3) -> Quat:
+        dq_corr: Quat = as_quat(np.array([
+                1,
+                0.5 * K_eff * e_axis[0],
+                0.5 * K_eff * e_axis[1],
+                0.5 * K_eff * e_axis[2]]))
+        return libq.quat_norm(dq_corr)
 
 def integrate_gyro_acc(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
                        K: float, g0: float, g_world_unit: Vec3,

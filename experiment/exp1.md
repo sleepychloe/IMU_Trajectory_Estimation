@@ -191,10 +191,7 @@ to avoid premature stabilization detection under mild motion/noise.<br>
 ```py
 # resample.py
 
-def find_stable_start_idx(dt: ScalarBatch, w: Vec3Batch, q_ref: QuatBatch,
-                          sample_window: int, threshold: float, sample_hz: int,
-                          consecutive: int, min_cut_second: int, max_cut_second: int
-                          ) -> int:
+def find_stable_start_idx(. . .) -> int:
 	. . .
         max_idx: int = min(sample_hz * max_cut_second, n - sample_window)
         . . .
@@ -208,10 +205,9 @@ def find_stable_start_idx(dt: ScalarBatch, w: Vec3Batch, q_ref: QuatBatch,
                         cons += 1
                         if cons >= consecutive:
                                 best_idx = i - (consecutive - 1) * sample_hz
-                                best_idx = max(0, best_idx)
+                                . . .
                                 break
-                else:  
-                        cons = 0
+                . . .
                 i += sample_hz
 	. . .
         return best_idx

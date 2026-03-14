@@ -200,7 +200,7 @@ Experiment 1 confirms:<br>
 
 This dataset is a clean demonstration of why gating matters.<br>
 Accelerometer correction helps overall, but blindly trusting accel can be unstable when linear accel is strong.<br>
-Gating improves robustness by suppressing bad accel updates.<br>
+Gating improves robustness by suppressing bad accel updates in this dataset.<br>
 
 <br>
 
@@ -212,12 +212,12 @@ Gating improves robustness by suppressing bad accel updates.<br>
 
 <br>
 
-|         |  tau  |         K         |       σ_gyro       |        σ_acc       |
-|:-------:|------:|------------------:|-------------------:|-------------------:|
-| exp 2-1 |  0.3  | 0.033329264322977 |  inf (not applied) |  inf (not applied) |
-| exp 2-2 |  0.2  | 0.049993896484466 |  inf (not applied) |          0.6755996 |
-| exp 2-3 |  0.2  | 0.049993896484466 |  inf (not applied) |          0.6755996 |
-| exp 2-3 |  0.2  | 0.049993896484466 | time-varying sigma | time-varying sigma |
+|         |  tau   |         K         |       σ_gyro       |        σ_acc       |
+|:-------:|-------:|------------------:|-------------------:|-------------------:|
+| exp 2-1 |  0.33  | 0.030621685926523 |  inf (not applied) |  inf (not applied) |
+| exp 2-2 |  0.33  | 0.030621685926523 |  inf (not applied) |          5.8527864 |
+| exp 2-3 |  0.33  | 0.030621685926523 |          2.9182227 |          5.8527864 |
+| exp 2-4 |  0.22  | 0.044943586381469 | time-varying sigma | time-varying sigma |
 
 ** Note: suggested sigmas are reported for reference. the selected run may disable gating (σ=inf) when it does not improve the score<br>
 
@@ -228,10 +228,10 @@ Gating improves robustness by suppressing bad accel updates.<br>
 |         |  Mean error  |  p90 error   |
 |:-------:|-------------:|-------------:|
 | exp 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
-| exp 2-1 | <ul><li>0.40981 rad</li><li>23.48033 deg</li></ul> | <ul><li>0.75477 rad</li><li>43.24533 deg</li></ul> |
-| exp 2-2 | <ul><li>0.37464 rad</li><li>21.46521 deg</li></ul> | <ul><li>0.56815 rad</li><li>32.55285 deg</li></ul> |
-| exp 2-3 | <ul><li>0.37464 rad</li><li>21.46521 deg</li></ul> | <ul><li>0.56815 rad</li><li>32.55285 deg</li></ul> |
-| exp 2-4 | <ul><li>0.20511 rad</li><li>11.75182 deg</li></ul> | <ul><li>0.35550 rad</li><li>20.36846 deg</li></ul> |
+| exp 2-1 | <ul><li>0.33687 rad</li><li>19.30136 deg</li></ul> | <ul><li>0.56227 rad</li><li>32.21544 deg</li></ul> |
+| exp 2-2 | <ul><li>0.26177 rad</li><li>14.99855 deg</li></ul> | <ul><li>0.40604 rad</li><li>23.26442 deg</li></ul> |
+| exp 2-3 | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
+| exp 2-4 | <ul><li>0.22967 rad</li><li>13.15924 deg</li></ul> | <ul><li>0.45485 rad</li><li>26.06074 deg</li></ul> |
 
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
 
@@ -239,17 +239,17 @@ Gating improves robustness by suppressing bad accel updates.<br>
 
 #### [Secondary validation — Gravity & Linear Accel]
 
-Gravity direction error remains low (mean/p90 ≈ 2.81° / 4.71°), indicating a stable tilt estimate.<br>
-Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.89° / 23.83°).<br>
+Gravity direction error remains low (mean/p90 ≈ 2.75° / 4.50°), indicating a stable tilt estimate.<br>
+Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.88° / 23.93°).<br>
 
 <br>
 
 ##### [Observation]
 
-- This dataset is a clean “gating matters” case — fixed gating reduces large error regions and significantly tightens the error distribution
-- The best result is obtained with time-varying sigma (exp 2-4), indicating that reliability conditions change over time and a fixed sigma cannot balance all segments equally well
-- The reduced-error region aligns with periods where `||a||` deviates from g0, supporting the interpretation that gating suppresses incorrect tilt injections during dynamic motion
-- Compared with fixed gating, adaptive sigma improves both average error and the tail behavior, suggesting better segment-wise trade-offs (strictness during dynamic motion, permissiveness when stable)
+- This dataset is a strong “gating helps” case
+- Both accel-only and joint gating reduce error substantially relative to ungated correction
+- The best result is exp 2-3, suggesting that fixed jointly optimized gyro/acc gating provides the best trade-off for this dataset
+- Time-varying sigma still performs well, but the Optuna result shows that a carefully tuned fixed-gating configuration can outperform the adaptive schedule on this sequence
 
 <br>
 <br>
@@ -258,10 +258,10 @@ Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.89
 
 Experiment 2 confirms:<br>
 
-1. Accelerometer correction stabilizes roll/pitch by continuously correcting gyro drift
-2. Gating acts as a reliability controller that prevents incorrect tilt injections during dynamic motion
-3. Time-varying gating tends to help when fixed gating already demonstrates a clear advantage, suggesting that the proxy captures meaningful reliability structure in the data
-4. When fixed gating is not selected by the sigma sweep (`best sigma = inf`), adaptive gating often provides limited benefit and can degrade performance by suppressing valid corrections
+1. Accelerometer correction improves roll/pitch by continuously correcting gyro drift
+2. Gating can further improve performance, but only when the reliability proxy aligns with the actual failure modes of the dataset
+3. The usefulness of gating is not universal: some datasets benefit from fixed or joint gating, while others perform best with no gating at all
+4. The best configuration is dataset-dependent, which suggests that robustness should be evaluated across multiple motion regimes rather than inferred from a single sequence
 <br>
 
 <br>

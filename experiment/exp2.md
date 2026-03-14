@@ -60,6 +60,44 @@ At each step:<br>
 ** `weight_acc`: Accel magnitude residual-based confidence (approaches to 1 when `| ||a|| - g0 |` is small)<br>
 ** `weight_gyro`: Gyro norm-based confidence (approaches to 1 when `||w||` is small)<br>
 
+```py
+# pipeline.py
+def predict_gravity_body_frame(q_pred: Quat, g_world_unit: Vec3) -> Vec3:
+       g_pred: Vec3 = libq.rotate_world_to_body(q_pred, g_world_unit)
+       return safe_unit_vec3(g_pred)
+. . .
+
+def calc_acc_gating(g0: float, acc_sigma: float, a_meas: Vec3, g_pred: Vec3) -> float:
+        . . .
+        theta: float = np.arccos(np.clip(np.dot(a_unit, g_unit), -1, 1))
+        weight_acc : float = np.exp(-0.5 * (theta / acc_sigma) ** 2)
+        return weight_acc
+
+def calc_gyro_gating(gyro_sigma: float, w: Vec3) -> float:
+        . . .
+        weight_gyro: float = np.exp(-0.5 * (w_norm / gyro_sigma) ** 2)
+        return weight_gyro
+. . .
+
+def integrate_gyro_acc(. . .) -> tuple[. . .]:
+	. . .
+        for i in range(len(dt)):
+                q_pred: Quat = gyro_predict(q, w_avg[i], dt[i])
+
+                g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
+                . . .
+
+                weight_acc[i] = calc_acc_gating(g0, acc_gate_sigma[i], a_meas, g_pred)
+                weight_gyro[i] = calc_gyro_gating(gyro_gate_sigma[i], w_avg[i])
+
+                e_axis: Vec3 = np.cross(g_pred, a_unit)
+                dq_corr: Quat = small_angle_correction_quat(K*(weight_acc[i]*weight_gyro[i]), e_axis)
+
+                q = libq.quat_norm(libq.quat_mul(q_pred, dq_corr))
+                res[i] = q
+		. . .
+        return res, g_body_est, a_lin_est, weight_acc, weight_gyro
+```
 <br>
 <br>
 <br>
