@@ -177,7 +177,6 @@ def calc_score_quasi(tau: float, dt: ScalarBatch,
                      best_quasi_static: tuple[int, int, int] | None = None,
                      runner_kwargs: dict[str, Any] = None,
                      ) -> float:
-
         dt_median: float = float(np.median(dt))
 
         if best_quasi_static is None:
@@ -205,7 +204,6 @@ def calc_score_quasi_ori(tau: float, dt: ScalarBatch, q_ref: QuatBatch,
                          best_quasi_static: tuple[int, int, int] | None = None,
                          runner_kwargs: dict[str, Any] = None,
                          ) -> float:
-
         dt_median: float = float(np.median(dt))
 
         if best_quasi_static is None:
