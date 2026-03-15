@@ -266,10 +266,10 @@ Each plot compares:<br>
 
 #### [Metrics]
 
-|         |  Mean error  |  p90 error   |
-|:-------:|-------------:|-------------:|
-| exp 1-1 | <ul><li>0.54751 rad</li><li>31.37006 deg</li></ul> | <ul><li>0.62856 rad</li><li>36.01396 deg</li></ul> |
-| exp 1-2 | <ul><li>0.39107 rad</li><li>22.40684 deg</li></ul> | <ul><li>0.56630 rad</li><li>32.44667 deg</li></ul> |
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-1 | <ul><li>0.54751 rad</li><li>31.37006 deg</li></ul> | <ul><li>0.62856 rad</li><li>36.01396 deg</li></ul> |
+| 1-2 | <ul><li>0.39107 rad</li><li>22.40684 deg</li></ul> | <ul><li>0.56630 rad</li><li>32.44667 deg</li></ul> |
 
 <br>
 
@@ -331,10 +331,10 @@ Each plot compares:<br>
 
 #### [Metrics]
 
-|         |  Mean error  |  p90 error   |
-|:-------:|-------------:|-------------:|
-| exp 1-1 | <ul><li>1.90991 rad</li><li>109.42990 deg</li></ul> | <ul><li>2.05530 rad</li><li>117.76002 deg</li></ul> |
-| exp 1-2 | <ul><li>0.38383 rad</li><li>21.99183 deg</li></ul> | <ul><li>0.54410 rad</li><li>31.17450 deg</li></ul> |
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-1 | <ul><li>1.90991 rad</li><li>109.42990 deg</li></ul> | <ul><li>2.05530 rad</li><li>117.76002 deg</li></ul> |
+| 1-2 | <ul><li>0.38383 rad</li><li>21.99183 deg</li></ul>  | <ul><li>0.54410 rad</li><li>31.17450 deg</li></ul>  |
 
 <br>
 
@@ -395,10 +395,10 @@ Each plot compares:<br>
 
 #### [Metrics]
 
-|         |  Mean error  |  p90 error   |
-|:-------:|-------------:|-------------:|
-| exp 1-1 | <ul><li>2.98634 rad</li><li>171.10485 deg</li></ul> | <ul><li>3.12675 rad</li><li>179.14982 deg</li></ul> |
-| exp 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-1 | <ul><li>2.98634 rad</li><li>171.10485 deg</li></ul> | <ul><li>3.12675 rad</li><li>179.14982 deg</li></ul> |
+| 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul>  | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul>  |
 
 <br>
 
@@ -460,10 +460,10 @@ Each plot compares:<br>
 
 #### [Metrics]
 
-|         |  Mean error  |  p90 error   |
-|:-------:|-------------:|-------------:|
-| exp 1-1 | <ul><li>1.04519 rad</li><li>59.88517 deg</li></ul> | <ul><li>2.30597 rad</li><li>132.12219 deg</li></ul> |
-| exp 1-2 | <ul><li>0.88808 rad</li><li>50.88316 deg</li></ul> | <ul><li>2.03692 rad</li><li>116.70718 deg</li></ul> |
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-1 | <ul><li>1.04519 rad</li><li>59.88517 deg</li></ul> | <ul><li>2.30597 rad</li><li>132.12219 deg</li></ul> |
+| 1-2 | <ul><li>0.88808 rad</li><li>50.88316 deg</li></ul> | <ul><li>2.03692 rad</li><li>116.70718 deg</li></ul> |
 
 <br>
 

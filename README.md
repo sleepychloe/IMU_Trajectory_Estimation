@@ -164,10 +164,10 @@ and why gyro-only orientation estimation is fundamentally unstable over long dur
 
 ##### [Metrics]
 
-|         |  Mean error  |  p90 error   |
-|:-------:|-------------:|-------------:|
-| exp 1-1 | <ul><li>0.54751 rad</li><li>31.37006 deg</li></ul> | <ul><li>0.62856 rad</li><li>36.01396 deg</li></ul> |
-| exp 1-2 | <ul><li>0.39107 rad</li><li>22.40684 deg</li></ul> | <ul><li>0.56630 rad</li><li>32.44667 deg</li></ul> |
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-1 | <ul><li>2.98634 rad</li><li>171.10485 deg</li></ul> | <ul><li>3.12675 rad</li><li>179.14982 deg</li></ul> |
+| 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul>  | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul>  |
 
 <br>
 
@@ -212,26 +212,30 @@ Gating improves robustness by suppressing bad accel updates in this dataset.<br>
 
 <br>
 
-|         |  tau   |         K         |       σ_gyro       |        σ_acc       |
-|:-------:|-------:|------------------:|-------------------:|-------------------:|
-| exp 2-1 |  0.33  | 0.030621685926523 |  inf (not applied) |  inf (not applied) |
-| exp 2-2 |  0.33  | 0.030621685926523 |  inf (not applied) |          5.8527864 |
-| exp 2-3 |  0.33  | 0.030621685926523 |          2.9182227 |          5.8527864 |
-| exp 2-4 |  0.22  | 0.044943586381469 | time-varying sigma | time-varying sigma |
+| exp |  tau   |      K      |    σ_gyro    |     σ_acc    |
+|:---:|-------:|------------:|-------------:|-------------:|
+| 2-1 |  0.33  | 0.030621686 |          inf |          inf |
+| 2-2 |  0.33  | 0.030621686 |          inf |    5.8527864 |
+| 2-3 |  0.33  | 0.030621686 |    2.9182227 |    5.8527864 |
+| 2-4 |  0.22  | 0.044943586 | time-varying | time-varying |
 
-** Note: suggested sigmas are reported for reference. the selected run may disable gating (σ=inf) when it does not improve the score<br>
+<br>
+
+** `σ = inf` means gating not applied<br>
 
 <br>
 
 ##### [Metrics]
 
-|         |  Mean error  |  p90 error   |
-|:-------:|-------------:|-------------:|
-| exp 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
-| exp 2-1 | <ul><li>0.33687 rad</li><li>19.30136 deg</li></ul> | <ul><li>0.56227 rad</li><li>32.21544 deg</li></ul> |
-| exp 2-2 | <ul><li>0.26177 rad</li><li>14.99855 deg</li></ul> | <ul><li>0.40604 rad</li><li>23.26442 deg</li></ul> |
-| exp 2-3 | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
-| exp 2-4 | <ul><li>0.22967 rad</li><li>13.15924 deg</li></ul> | <ul><li>0.45485 rad</li><li>26.06074 deg</li></ul> |
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
+| 2-1 | <ul><li>0.33687 rad</li><li>19.30136 deg</li></ul> | <ul><li>0.56227 rad</li><li>32.21544 deg</li></ul> |
+| 2-2 | <ul><li>0.26177 rad</li><li>14.99855 deg</li></ul> | <ul><li>0.40604 rad</li><li>23.26442 deg</li></ul> |
+| 2-3 | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
+| 2-4 | <ul><li>0.22967 rad</li><li>13.15924 deg</li></ul> | <ul><li>0.45485 rad</li><li>26.06074 deg</li></ul> |
+
+<br>
 
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
 
