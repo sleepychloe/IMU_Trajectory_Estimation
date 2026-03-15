@@ -39,6 +39,7 @@ Four runs are compared (same dataset, same trimmed start):<br>
 <br>
 
 Key hypothesis:<br>
+
 The correction is expected to counteract accumulated gyro drift, which may make its benefits more visible over longer sequences.<br>
 
 <br>
@@ -60,8 +61,13 @@ At each step:<br>
 ** `weight_acc`: Accel magnitude residual-based confidence (approaches to 1 when `| ||a|| - g0 |` is small)<br>
 ** `weight_gyro`: Gyro norm-based confidence (approaches to 1 when `||w||` is small)<br>
 
+<br>
+
+##### [Implementation]
+
 ```py
 # pipeline.py
+
 def predict_gravity_body_frame(q_pred: Quat, g_world_unit: Vec3) -> Vec3:
        g_pred: Vec3 = libq.rotate_world_to_body(q_pred, g_world_unit)
        return safe_unit_vec3(g_pred)
@@ -83,10 +89,8 @@ def integrate_gyro_acc(. . .) -> tuple[. . .]:
 	. . .
         for i in range(len(dt)):
                 q_pred: Quat = gyro_predict(q, w_avg[i], dt[i])
-
                 g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
                 . . .
-
                 weight_acc[i] = calc_acc_gating(g0, acc_gate_sigma[i], a_meas, g_pred)
                 weight_gyro[i] = calc_gyro_gating(gyro_gate_sigma[i], w_avg[i])
 
@@ -98,6 +102,7 @@ def integrate_gyro_acc(. . .) -> tuple[. . .]:
 		. . .
         return res, g_body_est, a_lin_est, weight_acc, weight_gyro
 ```
+
 <br>
 <br>
 <br>
@@ -208,7 +213,7 @@ A larger sigma makes gating weaker (more permissive), while a smaller sigma make
 
 <br>
 
-#### [Fixed sigma (baseline)]
+#### [Fixed sigma]
 
 A fixed sigma_base is suggested from robust percentiles of the data.<br>
 If a quasi-static segment exists, statistics are computed on that segment, otherwise, the full sequence is used.<br>
@@ -238,6 +243,7 @@ def suggest_fixed_gate_sigma(w. . .) -> tuple[float, float, float]:
         . . .
         return gyro_sigma, acc_sigma, mag_sigma
 ```
+
 <br>
 <br>
 
@@ -329,14 +335,14 @@ then samples new parameters that maximize the ratio between them:<br>
 
 #### [Optimization target]
 
-| exp |             Target             |
-|:---:|:-------------------------------|
-| 2-1 | <ul><li>tau</li></ul> |
-| 2-2 | <ul><li>tau</li><li>acc_gate_sigma</li></ul> |
-| 2-3 | <ul><li>tau</li><li>acc_gate_sigma</li><li>gyro_gate_sigma</li></ul> |
-| 2-4 | <ul><li>tau</li><li>percentile (`p`)</li><li>sliding window size (`win_s`)</li><li>update ratio (`update_ratio`)</li><li>EMA factor (`ema_alpha`)</li></ul> |
+| exp | trial |             Target             |
+|:---:|------:|:-------------------------------|
+| 2-1 |    15 | <ul><li>tau</li></ul> |
+| 2-2 |    25 | <ul><li>tau</li><li>acc_gate_sigma</li></ul> |
+| 2-3 |    30 | <ul><li>tau</li><li>acc_gate_sigma</li><li>gyro_gate_sigma</li></ul> |
+| 2-4 |    40 | <ul><li>tau</li><li>percentile (`p`)</li><li>sliding window size (`win_s`)</li><li>update ratio (`update_ratio`)</li><li>EMA factor (`ema_alpha`)</li></ul> |
 
-** for exp2-4, Optuna optimizes the parameters of the function `suggest_timevarying_gate_sigma(...)`, rather than the sigma values directly.<br>
+** For exp2-4, Optuna optimizes the parameters of the function `suggest_timevarying_gate_sigma(...)`, rather than the sigma values directly.<br>
 
 <br>
 
@@ -359,11 +365,17 @@ For each trial:<br>
 
 # optuna_exp_2.py
 
+def exp_2_1(. . .) -> tuple[float, float]:
+	. . .
+
+def exp_2_2(. . .) -> tuple[float, float]:
+	. . .
+
 def exp_2_3(. . .) -> tuple[float, float]:
         def objective(trial):
-                tau: float = trial.suggest_float("tau", tau_candidate[0], tau_candidate[1])
-                acc_gate_sigma: float = trial.suggest_float("acc_gate_sigma", acc_gate_sigma_candidate[0], acc_gate_sigma_candidate[1])
-                gyro_gate_sigma: float = trial.suggest_float("gyro_gate_sigma", gyro_gate_sigma_candidate[0], gyro_gate_sigma_candidate[1])
+                tau: float = trial.suggest_float("tau", . . .)
+                acc_gate_sigma: float = trial.suggest_float("acc_gate_sigma", . . .)
+                gyro_gate_sigma: float = trial.suggest_float("gyro_gate_sigma", . . .)
 
                 score: float = calc_score_quasi_ori(. . .)
                 return score
@@ -376,12 +388,12 @@ def exp_2_3(. . .) -> tuple[float, float]:
 def exp_2_4(. . .) -> tuple[Any, ...]:
 	. . .
         def objective_sigma(trial):
-                tau: float = trial.suggest_float("tau", tau_candidate[0], tau_candidate[1])
-                p: int = trial.suggest_int("p", p_candidate[0], p_candidate[1])
-                win: float = trial.suggest_float("win_s", win_s_candidate[0], win_s_candidate[1], log=True)
-                update_ratio: float = trial.suggest_float("update_ratio", update_ratio_candidate[0], update_ratio_candidate[1])
+                tau: float = trial.suggest_float("tau", . . .)
+                p: int = trial.suggest_int("p", . . .)
+                win: float = trial.suggest_float("win_s", . . .)
+                update_ratio: float = trial.suggest_float("update_ratio", . . .)
                 update: float = win * update_ratio
-                ema: float = trial.suggest_float("ema_alpha", ema_candidate[0], ema_candidate[1])
+                ema: float = trial.suggest_float("ema_alpha", . . .)
 
                 [. . .] = suggest_timevarying_gate_sigma(. . .)
                 score: float = calc_score_quasi_ori(. . .)
