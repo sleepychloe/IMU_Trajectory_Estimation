@@ -1,15 +1,15 @@
 
 
-[START] 2026-03-13 20:36:20.024
+[START] 2026-03-14 10:39:35.767
 
 [INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
 
-[END] 2026-03-13 20:36:20.683
+[END] 2026-03-14 10:39:36.342
 
 
 
 
-[START] 2026-03-13 20:36:20.699
+[START] 2026-03-14 10:39:36.360
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -19,12 +19,12 @@ Best quasi static(start, end, length):  (2523, 3540, 1017)
 Suggested gyro_sigma:  0.44791971689543864
 Suggested acc_sigma:  2.908568806018301
 
-[END] 2026-03-13 20:36:21.799
+[END] 2026-03-14 10:39:37.396
 
 
 
 
-[START] 2026-03-13 20:36:22.913
+[START] 2026-03-14 10:39:38.680
 
 
 [chosen value]
@@ -38,12 +38,12 @@ gyro_gate_sigma=inf
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.1600024596055202 80.36550560592005 19.47265769657514 29.401614468015985
 
-[END] 2026-03-13 20:37:53.637
+[END] 2026-03-14 10:41:11.578
 
 
 
 
-[START] 2026-03-13 20:37:53.656
+[START] 2026-03-14 10:41:11.598
 
 
 [chosen value]
@@ -57,12 +57,12 @@ gyro_gate_sigma=inf
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.1176308583223846 80.2773240575269 19.398194197235362 29.289245167175714
 
-[END] 2026-03-13 20:41:21.662
+[END] 2026-03-14 10:44:23.154
 
 
 
 
-[START] 2026-03-13 20:41:21.683
+[START] 2026-03-14 10:44:23.173
 
 
 [chosen value]
@@ -76,12 +76,12 @@ gyro_gate_sigma=0.1114052
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
 0.15291049140862284 80.239904800302 19.389322906259657 29.268658284569987
 
-[END] 2026-03-13 20:45:35.625
+[END] 2026-03-14 10:48:54.129
 
 
 
 
-[START] 2026-03-13 20:45:35.648
+[START] 2026-03-14 10:48:54.158
 
 
 [chosen value]
@@ -94,21 +94,21 @@ acc_gate_sigma/gyro_gate_sigma = time-varying gate sigma
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
 0.1548125606854624 80.26540184394847 19.410759792893614 29.281709173873722
 
-[END] 2026-03-13 20:51:17.763
+[END] 2026-03-14 10:55:03.056
 
 
 
 
-[START] 2026-03-13 20:51:19.490
+[START] 2026-03-14 10:55:05.096
 
 best: exp2-3
 
-[END] 2026-03-13 20:51:19.495
+[END] 2026-03-14 10:55:05.101
 
 
 
 
-[START] 2026-03-13 20:51:26.176
+[START] 2026-03-14 10:55:12.136
 
 [Gravity]
 RMSE norm: 0.26587589801291317
@@ -133,6 +133,6 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 [Consistency ratio]
 rmse_norm of (a_lin_est / g_est):  2.8783058114411397
 
-[END] 2026-03-13 20:51:26.672
+[END] 2026-03-14 10:55:12.606
 
 
