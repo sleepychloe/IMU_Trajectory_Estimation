@@ -141,7 +141,7 @@ Full experimental process and results:<br>
 
 - [Experiment 1](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp1.md)
 - [Experiment 2](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp2.md)
-<!--- [Experiment 3]()-->
+- [Experiment 3](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp3.md)
 
 <br>
 <br>
