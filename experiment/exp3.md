@@ -563,13 +563,32 @@ best: exp3-3
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
 
-|   best exp 2    |            best exp 3             |
-|:---------------:|:---------------------------------:|
-|  grav  |  acc   |      grav       |       acc       |
-|:------:|:------:|:---------------:|:---------------:|
-|  mean  |  mean  |  mean  |   p90  |  mean  |   p90  |
-|-------:|-------:|-------:|-------:|-------:|-------:|
-|   1.34 |  10.23 |   1.06 |   2.05 |   8.15 |  18.59 |
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">best exp 2</th>
+      <th colspan="4">best exp 3</th>
+    </tr>
+    <tr>
+      <th>grav mean</th>
+      <th>acc mean</th>
+      <th>grav mean</th>
+      <th>grav p90</th>
+      <th>acc mean</th>
+      <th>acc p90</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1.34</td>
+      <td>10.23</td>
+      <td>1.06</td>
+      <td>2.05</td>
+      <td>8.15</td>
+      <td>18.59</td>
+    </tr>
+  </tbody>
+</table>
 
 <br>
 
@@ -767,13 +786,32 @@ best: exp3-3
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
 
-|   best exp 2    |            best exp 3             |
-|:---------------:|:---------------------------------:|
-|  grav  |  acc   |      grav       |       acc       |
-|:------:|:------:|:---------------:|:---------------:|
-|  mean  |  mean  |  mean  |   p90  |  mean  |   p90  |
-|-------:|-------:|-------:|-------:|-------:|-------:|
-|   3.07 |  14.61 |   0.60 |   1.07 |   5.90 |  14.36 |
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">best exp 2</th>
+      <th colspan="4">best exp 3</th>
+    </tr>
+    <tr>
+      <th>grav mean</th>
+      <th>acc mean</th>
+      <th>grav mean</th>
+      <th>grav p90</th>
+      <th>acc mean</th>
+      <th>acc p90</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.07</td>
+      <td>14.61</td>
+      <td>0.60</td>
+      <td>1.07</td>
+      <td>5.90</td>
+      <td>14.36</td>
+    </tr>
+  </tbody>
+</table>
 
 <br>
 
@@ -876,13 +914,32 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
 
-|   best exp 2    |            best exp 3             |
-|:---------------:|:---------------------------------:|
-|  grav  |  acc   |      grav       |       acc       |
-|:------:|:------:|:---------------:|:---------------:|
-|  mean  |  mean  |  mean  |   p90  |  mean  |   p90  |
-|-------:|-------:|-------:|-------:|-------:|-------:|
-|   2.75 |  11.88 |        |        |        |        |
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">best exp 2</th>
+      <th colspan="4">best exp 3</th>
+    </tr>
+    <tr>
+      <th>grav mean</th>
+      <th>acc mean</th>
+      <th>grav mean</th>
+      <th>grav p90</th>
+      <th>acc mean</th>
+      <th>acc p90</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.75</td>
+      <td>11.88</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
 
 <br>
 
@@ -959,13 +1016,32 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
 
-|   best exp 2    |            best exp 3             |
-|:---------------:|:---------------------------------:|
-|  grav  |  acc   |      grav       |       acc       |
-|:------:|:------:|:---------------:|:---------------:|
-|  mean  |  mean  |  mean  |   p90  |  mean  |   p90  |
-|-------:|-------:|-------:|-------:|-------:|-------:|
-|   2.17 |  28.50 |        |        |        |        |
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">best exp 2</th>
+      <th colspan="4">best exp 3</th>
+    </tr>
+    <tr>
+      <th>grav mean</th>
+      <th>acc mean</th>
+      <th>grav mean</th>
+      <th>grav p90</th>
+      <th>acc mean</th>
+      <th>acc p90</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.17</td>
+      <td>28.50</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
 
 <br>
 
