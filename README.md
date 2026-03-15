@@ -179,7 +179,7 @@ and why gyro-only orientation estimation is fundamentally unstable over long dur
 <br>
 <br>
 
-#### Conclusion across all datasets <a name="exp-1-conclusion"></a>
+##### [Conclusion across all datasets]
 
 Experiment 1 confirms:<br>
 
@@ -241,7 +241,7 @@ Gating improves robustness by suppressing bad accel updates in this dataset.<br>
 
 <br>
 
-#### [Secondary validation — Gravity & Linear Accel]
+##### [Secondary validation — Gravity & Linear Accel]
 
 Gravity direction error remains low (mean/p90 ≈ 2.75° / 4.50°), indicating a stable tilt estimate.<br>
 Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.88° / 23.93°).<br>
@@ -258,7 +258,7 @@ Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.88
 <br>
 <br>
 
-#### Conclusion across all datasets <a name="exp-2-conclusion"></a>
+##### [Conclusion across all datasets]
 
 Experiment 2 confirms:<br>
 
@@ -266,18 +266,122 @@ Experiment 2 confirms:<br>
 2. Gating can further improve performance, but only when the reliability proxy aligns with the actual failure modes of the dataset
 3. The usefulness of gating is not universal: some datasets benefit from fixed or joint gating, while others perform best with no gating at all
 4. The best configuration is dataset-dependent, which suggests that robustness should be evaluated across multiple motion regimes rather than inferred from a single sequence
-<br>
 
 <br>
 <br>
 <br>
 
-<!--### Experiment 3 — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
+### Experiment 3 — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
+
+<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_01.png" width="952" height="311">
+
+<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_02.png" width="952" height="631">
+
+This dataset is a strong demonstration of the benefit of magnetometer correction.<br>
+Once magnetic heading correction is added, orientation error drops sharply compared with both gyro-only and the best exp 2 result.<br>
+In this dataset, fixed norm-based gating provides the best trade off, while innovation only and time-varying gating are less effective.<br>
+
+<br>
+
+##### [Chosen parameters]
+
+- quasi-static: (41487, 43669, 2182)
+- suggested σ_gyro: 0.4822681
+- suggested σ_acc : 0.6755996
+- suggested σ_mag : 5.0989239
+
+<br>
+
+| exp |  tau   |      K      | mag_gain |     σ_acc    |    σ_gyro    |     σ_mag    | σ_mag_err |
+|:---:|-------:|------------:|---------:|-------------:|-------------:|-------------:|----------:|
+| 3-1 |  3.93  | 0.002542621 | 3.577178 |          inf |          inf |          inf |       inf |
+| 3-2 |  3.35  | 0.002987808 | 2.131268 |          inf |          inf |          inf | 0.1900067 |
+| 3-3 |  2.49  | 0.004021669 | 1.403544 |    1.9785102 |    1.7974045 |   23.2823962 |       inf |
+| 3-4 |  3.98  | 0.002512575 | 2.670871 |    6.2055300 |    4.4092371 |   44.7035222 | 0.8666832 |
+| 3-5 |  3.47  | 0.002880201 | 5.377969 | time-varying | time-varying | time-varying |       inf |
+| 3-6 |  3.44  | 0.002903001 | 7.139949 | time-varying | time-varying | time-varying | 6.1261591 |
+
+<br>
+
+** `σ = inf` means gating not applied<br>
+
+<br>
+
+##### [Metrics]
+
+| exp |  Mean error  |  p90 error   |
+|:---:|-------------:|-------------:|
+| 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
+| b2  | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
+| 3-1 | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul>  | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul>  |
+| 3-2 | <ul><li>0.04584 rad</li><li>2.62661 deg</li></ul>  | <ul><li>0.08220 rad</li><li>4.70992 deg</li></ul>  |
+| 3-3 | <ul><li>0.04215 rad</li><li>2.41480 deg</li></ul>  | <ul><li>0.07740 rad</li><li>4.43479 deg</li></ul>  |
+| 3-4 | <ul><li>0.04328 rad</li><li>2.47981 deg</li></ul>  | <ul><li>0.07758 rad</li><li>4.44493 deg</li></ul>  |
+| 3-5 | <ul><li>0.06176 rad</li><li>3.53880 deg</li></ul>  | <ul><li>0.11218 rad</li><li>6.42756 deg</li></ul>  |
+| 3-6 | <ul><li>0.06180 rad</li><li>3.54069 deg</li></ul>  | <ul><li>0.11427 rad</li><li>6.54703 deg</li></ul>  |
+
+<br>
+
+** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
+** `b2` refers to the best experiment 2 result which makes minimum error (calculated by 0.8 * mean error + 0.2 * p90 error), evaluated on the same trimmed segment.<br>
+
+<br>
+
+##### [Secondary validation — Gravity & Linear Accel from Best Exp3]
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="2">best exp 2</th>
+      <th colspan="4">best exp 3</th>
+    </tr>
+    <tr>
+      <th>grav mean</th>
+      <th>acc mean</th>
+      <th>grav mean</th>
+      <th>grav p90</th>
+      <th>acc mean</th>
+      <th>acc p90</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2.75</td>
+      <td>11.88</td>
+      <td>1.01</td>
+      <td>1.38</td>
+      <td>6.78</td>
+      <td>15.71</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+##### [Observation]
+
+- The best result is exp 3-3, continuing the same trend as Dataset 01 and 02
+- Innovation-only gating (exp 3-2) is again worse than ungated magnetometer correction
+- Adding norm-based gating together with innovation gating (exp 3-4) improves over exp 3-2, but still does not surpass exp 3-3
+- Time-varying sigma variants perform worst on this dataset as well
+- Across the first three datasets, fixed norm-based gating appears to be the most reliable and consistently effective strategy among the evaluated Experiment 3 configurations
+
+<br>
+<br>
+
+##### [Conclusion across all datasets]
+
+Experiment 3 suggests:<br>
+
+1. Adding magnetometer correction yields a major improvement over gyro+accelerometer fusion alone on all evaluated datasets
+2. For the relatively consistent datasets in this experiment, fixed norm-based gating is the most effective choice among the evaluated configurations
+3. For the long non-stationary dataset, time-varying sigma can help, but it does not solve all failure modes
+4. These results suggest that the next step should focus on improving robustness during gyro integration itself, especially by detecting and suppressing abnormal integrated behavior before it propagates
 
 <br>
 <br>
 <br>
-<br>-->
+<br>
 
 ## Understanding Coordinate Systems and Sensors <a name="orientation"></a>
 

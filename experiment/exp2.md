@@ -1092,12 +1092,12 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 ### Cross-dataset Summary <a name="exp-2-data-sum"></a>
 
-| Dataset | best   | exp 1-2 Mean  | best Mean     | exp 1-2 p90   | best p90      | best grav Mean | best acc Mean  |
-|:--------|-------:|--------------:|--------------:|--------------:|--------------:|---------------:|---------------:|
-| data 01 | exp2-3 | 22.40684 deg  | 19.38932 deg  | 32.44667 deg  | 29.26866 deg  | 1.34461 deg    | 10.22541 deg   |
-| data 02 | exp2-1 | 21.99183 deg  | 9.72036 deg   | 31.17450 deg  | 18.74848 deg  | 3.06507 deg    | 14.61237 deg   |
-| data 03 | exp2-3 | 30.81266 deg  | 13.79096 deg  | 46.56837 deg  | 22.59707 deg  | 2.75350 deg    | 11.87995 deg   |
-| data 04 | exp2-2 | 50.88316 deg  | 43.49773 deg  | 116.70718 deg | 101.59235 deg | 2.16626 deg    | 28.49599 deg   |
+| Dataset | best | exp 1-2 Mean  | best Mean     | exp 1-2 p90   | best p90      | best grav Mean | best acc Mean  |
+|:--------|-----:|--------------:|--------------:|--------------:|--------------:|---------------:|---------------:|
+| data 01 | 2-3  | 22.40684 deg  | 19.38932 deg  |  32.44667 deg |  29.26866 deg | 1.34461 deg    | 10.22541 deg   |
+| data 02 | 2-1  | 21.99183 deg  |  9.72036 deg  |  31.17450 deg |  18.74848 deg | 3.06507 deg    | 14.61237 deg   |
+| data 03 | 2-3  | 30.81266 deg  | 13.79096 deg  |  46.56837 deg |  22.59707 deg | 2.75350 deg    | 11.87995 deg   |
+| data 04 | 2-2  | 50.88316 deg  | 43.49773 deg  | 116.70718 deg | 101.59235 deg | 2.16626 deg    | 28.49599 deg   |
 
 <br>
 
@@ -1111,6 +1111,7 @@ Across all datasets:<br>
 - In the longer sequences, the benefit often becomes more visible, although the magnitude of the gain remains dataset-dependent
 - Gating is strongly dataset-dependent. It helps when linear acceleration frequently violates the gravity assumption, but may be marginal or unnecessary when accelerometer measurements are already sufficiently consistent
 
+<br>
 <br>
 
 Datasets where gating helps (data 01, data 03, data 04):<br>
@@ -1128,6 +1129,7 @@ Dataset where gating is unnecessary or harmful (data 02):<br>
 - This indicates that accelerometer correction is already reliable enough in this motion pattern
 - Additional gating appears to suppress useful corrections more than it filters harmful ones
 
+<br>
 <br>
 
 Overall interpretation:<br>
