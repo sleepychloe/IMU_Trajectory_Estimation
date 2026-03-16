@@ -1,0 +1,46 @@
+
+
+[START] 2026-03-16 13:42:24.143
+
+[INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
+
+[END] 2026-03-16 13:42:24.816
+
+
+
+
+[START] 2026-03-16 13:42:24.830
+
+Detected accel unit in [m/s²]
+Selected g_world_unit: [ 0  0 -1]
+
+Best quasi static(start, end, length):  (2523, 3540, 1017)
+
+Suggested gyro_sigma:  0.44791971689543864
+Suggested acc_sigma:  2.908568806018301
+Suggested mag_sigma:  6.850455808768257
+
+[END] 2026-03-16 13:42:25.825
+
+
+
+
+[START] 2026-03-16 13:42:25.857
+
+[exp 4-00] Gyro guard test angle error in rad — min/max/mean/p90
+0.0027866181015508426 0.5548562426428996 0.038932489827991586 0.07559355968535549
+
+[exp 4-00] Gyro guard test angle error in deg — min/max/mean/p90
+0.15966145633362114 31.79092093992488 2.230667353079926 4.331191928341156
+
+
+[exp 4-01] Gyro guard test angle error in rad — min/max/mean/p90
+0.0027866181015508426 0.5847782864946023 0.039081338946933296 0.07565423484285555
+
+[exp 4-01] Gyro guard test angle error in deg — min/max/mean/p90
+0.15966145633362114 33.50532776703282 2.239195779379527 4.3346683587872015
+
+
+[END] 2026-03-16 13:42:50.732
+
+

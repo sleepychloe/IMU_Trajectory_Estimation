@@ -138,9 +138,12 @@ def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float) -> float:
         if not np.isfinite(mag_err_sigma) or mag_err_sigma <= 0:
                 return 1
         e_axis_norm: float = float(np.linalg.norm(e_axis_mag))
-        if e_axis_norm > 5 * mag_err_sigma:
+        if e_axis_norm > 2:
                 return 0
+        elif e_axis_norm > 1.2 * mag_err_sigma:
+                return np.exp(-0.06 * (e_axis_norm / mag_err_sigma) ** 2)
         return 1
+        
 
 def calc_mag_err_axis(q_pred: Quat, g_pred: Vec3, m_unit: Vec3, m_world_h_unit: Vec3,
                       threshold: float = 0.2) -> Vec3:
@@ -219,3 +222,152 @@ def integrate_gyro_acc_mag(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
                 g_body_est[i] = libq.rotate_world_to_body(q, g_world_unit) * g0
                 a_lin_est[i] = a_src[i] + g_body_est[i]
         return res, g_body_est, a_lin_est, weight_acc, weight_gyro, weight_mag
+
+def calc_gyro_prop_delta_gate(w_curr: Vec3, w_prev: Vec3, gyro_delta_sigma: float) -> float:
+        if not np.isfinite(gyro_delta_sigma) or gyro_delta_sigma <= 0:
+                return 1
+
+        dw: Vec3 = w_curr - w_prev
+        dw_norm: float = np.linalg.norm(dw)
+        weight_gyro_prop: float = np.exp(-0.5 * (dw_norm / max(gyro_delta_sigma, EPS)) ** 2)
+        return weight_gyro_prop
+
+def calc_gyro_prop_theta_gate(w_curr: Vec3, w_prev: Vec3, gyro_theta_sigma: float,
+                              w_min: float = 0.3, threshold: float = np.deg2rad(80)) -> float:
+        if not np.isfinite(gyro_theta_sigma) or gyro_theta_sigma <= 0:
+                return 1
+
+        prev_norm: float = np.linalg.norm(w_prev)
+        curr_norm: float = np.linalg.norm(w_curr)
+        if prev_norm < w_min or curr_norm < w_min:
+                return 1
+
+        cos_theta: float = float(np.dot(w_prev, w_curr) / max(prev_norm * curr_norm, EPS))
+        cos_theta = max(-1, min(1, cos_theta))
+        theta: float = float(np.arccos(cos_theta))
+        if theta <= threshold:
+                return 1
+
+        dev: float = theta - threshold
+        weight_gyro_prop: float = np.exp(-0.5 * (dev / max(gyro_theta_sigma, EPS)) ** 2)
+        return weight_gyro_prop
+
+def calc_gyro_prop_pre_integration_gate(q: Quat, w_raw: Vec3, dt: float,
+                                        a: Vec3, m: Vec3,
+                                        g_world_unit: Vec3, m_world_h_unit: Vec3,
+                                        gyro_pre_integ_sigma: float) -> float:
+        if not np.isfinite(gyro_pre_integ_sigma) or gyro_pre_integ_sigma <= 0:
+                return 1
+
+        q_pred: Quat = gyro_predict(q, w_raw, dt)
+        g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
+        a_meas: Vec3 = select_acc_measurement(a.copy(), g_pred.copy())
+        a_unit: Vec3 = safe_unit_vec3(a_meas)
+        m_meas: Vec3 = m.copy()
+        m_unit: Vec3 = safe_unit_vec3(m_meas)
+
+        e_axis_acc: Vec3 = np.cross(g_pred, a_unit)
+        e_axis_mag: Vec3 = calc_mag_err_axis(q_pred, g_pred, m_unit, m_world_h_unit)
+
+        innov: float = np.linalg.norm(e_axis_acc) + np.linalg.norm(e_axis_mag)
+        weight_gyro_prop: float = np.exp(-0.5 * (innov / max(gyro_pre_integ_sigma, EPS)) ** 2)
+        return weight_gyro_prop
+
+def calc_gyro_prop_gating(q: Quat, dt: float, w_curr: Vec3, w_prev: Vec3,
+                          a: Vec3, m: Vec3, g_world_unit: Vec3, m_world_h_unit: Vec3,
+                          gyro_delta_sigma: float, gyro_theta_sigma: float,
+                          gyro_pre_integ_sigma: float, w_cap: float
+                          ) -> tuple[float, Vec3]:
+        weight_gyro_prop: float = 1
+
+        if w_prev is None:
+                return 1, w_curr
+
+        weight_gyro_prop *= calc_gyro_prop_delta_gate(w_curr, w_prev, gyro_delta_sigma)
+        weight_gyro_prop *= calc_gyro_prop_theta_gate(w_curr, w_prev, gyro_theta_sigma)
+        weight_gyro_prop *= calc_gyro_prop_pre_integration_gate(
+                                                q, w_curr, dt,
+                                                a, m,
+                                                g_world_unit, m_world_h_unit,
+                                                gyro_pre_integ_sigma)
+        w_use: Vec3 = weight_gyro_prop * w_curr
+        w_use_norm: float = np.linalg.norm(w_use)
+        if np.isfinite(w_cap) and w_use_norm > w_cap:
+                w_use = w_use * (w_cap / w_use_norm)
+        return weight_gyro_prop, w_use
+
+def check_integration_integrate_gyro_acc_mag(
+        		q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch,
+                        gyro_delta_sigma: float, gyro_theta_sigma: float,
+                        gyro_pre_integ_sigma: float, w_cap: float,
+                        K: float, g0: float, g_world_unit: Vec3,
+                        m0: float, m_world_h_unit: Vec3, mag_gain: float,
+                        acc_gate_sigma: float | ScalarBatch, gyro_gate_sigma: float | ScalarBatch,
+                        mag_gate_sigma: float | ScalarBatch, mag_err_sigma: float,
+                        a_src: Vec3Batch, m_src: Vec3Batch
+                        ) -> tuple[ScalarBatch, Vec3Batch, QuatBatch, Vec3Batch,
+                                   Vec3Batch, ScalarBatch, ScalarBatch, ScalarBatch]:
+        """
+        Returns:
+                weight_gyro_prop: (N,) ScalarBatch
+                w_use: (N,3) Vec3Batch
+                res (q_gyro_acc_mag): (N,4) QuatBatch
+                g_body_est: (N,3) Vec3Batch
+                a_lin_est: (N,3) Vec3Batch
+                weight_acc: (N,) ScalarBatch
+                weight_gyro: (N,) ScalarBatch
+                weight_mag: (N,) ScalarBatch
+        """
+        weight_gyro_prop: ScalarBatch = as_scalar_batch(np.zeros((len(dt),)))
+        w_use: Vec3Batch = as_vec3_batch(np.zeros((len(dt), 3)))
+        q: Quat = q0.copy()
+        res: QuatBatch = as_quat_batch(np.zeros((len(dt), 4)))
+        g_body_est: Vec3Batch = as_vec3_batch(np.zeros((len(dt), 3)))
+        a_lin_est: Vec3Batch = as_vec3_batch(np.zeros((len(dt), 3)))
+        weight_acc: ScalarBatch = as_scalar_batch(np.zeros((len(dt),)))
+        weight_gyro: ScalarBatch = as_scalar_batch(np.zeros((len(dt),)))
+        weight_mag: ScalarBatch = as_scalar_batch(np.zeros((len(dt),)))
+
+        if not isinstance(acc_gate_sigma, np.ndarray):
+                acc_gate_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), acc_gate_sigma))
+        if not isinstance(gyro_gate_sigma, np.ndarray):
+                gyro_gate_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt),), gyro_gate_sigma))
+        if not isinstance(mag_gate_sigma, np.ndarray):
+                mag_gate_sigma: ScalarBatch = as_scalar_batch(np.full((len(dt), ), mag_gate_sigma))
+
+        for i in range(len(dt)):
+                weight_gyro_prop[i], w_use[i] = calc_gyro_prop_gating(
+                                                q, dt[i], w_avg[i], (w_avg[i-1] if i > 0 else None),
+                                                a_src[i], m_src[i], g_world_unit, m_world_h_unit,
+                                                gyro_delta_sigma, gyro_theta_sigma,
+                                                gyro_pre_integ_sigma, w_cap)
+                q_pred: Quat = gyro_predict(q, w_use[i], dt[i])
+
+                g_pred: Vec3 = predict_gravity_body_frame(q_pred, g_world_unit)
+                a_meas: Vec3 = select_acc_measurement(a_src[i].copy(), g_pred.copy())
+                a_unit: Vec3 = safe_unit_vec3(a_meas)
+                m_meas: Vec3 = m_src[i].copy()
+                m_unit: Vec3 = safe_unit_vec3(m_meas)
+
+                weight_acc[i] = calc_acc_gating(g0, acc_gate_sigma[i], a_meas, g_pred)
+                weight_gyro[i] = calc_gyro_gating(gyro_gate_sigma[i], w_avg[i])
+                weight_mag[i] = calc_mag_gating(m0, mag_gate_sigma[i], m_meas)
+
+                e_axis_acc: Vec3 = np.cross(g_pred, a_unit)
+                e_axis_mag: Vec3 = calc_mag_err_axis(q_pred, g_pred, m_unit, m_world_h_unit)
+
+                weight_mag_innov: float = calc_mag_innovation_gating(e_axis_mag, mag_err_sigma)
+                weight_mag[i] = weight_mag[i] * weight_mag_innov
+
+                e_axis: Vec3 = (weight_acc[i] * weight_gyro[i] * e_axis_acc
+                                + mag_gain * weight_mag[i] * e_axis_mag)
+                dq_corr: Quat = small_angle_correction_quat(K, e_axis)
+
+                q = libq.quat_norm(libq.quat_mul(q_pred, dq_corr))
+                res[i] = q
+
+                g_body_est[i] = libq.rotate_world_to_body(q, g_world_unit) * g0
+                a_lin_est[i] = a_src[i] + g_body_est[i]
+        return [weight_gyro_prop, w_use,
+                res, g_body_est, a_lin_est,
+                weight_acc, weight_gyro, weight_mag]
