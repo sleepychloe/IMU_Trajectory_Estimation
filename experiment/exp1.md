@@ -26,7 +26,7 @@
 
 This experiment isolates the gyro propagation step to answer two questions:<br>
 
-1. How unstable is gyro-only orientation over time?
+1. How does gyro-only orientation drift over time?
 
 2. Why must we trim the initial stabilization period for fair evaluation?
 
@@ -129,8 +129,8 @@ In real logs, the first seconds often contain transient effects:<br>
 <br>
 
 If we start evaluating from `t = 0 s`,<br>
-a short transient can permanently dominate error statistics,<br>
-and even push the gyro-only estimate into an unrecoverable bad trajectory.<br>
+a short transient can dominate error statistics,<br>
+and can push the gyro-only estimate into a significantly degraded trajectory.<br>
 
 <br>
 <br>
@@ -366,7 +366,7 @@ Each plot compares:<br>
 
 #### [Observation]
 
-- Without trimming, the estimator looks much worse than it actually is
+- Without trimming, the estimator appears much worse than its post-transient behavior suggests
 - After trimming, drift becomes interpretable (bias accumulation)
 
 <br>
@@ -430,7 +430,7 @@ Each plot compares:<br>
 
 #### [Observation]
 
-- The no-cut run collapses near π radians (≈180° flip), indicating catastrophic divergence
+- The no-cut run collapses near π radians (≈180° flip), indicating severe divergence
 - After trimming, error behaves as expected: steady drift with occasional spikes
 
 <br>
@@ -495,7 +495,7 @@ Each plot compares:<br>
 
 #### [Observation]
 
-- Long uncontrolled motion produces large error spikes regardless
+- Long uncontrolled motion produces large error spikes in both settings
 - Still, trimming reduces mean/p90, supporting the presence of a startup transient
 
 <br>
@@ -516,15 +516,15 @@ Each plot compares:<br>
 
 Across all datasets:<br>
 
-- Initial trimming consistently reduces mean/p90 error
-- Without trimming, gyro-only can produce misleadingly catastrophic statistics (especially data03)
-- Even after trimming, gyro-only exhibits unavoidable drift over time (bias accumulation)
+- Initial trimming reduces mean/p90 error across all evaluated datasets
+- Without trimming, gyro-only can produce misleadingly large error statistics
+- Even after trimming, gyro-only exhibits drift over time due to bias accumulation
 
 <br>
 
 Therefore:<br>
 
-Trimming is necessary for fair evaluation, but not sufficient for long-term stability.<br>
+Trimming is important for fair evaluation, but not sufficient for long-term stability.<br>
 
 <br>
 <br>
@@ -533,10 +533,10 @@ Trimming is necessary for fair evaluation, but not sufficient for long-term stab
 
 ## Conclusion <a name="exp-1-conclusion"></a>
 
-Experiment 1 confirms:<br>
+Experiment 1 shows that:<br>
 
-1. Gyro-only integration is inherently unstable over time (drift is unavoidable)
-2. The initial stabilization period must be trimmed to avoid transient artifacts dominating results
+1. Gyro-only integration exhibits drift over time due to bias accumulation
+2. The initial stabilization period should be trimmed for fair evaluation
 
 <br>
 

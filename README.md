@@ -10,9 +10,9 @@ Currently in progress
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experimental roadmap (progressive complexity)](#project-exp) <br>
 
  * [Experiment Result Shortcut](#exp) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 1 — Gyro-only propagation](#exp-1) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 2 — Gyro + Accelerometer](#exp-2) <br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 3 — Gyro + Accelerometer + Magnetometer](#exp-3) <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 1 (Dataset 03) — Gyro-only propagation](#exp-1) <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 2 (Dataset 03) — Gyro + Accelerometer](#exp-2) <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Experiment 3 (Dataset 03) — Gyro + Accelerometer + Magnetometer](#exp-3) <br>
 
  * [Understanding Coordinate Systems and Sensors](#orientation) <br>
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- [Coordinate Frame](#orientation-coordinate) <br>
@@ -142,14 +142,27 @@ Full experimental process and results:<br>
 - [Experiment 3](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp3.md)
 
 <br>
+
+##### [Datasets]
+
+4 datasets are used for the experiment recorded by Sensor Logger application.<br>
+
+| Dataset | Duration | Measured by | Posture  | Notes                        |
+|:--------|---------:|:-----------:|:--------:|:-----------------------------|
+| data 01 | 5 min    | A           | known    | <ul><li>controlled environment</li><li>outdoor setting</li><li>human gait variations only</li></ul> |
+| data 02 | 9 min    | A           | known    | <ul><li>controlled environment</li><li>outdoor setting</li><li>human gait variations only</li></ul> |
+| data 03 | 13 min   | A           | known    | <ul><li>controlled environment</li><li>outdoor setting</li><li>human gait variations only</li></ul> |
+| data 04 | 96 min   | B           | unknown  | <ul><li>uncontrolled environment</li><li>indoor ↔ outdoor transition</li><li>pedestrian + public transport(metro/tram)</li></ul> | 
+
+<br>
 <br>
 
-### Experiment 1 — Gyro-only propagation <a name="exp-1"></a>
+### Experiment 1 (Dataset 03) — Gyro-only propagation <a name="exp-1"></a>
 
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp1/data03_exp1.png" width="952" height="311">
 
-This dataset clearly illustrates why initial stabilization trimming is necessary,<br>
-and why gyro-only orientation estimation is fundamentally unstable over long durations.<br>
+This dataset clearly illustrates why initial stabilization trimming is needed,<br>
+and how gyro-only orientation estimation exhibits drift over long durations.<br>
 
 <br>
 
@@ -171,24 +184,24 @@ and why gyro-only orientation estimation is fundamentally unstable over long dur
 
 ##### [Observation]
 
-- The trimmed curve shows a cleaner drift trend
-- Early segment inflates metrics despite long-term behavior being similar
+- The no-cut run collapses near π radians (≈180° flip), indicating severe divergence
+- After trimming, error behaves as expected: steady drift with occasional spikes
 
 <br>
 <br>
 
 ##### [Conclusion across all datasets]
 
-Experiment 1 confirms:<br>
+Experiment 1 shows that:<br>
 
-1. Gyro-only integration is inherently unstable over time (drift is unavoidable)
-2. The initial stabilization period must be trimmed to avoid transient artifacts dominating results
+1. Gyro-only integration exhibits drift over time due to bias accumulation
+2. The initial stabilization period should be trimmed for fair evaluation
 
 <br>
 <br>
 <br>
 
-### Experiment 2 — Gyro + Accelerometer <a name="exp-2"></a>
+### Experiment 2 (Dataset 03) — Gyro + Accelerometer <a name="exp-2"></a>
 
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp2/data03_exp2_01.png" width="952" height="311">
 
@@ -196,9 +209,9 @@ Experiment 1 confirms:<br>
 
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp2/data03_exp2_03.png" width="952" height="471">
 
-This dataset is a clean demonstration of why gating matters.<br>
-Accelerometer correction helps overall, but blindly trusting accel can be unstable when linear accel is strong.<br>
-Gating improves robustness by suppressing bad accel updates in this dataset.<br>
+This dataset is a representative case where gating improves performance.<br>
+Accelerometer correction reduces error overall, but ungated accel updates become less reliable during stronger linear motion.<br>
+In this dataset, gating improves the trade-off between average error and tail error by suppressing less reliable accel corrections.<br>
 
 <br>
 
@@ -213,9 +226,9 @@ Gating improves robustness by suppressing bad accel updates in this dataset.<br>
 | exp |  tau   |      K      |    σ_gyro    |     σ_acc    |
 |:---:|-------:|------------:|-------------:|-------------:|
 | 2-1 |  0.33  | 0.030621686 |          inf |          inf |
-| 2-2 |  0.33  | 0.030621686 |          inf |    5.8527864 |
-| 2-3 |  0.33  | 0.030621686 |    2.9182227 |    5.8527864 |
-| 2-4 |  0.22  | 0.044943586 | time-varying | time-varying |
+| 2-2 |  0.33  | 0.030128090 |          inf |    4.9552873 |
+| 2-3 |  0.30  | 0.033410594 |    1.7842051 |    5.5064391 |
+| 2-4 |  0.27  | 0.036953844 | time-varying | time-varying |
 
 <br>
 
@@ -229,13 +242,13 @@ Gating improves robustness by suppressing bad accel updates in this dataset.<br>
 |:---:|-------------:|-------------:|
 | 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
 | 2-1 | <ul><li>0.33687 rad</li><li>19.30136 deg</li></ul> | <ul><li>0.56227 rad</li><li>32.21544 deg</li></ul> |
-| 2-2 | <ul><li>0.26177 rad</li><li>14.99855 deg</li></ul> | <ul><li>0.40604 rad</li><li>23.26442 deg</li></ul> |
-| 2-3 | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
-| 2-4 | <ul><li>0.22967 rad</li><li>13.15924 deg</li></ul> | <ul><li>0.45485 rad</li><li>26.06074 deg</li></ul> |
+| 2-2 | <ul><li>0.23173 rad</li><li>13.27729 deg</li></ul> | <ul><li>0.39782 rad</li><li>22.79322 deg</li></ul> |
+| 2-3 | <ul><li>0.24289 rad</li><li>13.91633 deg</li></ul> | <ul><li>0.38963 rad</li><li>22.32396 deg</li></ul> |
+| 2-4 | <ul><li>0.23669 rad</li><li>13.56111 deg</li></ul> | <ul><li>0.45578 rad</li><li>26.11399 deg</li></ul> |
 
 <br>
 
-** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
+** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
 
@@ -246,38 +259,46 @@ Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.88
 
 <br>
 
+|      |  Mean error  |  p90 error   |
+|:----:|-------------:|-------------:|
+| grav | <ul><li>0.04878 rad</li><li>2.79477 deg</li></ul> | <ul><li>0.07998 rad</li><li>4.58227 deg</li></ul> |
+| acc  | <ul><li>0.20927 rad</li><li>11.99003 deg</li></ul> | <ul><li>0.42003 rad</li><li>24.06610 deg</li></ul> |
+
+<br>
+
 ##### [Observation]
 
-- This dataset is a strong “gating helps” case
-- Both accel-only and joint gating reduce error substantially relative to ungated correction
-- The best result is exp 2-3, suggesting that fixed jointly optimized gyro/acc gating provides the best trade-off for this dataset
-- Time-varying sigma still performs well, but the Optuna result shows that a carefully tuned fixed-gating configuration can outperform the adaptive schedule on this sequence
+- This dataset is another clear case where gating helps substantially relative to ungated gyro+acc correction
+- Both accel-only and joint fixed gating reduce error strongly compared with exp 2-1
+- The best result is exp 2-3 under the selected ranking criterion, indicating that jointly tuned fixed gyro/acc gating provides the best overall trade-off between mean and tail error on this sequence
+- Although exp 2-2 achieves a slightly lower mean error, exp 2-3 yields the best combined result once p90 error is also taken into account
+- The time-varying schedule remains competitive, but it does not outperform the best fixed-gating configuration here
 
 <br>
 <br>
 
 ##### [Conclusion across all datasets]
 
-Experiment 2 confirms:<br>
+Experiment 2 shows that:<br>
 
-1. Accelerometer correction improves roll/pitch by continuously correcting gyro drift
-2. Gating can further improve performance, but only when the reliability proxy aligns with the actual failure modes of the dataset
-3. The usefulness of gating is not universal: some datasets benefit from fixed or joint gating, while others perform best with no gating at all
-4. The best configuration is dataset-dependent, which suggests that robustness should be evaluated across multiple motion regimes rather than inferred from a single sequence
+1. Accelerometer correction improves roll/pitch estimation across the evaluated datasets
+2. Gating can provide an additional benefit in certain motion regimes, but its usefulness depends strongly on the dataset and the motion regime
+3. The benefit of gating is not universal. On the longest and most difficult sequence evaluated, ungated gyro+acc correction still performs best.
+4. The best configuration is therefore dataset-dependent, which reinforces the need to evaluate robustness across multiple motion patterns rather than drawing conclusions from a single sequence
 
 <br>
 <br>
 <br>
 
-### Experiment 3 — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
+### Experiment 3 (Dataset 03) — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
 
-<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_01.png" width="952" height="311">
+<!--<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_01.png" width="952" height="311">
 
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_02.png" width="952" height="631">
 
-This dataset is a strong demonstration of the benefit of magnetometer correction.<br>
-Once magnetic heading correction is added, orientation error drops sharply compared with both gyro-only and the best exp 2 result.<br>
-In this dataset, fixed norm-based gating provides the best trade off, while innovation only and time-varying gating are less effective.<br>
+This dataset is a representative case where magnetometer correction provides a clear additional benefit.<br>
+Once magnetic heading correction is added, orientation error decreases substantially relative to both the gyro-only baseline and the best result from experiment 2.<br>
+In this dataset, fixed norm-based gating provides the best trade off among the tested magnetometer gating variants.<br>
 
 <br>
 
@@ -374,7 +395,7 @@ Experiment 3 suggests:<br>
 1. Adding magnetometer correction yields a major improvement over gyro+accelerometer fusion alone on all evaluated datasets
 2. For the relatively consistent datasets in this experiment, fixed norm-based gating is the most effective choice among the evaluated configurations
 3. For the long non-stationary dataset, time-varying sigma can help, but it does not solve all failure modes
-4. These results suggest that the next step should focus on improving robustness during gyro integration itself, especially by detecting and suppressing abnormal integrated behavior before it propagates
+4. These results suggest that the next step should focus on improving robustness during gyro integration itself, especially by detecting and suppressing abnormal integrated behavior before it propagates-->
 
 <br>
 <br>

@@ -40,7 +40,7 @@ Four runs are compared (same dataset, same trimmed start):<br>
 
 Key hypothesis:<br>
 
-The correction is expected to counteract accumulated gyro drift, which may make its benefits more visible over longer sequences.<br>
+Accelerometer-based correction is expected to counteract accumulated gyro drift, which may make its benefits more visible.<br>
 
 <br>
 <br>
@@ -335,14 +335,18 @@ then samples new parameters that maximize the ratio between them:<br>
 
 #### [Optimization target]
 
-| exp | trial |             Target             |
-|:---:|------:|:-------------------------------|
-| 2-1 |    15 | <ul><li>tau</li></ul> |
-| 2-2 |    25 | <ul><li>tau</li><li>acc_gate_sigma</li></ul> |
-| 2-3 |    30 | <ul><li>tau</li><li>acc_gate_sigma</li><li>gyro_gate_sigma</li></ul> |
-| 2-4 |    40 | <ul><li>tau</li><li>percentile (`p`)</li><li>sliding window size (`win_s`)</li><li>update ratio (`update_ratio`)</li><li>EMA factor (`ema_alpha`)</li></ul> |
+| exp | trial |             Target ∈ Range (min, max)             |
+|:---:|------:|:--------------------------------------------------|
+| 2-1 |    15 | <ul><li>tau ∈ (0.1, 4)</li></ul> |
+| 2-2 |    20 | <ul><li>tau ∈ 2-1_best*(0.9, 1.1)</li><li>acc_gate_sigma ∈ suggested_acc*(0.01, 10)</li></ul> |
+| 2-3 |    20 | <ul><li>tau ∈ 2-2_best*(0.9, 1.1)</li><li>acc_gate_sigma ∈ 2-2_best*(0.7, 1.3)</li><li>gyro_gate_sigma ∈ suggested_gyro*(0.1, 10)</li></ul> |
+| 2-4 |    40 | <ul><li>tau ∈ 2-3_best*(0.9, 1.1)</li><li>percentile `p` ∈ (50. 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li></ul> |
 
-** For exp2-4, Optuna optimizes the parameters of the function `suggest_timevarying_gate_sigma(...)`, rather than the sigma values directly.<br>
+<br>
+
+** 2-x_best: Optimal value selected from experiment 2-x<br>
+** x_gate_sigma: fixed gate sigma estimated from robust percentiles of the data<br>
+** For exp2-4, Optuna optimizes the parameters of the function `suggest_timevarying_gate_sigma(...)`, rather than the sigma values directly<br>
 
 <br>
 
@@ -362,7 +366,6 @@ For each trial:<br>
 <br>
 
 ```py
-
 # optuna_exp_2.py
 
 def exp_2_1(. . .) -> tuple[float, float]:
@@ -444,9 +447,9 @@ Each plot compares:<br>
 | exp |  tau   |      K      |    σ_gyro    |     σ_acc    |
 |:---:|-------:|------------:|-------------:|-------------:|
 | 2-1 |  3.96  | 0.002521892 |          inf |          inf |
-| 2-2 |  3.98  | 0.002511610 |          inf |    1.4138655 |
-| 2-3 |  3.99  | 0.002504219 |    0.1114052 |   20.0266970 |
-| 2-4 |  2.85  | 0.003503313 | time-varying | time-varying |
+| 2-2 |  4.03  | 0.002483076 |          inf |    2.9133442 |
+| 2-3 |  4.41  | 0.002266319 |    0.1969152 |    2.9791675 |
+| 2-4 |  4.50  | 0.002220946 | time-varying | time-varying |
 
 <br>
 
@@ -455,7 +458,7 @@ Each plot compares:<br>
 <br>
 
 ```
-[START] 2026-03-13 20:36:20.699
+[START] 2026-03-17 04:05:48.975
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -465,7 +468,7 @@ Best quasi static(start, end, length):  (2523, 3540, 1017)
 Suggested gyro_sigma:  0.44791971689543864
 Suggested acc_sigma:  2.908568806018301
 
-[END] 2026-03-13 20:36:21.799
+[END] 2026-03-17 04:05:49.806
 ```
 
 <br>
@@ -476,62 +479,79 @@ Suggested acc_sigma:  2.908568806018301
 |:---:|-------------:|-------------:|
 | 1-2 | <ul><li>0.39107 rad</li><li>22.40684 deg</li></ul> | <ul><li>0.56630 rad</li><li>32.44667 deg</li></ul> |
 | 2-1 | <ul><li>0.33986 rad</li><li>19.47266 deg</li></ul> | <ul><li>0.51315 rad</li><li>29.40161 deg</li></ul> |
-| 2-2 | <ul><li>0.33856 rad</li><li>19.39819 deg</li></ul> | <ul><li>0.51119 rad</li><li>29.28925 deg</li></ul> |
-| 2-3 | <ul><li>0.33841 rad</li><li>19.38932 deg</li></ul> | <ul><li>0.51083 rad</li><li>29.26866 deg</li></ul> |
-| 2-4 | <ul><li>0.33878 rad</li><li>19.41076 deg</li></ul> | <ul><li>0.51106 rad</li><li>29.28171 deg</li></ul> |
+| 2-2 | <ul><li>0.33849 rad</li><li>19.39417 deg</li></ul> | <ul><li>0.51207 rad</li><li>29.33957 deg</li></ul> |
+| 2-3 | <ul><li>0.33782 rad</li><li>19.35529 deg</li></ul> | <ul><li>0.51093 rad</li><li>29.27439 deg</li></ul> |
+| 2-4 | <ul><li>0.33899 rad</li><li>19.42277 deg</li></ul> | <ul><li>0.51110 rad</li><li>29.28387 deg</li></ul> |
 
 <br>
 
-** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
+** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
 
 ```
-[START] 2026-03-13 20:37:53.656
+[START] 2026-03-17 04:05:50.987
+. . .
+[exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
+0.002792569731405555 1.4026426778532652 0.3398619909190511 0.51315497786888
+
+[exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
+0.1600024596055202 80.36550560592005 19.47265769657514 29.401614468015985
+
+[END] 2026-03-17 04:07:15.421
+
+
+
+
+[START] 2026-03-17 04:07:15.434
 . . .
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.0020530457796725846 1.401103619494298 0.3385623576830154 0.5111937635910532
+0.002748354142392041 1.401548675497198 0.33849208040378065 0.5120721420212044
 
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.1176308583223846 80.2773240575269 19.398194197235362 29.289245167175714
+0.15746909296636083 80.30282388814003 19.39416760573955 29.339572544038706
 
-[END] 2026-03-13 20:41:21.662
-
-
+[END] 2026-03-17 04:09:43.773
 
 
-[START] 2026-03-13 20:41:21.683
+
+
+[START] 2026-03-17 04:09:43.784
 . . .
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.0026687915359229707 1.4004505302520731 0.3384075244465869 0.5108344547068617
+0.00163324271634456 1.4005973749091025 0.3378135110770164 0.510934527798625
 
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.15291049140862284 80.239904800302 19.389322906259657 29.268658284569987
+0.09357791456702556 80.24831837939384 19.355288447208924 29.27439205037085
 
-[END] 2026-03-13 20:45:35.625
-
-
+[END] 2026-03-17 04:12:31.277
 
 
-[START] 2026-03-13 20:45:35.648
+
+
+[START] 2026-03-17 04:12:31.327
 . . .
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
-0.002701988907404848 1.4008955376132286 0.3387816686997262 0.5110622356955252
+0.0027016091819519134 1.400982210449621 0.33899127245759747 0.5110999765456887
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
-0.1548125606854624 80.26540184394847 19.410759792893614 29.281709173873722
+0.15479080401963552 80.27036783167219 19.42276920358972 29.28387156530333
 
-[END] 2026-03-13 20:51:17.763
-
-
+[END] 2026-03-17 04:17:37.159
 
 
-[START] 2026-03-13 20:51:19.490
+
+
+[START] 2026-03-17 04:17:38.907
 
 best: exp2-3
 
-[END] 2026-03-13 20:51:19.495
+[END] 2026-03-17 04:17:38.916
 ```
+
+<br>
+
+** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
 
@@ -541,8 +561,8 @@ Estimated gravity and linear acceleration are compared against reference signals
 
 <br>
 
-Gravity direction error remains low (mean/p90 ≈ 1.34° / 2.26°), indicating a stable tilt estimate.<br>
-Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 10.23° / 21.31°).<br>
+Gravity direction error remains low (mean/p90 ≈ 0.98° / 1.52°), indicating a stable tilt estimate.<br>
+Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 8.92° / 19.42°).<br>
 
 <br>
 
@@ -550,38 +570,45 @@ These checks support that Experiment 2 is physically consistent and the orientat
 
 <br>
 
+|      |  Mean error  |  p90 error   |
+|:----:|-------------:|-------------:|
+| grav | <ul><li>0.01704 rad</li><li>0.97623 deg</li></ul> | <ul><li>0.02655 rad</li><li>1.52132 deg</li></ul> |
+| acc  | <ul><li>0.15561 rad</li><li>8.91570 deg</li></ul> | <ul><li>0.33894 rad</li><li>19.42011 deg</li></ul> |
+
+<br>
+
 ```
-[START] 2026-03-13 20:51:26.176
+[START] 2026-03-17 04:17:45.687
 
 [Gravity]
-RMSE norm: 0.26587589801291317
+RMSE norm: 0.20127494414237856
 
 Gravity est/ref angle error in rad — min/max/mean/p90
-9.496351035476002e-05 0.09487717993307279 0.023467824095431702 0.039529867883221555
+4.258330309511835e-05 0.09699583475086833 0.01703841175553693 0.026552023496872593
 
 Gravity est/ref angle error in deg — min/max/mean/p90
-0.0054410083510746405 5.436061982268377 1.3446072750236555 2.2648945944183363
+0.002439843545076657 5.55745196157312 0.9762290831983539 1.5213188839029932
 
 
 [Linear accel]
-RMSE norm: 0.7652721423726998
+RMSE norm: 0.7422099471787518
 
 Linear accel est/ref angle error in rad — min/max/mean/p90
-0.0006574962648661179 3.078695623870781 0.1784670038909429 0.3719501610105884
+0.0009246217951388085 3.073500429721502 0.15560836401671843 0.3389448841717979
 
 Linear accel est/ref angle error in deg — min/max/mean/p90
-0.03767176102244427 176.3962656531917 10.22540610529587 21.311174415118142
+0.052976926507263544 176.09860295468695 8.915702515093352 19.42011135059456
 . . .
-[END] 2026-03-13 20:51:26.672
+[END] 2026-03-17 04:17:46.155
 ```
 <br>
 
 #### [Observation]
 
-- Accelerometer correction improves over gyro-only, confirming that gravity-based tilt correction is beneficial
-- With Optuna-based joint tuning, the best result is exp 2-3 rather than exp 2-4
-- This suggests that for this dataset, fixed jointly tuned gyro/acc gating is slightly better than a more adaptive time-varying schedule
-- The gain is modest but consistent in both mean and p90 error, suggesting better suppression of occasional bad corrections without over-attenuating useful ones
+- Accelerometer correction improves over the gyro-only baseline, confirming that gravity-based tilt correction is beneficial on this sequence
+- The best result is exp 2-3, indicating that jointly tuned fixed gyro/acc gating provides the most effective trade-off for this dataset
+- The gain over exp 2-1 is modest but consistent in both mean and p90 error, suggesting that soft gating helps suppress occasional incorrect tilt corrections without removing too many useful ones
+- The time-varying schedule remains competitive, but it does not outperform the simpler fixed-gating configuration on this sequence
 
 <br>
 <br>
@@ -606,9 +633,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 | exp |  tau   |      K      |    σ_gyro    |     σ_acc    |
 |:---:|-------:|------------:|-------------:|-------------:|
 | 2-1 |  0.32  | 0.030621686 |          inf |          inf |
-| 2-2 |  0.33  | 0.030621686 |          inf |   21.8110573 |
-| 2-3 |  0.33  | 0.030621686 |    3.8147143 |   21.8110573 |
-| 2-4 |  2.38  | 0.004192651 | time-varying | time-varying |
+| 2-2 |  0.29  | 0.033967126 |          inf |   24.0230485 |
+| 2-3 |  0.27  | 0.037574026 |    6.2974666 |   22.9724577 |
+| 2-4 |  0.27  | 0.037549933 | time-varying | time-varying |
 
 <br>
 
@@ -617,7 +644,7 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 <br>
 
 ```
-[START] 2026-03-13 20:53:31.115
+[START] 2026-03-17 04:21:30.057
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -627,7 +654,7 @@ Best quasi static(start, end, length):  (0, 1635, 1635)
 Suggested gyro_sigma:  0.6304230586083284
 Suggested acc_sigma:  2.5176966756605874
 
-[END] 2026-03-13 20:53:32.105
+[END] 2026-03-17 04:21:30.973
 ```
 
 <br>
@@ -638,18 +665,18 @@ Suggested acc_sigma:  2.5176966756605874
 |:---:|-------------:|-------------:|
 | 1-2 | <ul><li>0.38383 rad</li><li>21.99183 deg</li></ul> | <ul><li>0.54410 rad</li><li>31.17450 deg</li></ul> |
 | 2-1 | <ul><li>0.16965 rad</li><li>9.72036 deg</li></ul>  | <ul><li>0.32722 rad</li><li>18.74848 deg</li></ul> |
-| 2-2 | <ul><li>0.17033 rad</li><li>9.75919 deg</li></ul>  | <ul><li>0.32728 rad</li><li>18.75152 deg</li></ul> |
-| 2-3 | <ul><li>0.18372 rad</li><li>10.52661 deg</li></ul> | <ul><li>0.33525 rad</li><li>19.20822 deg</li></ul> |
-| 2-4 | <ul><li>0.27834 rad</li><li>15.94769 deg</li></ul> | <ul><li>0.43657 rad</li><li>25.01365 deg</li></ul> |
+| 2-2 | <ul><li>0.16139 rad</li><li>9.24721 deg</li></ul>  | <ul><li>0.32466 rad</li><li>18.60155 deg</li></ul> |
+| 2-3 | <ul><li>0.15914 rad</li><li>9.11787 deg</li></ul>  | <ul><li>0.32830 rad</li><li>18.81032 deg</li></ul> |
+| 2-4 | <ul><li>0.25474 rad</li><li>14.59551 deg</li></ul> | <ul><li>0.39538 rad</li><li>22.65358 deg</li></ul> |
 
 <br>
 
-** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
+** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
 
 ```
-[START] 2026-03-13 20:53:33.824
+[START] 2026-03-17 04:21:32.349
 . . .
 [exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
 0.0014567112071040497 0.6559884332313202 0.16965223911367894 0.32722263712136174
@@ -657,98 +684,109 @@ Suggested acc_sigma:  2.5176966756605874
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.08346340413646963 37.58536863355405 9.72035728615807 18.74847606819489
 
-[END] 2026-03-13 20:56:18.437
+[END] 2026-03-17 04:24:01.134
 
 
 
 
-[START] 2026-03-13 20:56:18.458
+[START] 2026-03-17 04:24:01.145
 . . .
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.0025501833910737417 0.6562536601170682 0.17033002368757355 0.32727579437088
+0.004575584167113969 0.6583342412761097 0.16139428046193366 0.3246582173822904
 
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.1461147452928857 37.60056501472081 9.759191481661304 18.75152175424281
+0.2621616615825124 37.719773534068324 9.24721110801952 18.601545640246062
 
-[END] 2026-03-13 21:02:47.675
-
-
+[END] 2026-03-17 04:28:46.238
 
 
-[START] 2026-03-13 21:02:47.696
+
+
+[START] 2026-03-17 04:28:46.252
 . . .
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.0048145114886251165 0.6310042690493115 0.1837240882578165 0.33524673913803477
+0.004691134603283964 0.6479224948123612 0.1591369156292557 0.3283019619432845
 
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.27585118871546643 36.15388147126303 10.52661485206193 19.208223248132665
+0.2687822138959489 37.123224404335275 9.117873630285818 18.81031682521477
 
-[END] 2026-03-13 21:10:53.528
-
-
+[END] 2026-03-17 04:33:34.495
 
 
-[START] 2026-03-13 21:10:53.547
+
+
+[START] 2026-03-17 04:33:34.507
 . . .
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
-0.004083158345116812 0.6598162171077984 0.2783396728942163 0.4365705029083013
+0.004524775138459319 0.604989026170517 0.25473977323201047 0.39537957747500835
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
-0.23394774025881496 37.80468449456447 15.947688527890474 25.013647276549495
+0.25925051867944165 34.663317851300334 14.595513880313861 22.65358109498373
 
-[END] 2026-03-13 21:21:22.463
-
-
+[END] 2026-03-17 04:43:17.978
 
 
-[START] 2026-03-13 21:21:26.665
 
-best: exp2-1
 
-[END] 2026-03-13 21:21:26.671
+[START] 2026-03-17 04:43:22.166
+
+best: exp2-3
+
+[END] 2026-03-17 04:43:22.177
 ```
+
+<br>
+
+** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
-Gravity direction error remains low (mean/p90 ≈ 3.07° / 5.18°), indicating a stable tilt estimate.<br>
-Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 14.61° / 29.54°).<br>
+Gravity direction error remains low (mean/p90 ≈ 3.38° / 5.74°), indicating a stable tilt estimate.<br>
+Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 15.85° / 31.78°).<br>
+
+<br>
+
+|      |  Mean error  |  p90 error   |
+|:----:|-------------:|-------------:|
+| grav | <ul><li>0.05904 rad</li><li>3.38289 deg</li></ul> | <ul><li>0.10017 rad</li><li>5.73918 deg</li></ul> |
+| acc  | <ul><li>0.27664 rad</li><li>15.85026 deg</li></ul> | <ul><li>0.55462 rad</li><li>31.77723 deg</li></ul> |
 
 <br>
 
 ```
-[START] 2026-03-13 21:21:37.889
+[START] 2026-03-17 04:43:32.825
 
 [Gravity]
-RMSE norm: 0.6514719385309286
+RMSE norm: 0.7095678954417411
 
 Gravity est/ref angle error in rad — min/max/mean/p90
-0.0003908888676714563 0.38395432284377373 0.05349559243639937 0.09033607145073447
+0.00011644698410429857 0.421200010323766 0.05904257526139471 0.10016762190613224
 
 Gravity est/ref angle error in deg — min/max/mean/p90
-0.022396282376222175 21.998962224751686 3.0650716691576525 5.175875631919332
+0.006671920726203293 24.132982922418496 3.38289037406144 5.739181979083548
 
 
 [Linear accel]
-RMSE norm: 0.8326281426956755
+RMSE norm: 0.884723577813496
 
 Linear accel est/ref angle error in rad — min/max/mean/p90
-0.0010549179286515685 3.0958808687986137 0.2550339480877074 0.5155392527416404
+0.0012662548761560905 3.100442485184134 0.2766393045845288 0.5546173107550053
 
 Linear accel est/ref angle error in deg — min/max/mean/p90
-0.060442345044417777 177.3809076574551 14.612368857984167 29.538223355424247
+0.07255106019160472 177.64226902410314 15.850264600127586 31.777231151157444
 . . .
-[END] 2026-03-13 21:21:38.720
+[END] 2026-03-17 04:43:33.664
 ```
 <br>
 
 #### [Observation]
 
-- Accelerometer correction alone yields the dominant improvement over gyro-only
-- The best result is exp 2-1, meaning no gating is needed for this dataset
-- Both fixed and time-varying gating slightly degrade performance, consistent with over-suppressing valid accel corrections
-- This dataset acts as a negative control: adaptive gating is not universally beneficial, and for this sequence, “no gating” is the best configuration when the accel reliability proxy does not need to reject updates
+- Accelerometer correction provides a large improvement over the gyro-only baseline
+- The best result is exp 2-3, although exp 2-1 and exp 2-2 remain very close
+- This suggests that, for this dataset, mild jointly tuned fixed gating improves the balance between average error and tail error better than ungated correction
+- In contrast, the time-varying schedule clearly underperforms, indicating that additional adaptivity is not necessarily beneficial when the fixed-gating solution is already well matched to the motion pattern
 
 <br>
 <br>
@@ -773,9 +811,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 | exp |  tau   |      K      |    σ_gyro    |     σ_acc    |
 |:---:|-------:|------------:|-------------:|-------------:|
 | 2-1 |  0.33  | 0.030621686 |          inf |          inf |
-| 2-2 |  0.33  | 0.030621686 |          inf |    5.8527864 |
-| 2-3 |  0.33  | 0.030621686 |    2.9182227 |    5.8527864 |
-| 2-4 |  0.22  | 0.044943586 | time-varying | time-varying |
+| 2-2 |  0.33  | 0.030128090 |          inf |    4.9552873 |
+| 2-3 |  0.30  | 0.033410594 |    1.7842051 |    5.5064391 |
+| 2-4 |  0.27  | 0.036953844 | time-varying | time-varying |
 
 <br>
 
@@ -784,7 +822,7 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 <br>
 
 ```
-[START] 2026-03-13 21:22:58.527
+[START] 2026-03-17 04:46:01.090
 
 Detected accel unit in [m/s²]
 Selected g_world_unit: [ 0  0 -1]
@@ -794,7 +832,7 @@ Best quasi static(start, end, length):  (41487, 43669, 2182)
 Suggested gyro_sigma:  0.48226806557261265
 Suggested acc_sigma:  0.6755995626475786
 
-[END] 2026-03-13 21:22:59.416
+[END] 2026-03-17 04:46:01.897
 ```
 
 <br>
@@ -805,18 +843,18 @@ Suggested acc_sigma:  0.6755995626475786
 |:---:|-------------:|-------------:|
 | 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
 | 2-1 | <ul><li>0.33687 rad</li><li>19.30136 deg</li></ul> | <ul><li>0.56227 rad</li><li>32.21544 deg</li></ul> |
-| 2-2 | <ul><li>0.26177 rad</li><li>14.99855 deg</li></ul> | <ul><li>0.40604 rad</li><li>23.26442 deg</li></ul> |
-| 2-3 | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
-| 2-4 | <ul><li>0.22967 rad</li><li>13.15924 deg</li></ul> | <ul><li>0.45485 rad</li><li>26.06074 deg</li></ul> |
+| 2-2 | <ul><li>0.23173 rad</li><li>13.27729 deg</li></ul> | <ul><li>0.39782 rad</li><li>22.79322 deg</li></ul> |
+| 2-3 | <ul><li>0.24289 rad</li><li>13.91633 deg</li></ul> | <ul><li>0.38963 rad</li><li>22.32396 deg</li></ul> |
+| 2-4 | <ul><li>0.23669 rad</li><li>13.56111 deg</li></ul> | <ul><li>0.45578 rad</li><li>26.11399 deg</li></ul> |
 
 <br>
 
-** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
+** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
 
 ```
-[START] 2026-03-13 21:23:01.472
+[START] 2026-03-17 04:46:03.781
 . . .
 [exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
 0.007372901990831988 0.9060120450830597 0.3368722815697167 0.5622654170401866
@@ -824,99 +862,115 @@ Suggested acc_sigma:  0.6755995626475786
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.4224361668382753 51.91066637127579 19.301359968887475 32.21543536256581
 
-[END] 2026-03-13 21:26:50.789
+[END] 2026-03-17 04:49:23.512
 
 
 
 
-[START] 2026-03-13 21:26:50.805
+[START] 2026-03-17 04:49:23.525
 . . .
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.004190423138418297 0.7491750581956197 0.2617740843012642 0.4060407873669706
+0.006504140308894591 0.7830372741420375 0.231732513184545 0.3978166616786644
 
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.2400935602053332 42.92456895107684 14.998550216364258 23.26442342629629
+0.3726597890605756 44.864731009767176 13.277294981434132 22.793215734171223
 
-[END] 2026-03-13 21:35:47.849
-
-
+[END] 2026-03-17 04:55:51.550
 
 
-[START] 2026-03-13 21:35:47.866
+
+
+[START] 2026-03-17 04:55:51.565
 . . .
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.006448084704273436 0.7709568035636727 0.24069772632614023 0.3943932826850462
+0.006762815923363894 0.7632415810002321 0.2428857537054454 0.3896265363969847
 
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.3694480394977294 44.17257103109491 13.790963856882762 22.597070566163154
+0.3874808100326199 43.73052134020566 13.916328591176018 22.32395612184758
 
-[END] 2026-03-13 21:46:41.704
-
-
+[END] 2026-03-17 05:02:29.047
 
 
-[START] 2026-03-13 21:46:41.723
+
+
+[START] 2026-03-17 05:02:29.063
 . . .
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
-0.0030553382057283093 0.8848460029354784 0.22967207907273088 0.45484578146167504
+0.0019336906480635027 0.8863477754775086 0.23668594042411384 0.45577514740030156
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
-0.17505798417330576 50.69794148722337 13.159240802862398 26.06074360708376
+0.11079231301795571 50.78398671567033 13.561105456386565 26.113992352990273
 
-[END] 2026-03-13 22:01:21.613
-
-
+[END] 2026-03-17 05:15:29.988
 
 
-[START] 2026-03-13 22:01:26.982
+
+
+[START] 2026-03-17 05:15:34.348
 
 best: exp2-3
 
-[END] 2026-03-13 22:01:26.990
+[END] 2026-03-17 05:15:34.362
 ```
+
+<br>
+
+** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
-Gravity direction error remains low (mean/p90 ≈ 2.75° / 4.50°), indicating a stable tilt estimate.<br>
-Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.88° / 23.93°).<br>
+Gravity direction error remains low (mean/p90 ≈ 2.79° / 4.58°), indicating a stable tilt estimate.<br>
+Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.99° / 24.07°).<br>
+
+<br>
+
+|      |  Mean error  |  p90 error   |
+|:----:|-------------:|-------------:|
+| grav | <ul><li>0.04878 rad</li><li>2.79477 deg</li></ul> | <ul><li>0.07998 rad</li><li>4.58227 deg</li></ul> |
+| acc  | <ul><li>0.20927 rad</li><li>11.99003 deg</li></ul> | <ul><li>0.42003 rad</li><li>24.06610 deg</li></ul> |
 
 <br>
 
 ```
-[START] 2026-03-13 22:01:42.403
+[START] 2026-03-17 05:15:48.577
 
 [Gravity]
-RMSE norm: 0.5460307231145585
+RMSE norm: 0.552626287335186
 
 Gravity est/ref angle error in rad — min/max/mean/p90
-0.00020554934389784165 0.2799272083382073 0.04805769903184925 0.07862645299527786
+0.0002262118650697147 0.28012067223628173 0.04877787155003603 0.0799756400746747
 
 Gravity est/ref angle error in deg — min/max/mean/p90
-0.011777109887029468 16.038647608658582 2.7535033276349044 4.504963914713171
+0.012960985144277503 16.0497322735064 2.7947661734483153 4.582266640136192
 
 
 [Linear accel]
-RMSE norm: 0.7917494979296027
+RMSE norm: 0.7964169595942013
 
 Linear accel est/ref angle error in rad — min/max/mean/p90
-0.0007656885086786862 2.904607563155329 0.20734425512456875 0.41770524267912995
+0.0004397065133648307 2.893358227492407 0.2092655255132763 0.42003276708629594
 
 Linear accel est/ref angle error in deg — min/max/mean/p90
-0.04387071996895483 166.42175451057906 11.879950724921581 23.932747486001976
-. . .
-[END] 2026-03-13 22:01:43.637
+0.025193327440217524 165.77721505476762 11.990031409497982 24.066104811246273
 
+
+[Consistency ratio]
+rmse_norm of (a_lin_est / g_est):  1.44114925012814
+
+[END] 2026-03-17 05:15:49.671
 ```
+
 <br>
 
 #### [Observation]
 
-- This dataset is a strong “gating helps” case
-- Both accel-only and joint gating reduce error substantially relative to ungated correction
-- The best result is exp 2-3, suggesting that fixed jointly optimized gyro/acc gating provides the best trade-off for this dataset
-- Time-varying sigma still performs well, but the Optuna result shows that a carefully tuned fixed-gating configuration can outperform the adaptive schedule on this sequence
+- This dataset is another clear case where gating helps substantially relative to ungated gyro+acc correction
+- Both accel-only and joint fixed gating reduce error strongly compared with exp 2-1
+- The best result is exp 2-3 under the selected ranking criterion, indicating that jointly tuned fixed gyro/acc gating provides the best overall trade-off between mean and tail error on this sequence
+- Although exp 2-2 achieves a slightly lower mean error, exp 2-3 yields the best combined result once p90 error is also taken into account
+- The time-varying schedule remains competitive, but it does not outperform the best fixed-gating configuration here
 
 <br>
 <br>
@@ -941,9 +995,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 | exp |  tau   |      K      |    σ_gyro    |     σ_acc    |
 |:---:|-------:|------------:|-------------:|-------------:|
 | 2-1 |  3.96  | 0.002537040 |          inf |          inf |
-| 2-2 |  0.54  | 0.018787321 |          inf |    4.3770050 |
-| 2-3 |  0.33  | 0.030805618 |    1.6657816 |    4.3927886 |
-| 2-4 |  1.56  | 0.006459710 | time-varying | time-varying |
+| 2-2 |  3.98  | 0.002527921 |          inf |    1.7620850 |
+| 2-3 |  4.38  | 0.002299083 |    2.6397807 |    1.8511999 |
+| 2-4 |  4.77  | 0.002108354 | time-varying | time-varying |
 
 <br>
 
@@ -952,7 +1006,7 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 <br>
 
 ```
-[START] 2026-03-13 22:03:04.826
+[START] 2026-03-17 05:16:08.763
 
 Detected accel unit in [g] → converting to [m/s²]
 Selected g_world_unit: [0 0 1]
@@ -962,7 +1016,7 @@ Best quasi static(start, end, length):  (252162, 310194, 58032)
 Suggested gyro_sigma:  0.27528854262917185
 Suggested acc_sigma:  0.507068924693965
 
-[END] 2026-03-13 22:03:05.740
+[END] 2026-03-17 05:16:09.695
 ```
 
 #### [Metrics]
@@ -971,18 +1025,18 @@ Suggested acc_sigma:  0.507068924693965
 |:---:|-------------:|-------------:|
 | 1-2 | <ul><li>0.88808 rad</li><li>50.88316 deg</li></ul> | <ul><li>2.03692 rad</li><li>116.70718 deg</li></ul> |
 | 2-1 | <ul><li>0.86428 rad</li><li>49.51985 deg</li></ul> | <ul><li>2.01278 rad</li><li>115.32398 deg</li></ul> |
-| 2-2 | <ul><li>0.75918 rad</li><li>43.49773 deg</li></ul> | <ul><li>1.77312 rad</li><li>101.59235 deg</li></ul> |
-| 2-3 | <ul><li>0.77234 rad</li><li>44.25192 deg</li></ul> | <ul><li>1.80136 rad</li><li>103.21053 deg</li></ul> |
-| 2-4 | <ul><li>0.87627 rad</li><li>50.20653 deg</li></ul> | <ul><li>2.02915 rad</li><li>116.26161 deg</li></ul> |
+| 2-2 | <ul><li>0.87043 rad</li><li>49.87187 deg</li></ul> | <ul><li>2.02039 rad</li><li>115.75971 deg</li></ul> |
+| 2-3 | <ul><li>0.87335 rad</li><li>50.03905 deg</li></ul> | <ul><li>2.02857 rad</li><li>116.22858 deg</li></ul> |
+| 2-4 | <ul><li>0.87640 rad</li><li>50.21389 deg</li></ul> | <ul><li>2.03473 rad</li><li>116.58132 deg</li></ul> |
 
 <br>
 
-** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment.<br>
+** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
 
 ```
-[START] 2026-03-13 22:03:08.274
+[START] 2026-03-17 05:16:11.902
 . . .
 [exp 2-1] Gyro+Acc angle error in rad — min/max/mean/p90
 0.0018930921712486044 3.1415478697090844 0.8642844509787638 2.012783220058988
@@ -990,100 +1044,111 @@ Suggested acc_sigma:  0.507068924693965
 [exp 2-1] Gyro+Acc angle error in deg — min/max/mean/p90
 0.10846619164180232 179.99743407264518 49.51985133986466 115.32398358413164
 
-[END] 2026-03-13 22:30:15.767
+[END] 2026-03-17 05:41:25.950
 
 
 
 
-[START] 2026-03-13 22:30:15.785
+[START] 2026-03-17 05:41:25.961
 . . .
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.0029478255158607186 3.139350949771503 0.759178684274718 1.7731209809369155
+0.002687737167054129 3.1370720491834305 0.8704284129764128 2.020388085045019
 
 [exp 2-2] Gyro+Acc+Gating(Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.16889796079979388 179.87155983229363 43.49773450523618 101.59234877378175
+0.15399599611264989 179.7409884466672 49.87187443181871 115.75971025159804
 
-[END] 2026-03-13 23:35:36.918
-
-
+[END] 2026-03-17 06:32:20.184
 
 
-[START] 2026-03-13 23:35:36.939
+
+
+[START] 2026-03-17 06:32:20.205
 . . .
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in rad — min/max/mean/p90
-0.0011360053884325936 3.1359210156364 0.7723417233711358 1.801363633780796
+0.0024923534722615195 3.14092011061767 0.8733462451214835 2.0285713937500924
 
 [exp 2-3] Gyro+Acc+Gating(Gyro/Acc) — fixed sigma angle error in deg — min/max/mean/p90
-0.06508831426130733 179.67503908234434 44.25192109102662 103.21053358398926
+0.14280133501536116 179.96146612615615 50.03905389905887 116.2285793028514
 
-[END] 2026-03-14 00:55:23.840
-
-
+[END] 2026-03-17 07:13:07.014
 
 
-[START] 2026-03-14 00:55:23.859
+
+
+[START] 2026-03-17 07:13:07.025
 . . .
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in rad — min/max/mean/p90
-0.002744527635666205 3.1412745144228587 0.8762691695093098 2.0291479350369532
+0.004479150162939574 3.140442692180671 0.8763976984097652 2.0347278032129728
 
 [exp 2-4] Gyro+Acc+Gating(Gyro/Acc) — time varying sigma angle error in deg — min/max/mean/p90
-0.15724985028069202 179.98177196843685 50.206525130317175 116.26161268530356
+0.2566364001417726 179.93411206465439 50.21388929385873 116.58131558202885
 
-[END] 2026-03-14 02:41:47.986
-
-
+[END] 2026-03-17 08:50:28.899
 
 
-[START] 2026-03-14 02:42:18.391
 
-best: exp2-2
 
-[END] 2026-03-14 02:42:18.427
+[START] 2026-03-17 08:50:56.366
+
+best: exp2-1
+
+[END] 2026-03-17 08:50:56.445
 ```
 
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
-Gravity direction error remains low (mean/p90 ≈ 2.17° / 4.97°), indicating a stable tilt estimate.<br>
-Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 28.50° / 71.04°).<br>
+Gravity direction error remains low (mean/p90 ≈ 1.30° / 3.01°), indicating a stable tilt estimate.<br>
+Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 17.86° / 43.24°).<br>
+
+<br>
+
+|      |  Mean error  |  p90 error   |
+|:----:|-------------:|-------------:|
+| grav | <ul><li>0.02261 rad</li><li>1.29562 deg</li></ul> | <ul><li>0.05259 rad</li><li>3.01341 deg</li></ul> |
+| acc  | <ul><li>0.31165 rad</li><li>17.85600 deg</li></ul> | <ul><li>0.75470 rad</li><li>43.24097 deg</li></ul> |
 
 <br>
 
 ```
-[START] 2026-03-14 02:43:47.914
+[START] 2026-03-17 08:52:16.589
 
 [Gravity]
-RMSE norm: 0.5362058049520813
+RMSE norm: 0.311917118411453
 
 Gravity est/ref angle error in rad — min/max/mean/p90
-8.36705176921966e-06 0.5051207364322517 0.03780843846066841 0.08682412742298334
+1.2384971736170922e-05 0.19014754863324393 0.02261286401008407 0.05259384322202774
 
 Gravity est/ref angle error in deg — min/max/mean/p90
-0.000479396753343755 28.941286342108064 2.166263953776399 4.974656061243018
+0.0007096066098714055 10.894652021443441 1.2956216704810914 3.0134052449949205
 
 
 [Linear accel]
-RMSE norm: 0.7885668587209126
+RMSE norm: 0.6409108584616177
 
 Linear accel est/ref angle error in rad — min/max/mean/p90
-0.00024263020163022123 3.139339013847217 0.49734893556753823 1.2399683704252757
+0.0001003705495784379 3.124034313429527 0.31164593517791683 0.7546972116886191
 
 Linear accel est/ref angle error in deg — min/max/mean/p90
-0.013901686535819862 179.87087595420743 28.495994953343857 71.04495435508258
+0.005750808878253076 178.9939812135617 17.855996788102267 43.24096504004914
 . . .
-[END] 2026-03-14 02:43:55.710
-
+[END] 2026-03-17 08:52:24.211
 ```
+
+<br>
+
+** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
+
 <br>
 
 #### [Observation]
 
-- Very long, uncontrolled motion introduces large error plateaus/spikes that dominate both mean and tail metrics
-- Even on this long and difficult sequence, gated accel correction provides a meaningful gain over gyro-only and ungated gyro+acc
-- The best result is exp 2-2, meaning accel-only fixed gating performs best
-- Adding gyro gating or switching to time-varying sigma does not help further, suggesting that, in this dataset, accel reliability is a more informative proxy than gyro-norm confidence for the dominant failure segments
-- Remaining error may involve yaw/heading drift and unmodeled effects (e.g. mounting/frame mismatch), in addition to limitations of the current accel-magnitude proxy
+- This is the most difficult sequence, with large long-duration error plateaus and heavy tail behavior
+- Accelerometer correction still improves slightly over the gyro-only baseline, but the gain is much smaller than in the shorter datasets
+- The best result is exp 2-1, meaning that no gating performs best on this sequence
+- Both fixed and time-varying gating slightly degrade performance, suggesting that the current gating proxies do not align well with the dominant failure modes in this dataset
+- The remaining error likely includes effects that are not well handled by the current roll/pitch correction logic alone, such as long-horizon drift, heading-related effects, or dataset-specific frame/mounting mismatch
 
 <br>
 <br>
@@ -1094,49 +1159,50 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 | Dataset | best | exp 1-2 Mean  | best Mean     | exp 1-2 p90   | best p90      | best grav Mean | best acc Mean  |
 |:--------|-----:|--------------:|--------------:|--------------:|--------------:|---------------:|---------------:|
-| data 01 | 2-3  | 22.40684 deg  | 19.38932 deg  |  32.44667 deg |  29.26866 deg | 1.34461 deg    | 10.22541 deg   |
-| data 02 | 2-1  | 21.99183 deg  |  9.72036 deg  |  31.17450 deg |  18.74848 deg | 3.06507 deg    | 14.61237 deg   |
-| data 03 | 2-3  | 30.81266 deg  | 13.79096 deg  |  46.56837 deg |  22.59707 deg | 2.75350 deg    | 11.87995 deg   |
-| data 04 | 2-2  | 50.88316 deg  | 43.49773 deg  | 116.70718 deg | 101.59235 deg | 2.16626 deg    | 28.49599 deg   |
+| data 01 | 2-3  | 22.40684 deg  | 19.35529 deg  |  32.44667 deg |  29.27439 deg | 0.97623 deg    |  8.91570 deg   |
+| data 02 | 2-3  | 21.99183 deg  |  9.11787 deg  |  31.17450 deg |  18.81032 deg | 3.38289 deg    | 15.85026 deg   |
+| data 03 | 2-3  | 30.81266 deg  | 13.91633 deg  |  46.56837 deg |  22.32396 deg | 2.79477 deg    | 11.99003 deg   |
+| data 04 | 2-1  | 50.88316 deg  | 49.51986 deg  | 116.70718 deg | 115.32398 deg | 1.29562 deg    | 17.85600 deg   |
 
 <br>
 
-** best = minimum error (0.8 * mean + 0.2 * p90) across exp 2 (per dataset)<br>
+** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift) per dataset<br>
 
 <br>
 
 Across all datasets:<br>
 
-- Adding accelerometer correction consistently reduces error relative to gyro-only across these datasets
-- In the longer sequences, the benefit often becomes more visible, although the magnitude of the gain remains dataset-dependent
-- Gating is strongly dataset-dependent. It helps when linear acceleration frequently violates the gravity assumption, but may be marginal or unnecessary when accelerometer measurements are already sufficiently consistent
+- Adding accelerometer correction reduces error relative to the gyro-only baseline on all evaluated datasets, although the magnitude of improvement varies significantly
+- The magnitude of the gain is strongly dataset-dependent. (large in data 02, data 03 / modest in data 01 / small in data 04)
+- The effectiveness of gating is strongly dataset-dependent. In some sequences it improves both average and tail behavior, while in others it suppresses useful corrections and slightly hurts performance
 
 <br>
 <br>
 
-Datasets where gating helps (data 01, data 03, data 04):<br>
+Datasets where gating helps (data 01, data 02, data 03):<br>
 
-- A gated configuration outperforms ungated gyro+acc correction
-- This suggests that accel reliability is not uniform over time and that soft gating can suppress incorrect tilt updates during dynamic motion
-- In data 01 and data 03, joint gyro/acc gating performs best
-- In data 04, accel-only fixed gating performs best, suggesting that the gyro gate is not always useful even when accel gating is
+- A gated configuration outperforms ungated gyro+acc correction on these datasets
+- In all three of these datasets, the best overall result is exp 2-3 (jointly tuned fixed gyro/acc gating)
+- This suggests that combining accel-based and gyro-based confidence can improve robustness under certain motion patterns
+- The improvement is strong in data 02 and data 03, while data 01 shows a smaller but still consistent gain
 
 <br>
 
-Dataset where gating is unnecessary or harmful (data 02):<br>
+Dataset where gating is unnecessary or harmful (data 04):<br>
 
-- The best configuration is exp 2-1, i.e. gyro+acc without gating
-- This indicates that accelerometer correction is already reliable enough in this motion pattern
-- Additional gating appears to suppress useful corrections more than it filters harmful ones
+- The best configuration is exp 2-1 ( gyro+acc without gating)
+- This indicates that, for this sequence, the current gating design does not align well with the dominant error sources
+- Additional gating appears to attenuate useful corrections more than it filters harmful ones
 
 <br>
 <br>
 
 Overall interpretation:<br>
 
-- Across these datasets, accelerometer correction provides the main gain in roll/pitch stabilization
-- Gating provides a secondary gain only when the chosen proxy meaningfully separates reliable from unreliable updates
-- The fact that different datasets prefer different gating structures is itself an important experimental result
+- Across these datasets, accelerometer correction provides the primary gain in roll/pitch stabilization in the evaluated datasets
+- Fixed jointly tuned gating (exp 2-3) is the most successful gated variant among the evaluated configurations, since it is selected as best on three of the four datasets
+- However, its usefulness is not universal: the best configuration remains dataset-dependent, and one long sequence still favors ungated correction
+- This variability is itself an important result, suggesting that robustness should be evaluated across multiple motion regimes rather than inferred from a single dataset
 
 <br>
 <br>
@@ -1145,12 +1211,12 @@ Overall interpretation:<br>
 
 ### Conclusion <a name="exp-2-conclusion"></a>
 
-Experiment 2 confirms:<br>
+Experiment 2 shows that:<br>
 
-1. Accelerometer correction improves roll/pitch by continuously correcting gyro drift
-2. Gating can further improve performance, but only when the reliability proxy aligns with the actual failure modes of the dataset
-3. The usefulness of gating is not universal: some datasets benefit from fixed or joint gating, while others perform best with no gating at all
-4. The best configuration is dataset-dependent, which suggests that robustness should be evaluated across multiple motion regimes rather than inferred from a single sequence
+1. Accelerometer correction improves roll/pitch estimation across the evaluated datasets
+2. Gating can provide an additional benefit in certain motion regimes, but its usefulness depends strongly on the dataset and the motion regime
+3. The benefit of gating is not universal. On the longest and most difficult sequence evaluated, ungated gyro+acc correction still performs best.
+4. The best configuration is therefore dataset-dependent, which reinforces the need to evaluate robustness across multiple motion patterns rather than drawing conclusions from a single sequence
 
 <br>
 

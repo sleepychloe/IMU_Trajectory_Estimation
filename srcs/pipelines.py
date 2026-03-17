@@ -143,7 +143,6 @@ def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float) -> float:
         elif e_axis_norm > 1.2 * mag_err_sigma:
                 return np.exp(-0.06 * (e_axis_norm / mag_err_sigma) ** 2)
         return 1
-        
 
 def calc_mag_err_axis(q_pred: Quat, g_pred: Vec3, m_unit: Vec3, m_world_h_unit: Vec3,
                       threshold: float = 0.2) -> Vec3:

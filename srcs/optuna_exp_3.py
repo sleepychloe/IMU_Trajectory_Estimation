@@ -189,6 +189,7 @@ def exp_3_5(dt: ScalarBatch, q_ref: QuatBatch,
         """
         returns:
                 best_tau, best_K, best_mag_gain,
+                best_p, best_win_s, best_update_ratio, best_ema_alpha,
                 timevarying_acc_sigma, timevarying_gyro_sigma, timevarying_mag_sigma
         """
         dt_median: float = float(np.median(dt))
@@ -239,6 +240,7 @@ def exp_3_5(dt: ScalarBatch, q_ref: QuatBatch,
                                         p_gyro=best_p-10, p_acc=best_p, p_mag=best_p, sigma_floor=sigma_floor,
                                         win_s=best_win, update_s=best_update, ema_alpha=best_ema)
         return [best_tau, best_K, best_mag_gain,
+                best_p, best_win, best["update_ratio"], best_ema,
                 timevarying_acc_sigma, timevarying_gyro_sigma, timevarying_mag_sigma]
 
 def exp_3_6(dt: ScalarBatch, q_ref: QuatBatch,
@@ -258,7 +260,9 @@ def exp_3_6(dt: ScalarBatch, q_ref: QuatBatch,
         """
         returns:
                 best_tau, best_K, best_mag_gain,
-                timevarying_acc_sigma, timevarying_gyro_sigma, timevarying_mag_sigma, best_mag_err_sigma
+                best_p, best_win_s, best_update_ratio, best_ema_alpha,
+                timevarying_acc_sigma, timevarying_gyro_sigma, timevarying_mag_sigma,
+                best_mag_err_sigma
         """
         dt_median: float = float(np.median(dt))
 
@@ -310,4 +314,6 @@ def exp_3_6(dt: ScalarBatch, q_ref: QuatBatch,
                                         win_s=best_win, update_s=best_update, ema_alpha=best_ema)
         best_mag_err_sigma: float = best["mag_err_sigma"]
         return [best_tau, best_K, best_mag_gain,
-                timevarying_acc_sigma, timevarying_gyro_sigma, timevarying_mag_sigma, best_mag_err_sigma]
+                best_p, best_win, best["update_ratio"], best_ema,
+                timevarying_acc_sigma, timevarying_gyro_sigma, timevarying_mag_sigma,
+                best_mag_err_sigma]
