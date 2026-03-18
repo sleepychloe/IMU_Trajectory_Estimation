@@ -162,7 +162,7 @@ Full experimental process and results:<br>
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp1/data03_exp1.png" width="952" height="311">
 
 This dataset clearly illustrates why initial stabilization trimming is needed,<br>
-and how gyro-only orientation estimation exhibits drift over long durations.<br>
+and how gyro-only orientation estimation drifts over time.<br>
 
 <br>
 
@@ -211,7 +211,7 @@ Experiment 1 shows that:<br>
 
 This dataset is a representative case where gating improves performance.<br>
 Accelerometer correction reduces error overall, but ungated accel updates become less reliable during stronger linear motion.<br>
-In this dataset, gating improves the trade-off between average error and tail error by suppressing less reliable accel corrections.<br>
+In this dataset, gating improves the trade-off between average and tail error by suppressing less reliable accel corrections.<br>
 
 <br>
 
@@ -292,13 +292,13 @@ Experiment 2 shows that:<br>
 
 ### Experiment 3 (Dataset 03) — Gyro + Accelerometer + Magnetometer <a name="exp-3"></a>
 
-<!--<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_01.png" width="952" height="311">
+<img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_01.png" width="952" height="311">
 
 <img src="https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/img/exp3/data03_exp3_02.png" width="952" height="631">
 
 This dataset is a representative case where magnetometer correction provides a clear additional benefit.<br>
-Once magnetic heading correction is added, orientation error decreases substantially relative to both the gyro-only baseline and the best result from experiment 2.<br>
-In this dataset, fixed norm-based gating provides the best trade off among the tested magnetometer gating variants.<br>
+With magnetic heading correction, orientation error decreases substantially relative to both the gyro-only baseline and the best result from experiment 2.<br>
+In this dataset, fixed norm-based gating provides the best trade-off among the tested magnetometer-gating variants.<br>
 
 <br>
 
@@ -314,11 +314,11 @@ In this dataset, fixed norm-based gating provides the best trade off among the t
 | exp |  tau   |      K      | mag_gain |     σ_acc    |    σ_gyro    |     σ_mag    | σ_mag_err |
 |:---:|-------:|------------:|---------:|-------------:|-------------:|-------------:|----------:|
 | 3-1 |  3.93  | 0.002542621 | 3.577178 |          inf |          inf |          inf |       inf |
-| 3-2 |  3.35  | 0.002987808 | 2.131268 |          inf |          inf |          inf | 0.1900067 |
-| 3-3 |  2.49  | 0.004021669 | 1.403544 |    1.9785102 |    1.7974045 |   23.2823962 |       inf |
-| 3-4 |  3.98  | 0.002512575 | 2.670871 |    6.2055300 |    4.4092371 |   44.7035222 | 0.8666832 |
-| 3-5 |  3.47  | 0.002880201 | 5.377969 | time-varying | time-varying | time-varying |       inf |
-| 3-6 |  3.44  | 0.002903001 | 7.139949 | time-varying | time-varying | time-varying | 6.1261591 |
+| 3-2 |  4.32  | 0.002311993 | 3.388323 |          inf |          inf |          inf | 0.7612136 |
+| 3-3 |  3.96  | 0.002523787 | 3.241114 |    2.0484861 |    1.3120595 |   34.8068405 |       inf |
+| 3-4 |  4.09  | 0.002444338 | 3.375010 |    2.3851260 |    1.1860780 |   40.2588639 | 0.7412543 |
+| 3-5 |  4.45  | 0.002246526 | 3.298374 | time-varying | time-varying | time-varying |       inf |
+| 3-6 |  4.17  | 0.002397647 | 4.227693 | time-varying | time-varying | time-varying | 1.5525143 |
 
 <br>
 
@@ -331,13 +331,13 @@ In this dataset, fixed norm-based gating provides the best trade off among the t
 | exp |  Mean error  |  p90 error   |
 |:---:|-------------:|-------------:|
 | 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul> | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul> |
-| b2  | <ul><li>0.24070 rad</li><li>13.79096 deg</li></ul> | <ul><li>0.39439 rad</li><li>22.59707 deg</li></ul> |
-| 3-1 | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul>  | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul>  |
-| 3-2 | <ul><li>0.04584 rad</li><li>2.62661 deg</li></ul>  | <ul><li>0.08220 rad</li><li>4.70992 deg</li></ul>  |
-| 3-3 | <ul><li>0.04215 rad</li><li>2.41480 deg</li></ul>  | <ul><li>0.07740 rad</li><li>4.43479 deg</li></ul>  |
-| 3-4 | <ul><li>0.04328 rad</li><li>2.47981 deg</li></ul>  | <ul><li>0.07758 rad</li><li>4.44493 deg</li></ul>  |
-| 3-5 | <ul><li>0.06176 rad</li><li>3.53880 deg</li></ul>  | <ul><li>0.11218 rad</li><li>6.42756 deg</li></ul>  |
-| 3-6 | <ul><li>0.06180 rad</li><li>3.54069 deg</li></ul>  | <ul><li>0.11427 rad</li><li>6.54703 deg</li></ul>  |
+| b2  | <ul><li>0.24289 rad</li><li>13.91633 deg</li></ul> | <ul><li>0.38963 rad</li><li>22.32396 deg</li></ul> |
+| 3-1 | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul>  | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul> |
+| 3-2 | <ul><li>0.04219 rad</li><li>2.41742 deg</li></ul>  | <ul><li>0.07543 rad</li><li>4.32170 deg</li></ul> |
+| 3-3 | <ul><li>0.03418 rad</li><li>1.95857 deg</li></ul>  | <ul><li>0.06214 rad</li><li>3.56029 deg</li></ul> |
+| 3-4 | <ul><li>0.03677 rad</li><li>2.10667 deg</li></ul>  | <ul><li>0.06585 rad</li><li>3.77265 deg</li></ul> |
+| 3-5 | <ul><li>0.06298 rad</li><li>3.60866 deg</li></ul>  | <ul><li>0.11860 rad</li><li>6.79522 deg</li></ul> |
+| 3-6 | <ul><li>0.06038 rad</li><li>3.45952 deg</li></ul>  | <ul><li>0.11016 rad</li><li>6.31160 deg</li></ul> |
 
 <br>
 
@@ -365,12 +365,12 @@ In this dataset, fixed norm-based gating provides the best trade off among the t
   </thead>
   <tbody>
     <tr>
-      <td>2.75</td>
-      <td>11.88</td>
-      <td>1.01</td>
-      <td>1.38</td>
-      <td>6.78</td>
-      <td>15.71</td>
+      <td>2.79</td>
+      <td>11.99</td>
+      <td>0.87</td>
+      <td>1.27</td>
+      <td>6.75</td>
+      <td>15.75</td>
     </tr>
   </tbody>
 </table>
@@ -379,23 +379,24 @@ In this dataset, fixed norm-based gating provides the best trade off among the t
 
 ##### [Observation]
 
-- The best result is exp 3-3, continuing the same trend as Dataset 01 and 02
-- Innovation-only gating (exp 3-2) is again worse than ungated magnetometer correction
-- Adding norm-based gating together with innovation gating (exp 3-4) improves over exp 3-2, but still does not surpass exp 3-3
-- Time-varying sigma variants perform worst on this dataset as well
-- Across the first three datasets, fixed norm-based gating appears to be the most reliable and consistently effective strategy among the evaluated Experiment 3 configurations
+- Magnetometer correction substantially improves orientation accuracy relative to the best experiment 2 result on this dataset as well
+- The best result is exp 3-3, indicating that fixed norm-based gating provides the best overall result under the selected ranking criterion
+- Innovation-only gating (exp 3-2) improves slightly over ungated magnetometer correction, but does not match the best fixed norm-gated configuration
+- Adding innovation gating on top of norm-based gating (exp 3-4) remains competitive, but does not surpass exp 3-3 on this sequence
+- Time-varying sigma variants again perform worse than the best fixed-gating configurations
 
 <br>
 <br>
 
 ##### [Conclusion across all datasets]
 
-Experiment 3 suggests:<br>
-
-1. Adding magnetometer correction yields a major improvement over gyro+accelerometer fusion alone on all evaluated datasets
-2. For the relatively consistent datasets in this experiment, fixed norm-based gating is the most effective choice among the evaluated configurations
-3. For the long non-stationary dataset, time-varying sigma can help, but it does not solve all failure modes
-4. These results suggest that the next step should focus on improving robustness during gyro integration itself, especially by detecting and suppressing abnormal integrated behavior before it propagates-->
+1. In the evaluated datasets, adding magnetometer correction improves orientation angle error relative to the best gyro+accelerometer configuration from experiment 2 
+2. For the relatively consistent datasets in this experiment, fixed -gating configurations perform best among the evaluated variants, with norm-based gating present in each case
+3. For the long non-stationary dataset, a time-varying gating configuration performs best, suggesting that adaptive gating may become more useful under changing conditions, although it does not resolve all failure modes
+4. These results suggest that the next step should focus on improving robustness during gyro integration itself, especially by detecting and suppressing abnormal integrated behavior before it propagates
+5. The effect of innovation gating is dataset-dependent: it is sometimes beneficial, especially when combined with norm-based gating, but it is not uniformly dominant across all sequences
+6. Secondary validation reveals an important limitation — on Dataset 04, orientation error improves while gravity and linear-acceleration estimation become worse, indicating that better orientation agreement does not always imply better downstream signal separation
+7. These results suggest that future improvements should be evaluated not only by orientation error, but also by their effect on gravity / linear-accel decomposition, especially for long uncontrolled sequences
 
 <br>
 <br>

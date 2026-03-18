@@ -1097,6 +1097,10 @@ best: exp2-1
 
 <br>
 
+** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
+
+<br>
+
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
 
 Gravity direction error remains low (mean/p90 ≈ 1.30° / 3.01°), indicating a stable tilt estimate.<br>
@@ -1135,10 +1139,6 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 . . .
 [END] 2026-03-17 08:52:24.211
 ```
-
-<br>
-
-** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
 
@@ -1193,16 +1193,6 @@ Dataset where gating is unnecessary or harmful (data 04):<br>
 - The best configuration is exp 2-1 ( gyro+acc without gating)
 - This indicates that, for this sequence, the current gating design does not align well with the dominant error sources
 - Additional gating appears to attenuate useful corrections more than it filters harmful ones
-
-<br>
-<br>
-
-Overall interpretation:<br>
-
-- Across these datasets, accelerometer correction provides the primary gain in roll/pitch stabilization in the evaluated datasets
-- Fixed jointly tuned gating (exp 2-3) is the most successful gated variant among the evaluated configurations, since it is selected as best on three of the four datasets
-- However, its usefulness is not universal: the best configuration remains dataset-dependent, and one long sequence still favors ungated correction
-- This variability is itself an important result, suggesting that robustness should be evaluated across multiple motion regimes rather than inferred from a single dataset
 
 <br>
 <br>
