@@ -1,0 +1,192 @@
+
+
+[START] 2026-03-18 12:45:49.308
+
+[INFO] Stabilization detected too early (< min_cut), applying min_cut=10s policy
+
+[END] 2026-03-18 12:45:49.946
+
+
+
+
+[START] 2026-03-18 12:45:49.964
+
+Detected accel unit in [m/s²]
+Selected g_world_unit: [ 0  0 -1]
+
+Best quasi static(start, end, length):  (2523, 3540, 1017)
+
+Suggested gyro_sigma:  0.44791971689543864
+Suggested acc_sigma:  2.908568806018301
+Suggested mag_sigma:  6.850455808768257
+
+[END] 2026-03-18 12:45:50.747
+
+
+
+
+[START] 2026-03-18 12:45:50.789
+
+
+[chosen value]
+tau= 3.932469060126895 , K= 0.0025426212244773093
+mag_gain= 3.5771776662400905
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 3-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.002818835027033219 0.7172417482362367 0.042172969711376365 0.08175313998327868
+
+[exp 3-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.16150735019264875 41.09492506452112 2.416333173994919 4.68410988298409
+
+[END] 2026-03-18 12:48:52.502
+
+
+
+
+[START] 2026-03-18 12:48:52.517
+
+
+[chosen value]
+tau= 4.282566197670456 , K= 0.002334763512194607
+mag_gain= 3.519929920245394
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=1.6224342
+
+[exp 3-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.00280806873989446 0.6962182150580377 0.04136929699102485 0.07967920247718345
+
+[exp 3-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.1608904873785719 39.89036534295706 2.37028611900898 4.565282016910945
+
+[END] 2026-03-18 12:51:57.595
+
+
+
+
+[START] 2026-03-18 12:51:57.610
+
+
+[chosen value]
+tau= 4.572570503039086 , K= 0.0021866867422237557
+mag_gain= 4.397713410255224
+acc_gate_sigma=20.4765482
+gyro_gate_sigma=1.1233809
+mag_gate_sigma=25.3407412
+mag_err_sigma=inf
+
+[exp 3-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.0022300678365621764 0.5431561440288503 0.038150425089703295 0.07351459839444256
+
+[exp 3-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.12777347506288297 31.12055466945299 2.1858583442700037 4.2120762206007765
+
+[END] 2026-03-18 12:57:07.653
+
+
+
+
+[START] 2026-03-18 12:57:07.667
+
+
+[chosen value]
+tau= 4.7699779116997645 , K= 0.002096189852861593
+mag_gain= 5.678210094405326
+acc_gate_sigma=15.8903128
+gyro_gate_sigma=0.9994370
+mag_gate_sigma=18.0364040
+mag_err_sigma=1.5374059
+
+[exp 3-4] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.0017333672375821516 0.5303552091541307 0.037937464957498106 0.07606885323359422
+
+[exp 3-4] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.09931462705970755 30.387115127309734 2.1736566274900984 4.358424242685033
+
+[END] 2026-03-18 13:00:47.080
+
+
+
+
+[START] 2026-03-18 13:00:47.097
+
+
+[chosen value]
+tau= 5.173698030271023 , K= 0.0019326174891492838
+mag_gain= 4.930731964833801
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+mag_err_sigma=inf
+
+[exp 3-5] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.002409636697114314 0.7816545685336467 0.05958371638396706 0.1093147442364582
+
+[exp 3-5] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.13806201290449366 44.785507814097315 3.4138954765058074 6.263273483301096
+
+[END] 2026-03-18 13:07:41.921
+
+
+
+
+[START] 2026-03-18 13:07:41.936
+
+
+[chosen value]
+tau= 5.16003687902853 , K= 0.0019377340765753268
+mag_gain= 5.600152346494399
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+mag_err_sigma=1.9951553608116073
+
+[exp 3-6] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.0017723107976843774 0.7672592415278287 0.05703574444543082 0.10546355981071441
+
+[exp 3-6] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.10154592869277913 43.96071633195324 3.267907438109914 6.042616869579463
+
+[END] 2026-03-18 13:14:45.706
+
+
+
+
+[START] 2026-03-18 13:14:49.157
+
+best: exp3-4
+
+[END] 2026-03-18 13:14:49.167
+
+
+
+
+[START] 2026-03-18 13:14:57.173
+
+[Gravity]
+RMSE norm: 0.20526433541541741
+
+Gravity est/ref angle error in rad — min/max/mean/p90
+0.00016459727972550922 0.09293993934479382 0.017872906262809903 0.033646807603579174
+
+Gravity est/ref angle error in deg — min/max/mean/p90
+0.009430729447605911 5.325066272658551 1.0240420964919443 1.9278200697737742
+
+
+[Linear accel]
+RMSE norm: 0.7382335700551836
+
+Linear accel est/ref angle error in rad — min/max/mean/p90
+0.000719256919690961 2.824066823648598 0.14232560147445011 0.3241060575267027
+
+Linear accel est/ref angle error in deg — min/max/mean/p90
+0.04121038588387206 161.80711005798082 8.154656281146918 18.56990921090433
+
+
+[Consistency ratio]
+rmse_norm of (a_lin_est / g_est):  3.596501888947898
+
+[END] 2026-03-18 13:14:57.563
+
+

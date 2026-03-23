@@ -3,7 +3,7 @@ from typing import Any, Callable
 import optuna
 
 from my_types import ScalarBatch, Vec3Batch, QuatBatch
-from autotune import calc_score_quasi, calc_score_quasi_ori, suggest_timevarying_gate_sigma
+from autotune import calc_score_quasi_ori, suggest_timevarying_gate_sigma
 
 def exp_3_1(dt: ScalarBatch, q_ref: QuatBatch,
             best_quasi_static: tuple[int, int, int],

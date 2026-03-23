@@ -227,6 +227,77 @@ def calc_score_quasi_ori(tau: float, dt: ScalarBatch, q_ref: QuatBatch,
         ori_score: float = score_angle_err(calc_angle_err(q_est, q_ref))
         return quasi_score + ori_score
 
+def build_segment(len: int, hz: int,
+                  head_s: float, tail_s: float, stride_s: float, win_s: float
+                  ) -> list[tuple[int, int]]:
+        head: int = int(head_s * hz)
+        tail: int = int(tail_s * hz)
+        stride: int = int(stride_s * hz)
+        win: int = int(win_s * hz)
+        seg: list[tuple[int, int]] = []
+
+        seg.append((0, min(head, len)))
+
+        tail_start: int = max(0, len - tail)
+        start: int = stride
+        while start < tail_start:
+                end: int = min(start + win, tail_start)
+                if end > start:
+                        seg.append((start, end))
+                start += stride
+
+        if tail_start < len:
+                seg.append((tail_start, len))
+        return seg
+
+def calc_score_quasi_ori_from_seg(seg: list[tuple[int,int]],
+                                  tau: float, dt: ScalarBatch, q_ref: QuatBatch,
+                       		  w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
+                	          runner_func: Callable[[float], tuple[Any, ...]],
+                	          best_quasi_static: tuple[int, int, int] | None = None,
+                        	  runner_kwargs: dict[str, Any] = None,
+                        	  ) -> float:
+        dt_median: float = float(np.median(dt))
+        K: float = float(dt_median / tau)
+
+        quasi_score: float = 0
+        ori_score: float = 0
+        cnt: int = 0
+        for seg_s, seg_e in seg:
+                seg_len: int = seg_e - seg_s
+                if seg_len < 2:
+                        continue
+                seg_kwargs = dict(runner_kwargs)
+                seg_kwargs["q0"] = q_ref[seg_s]
+                seg_kwargs["dt"] = dt[seg_s:seg_e]
+                seg_kwargs["w"] = w[seg_s:seg_e]
+                seg_kwargs["a"] = a[seg_s:seg_e]
+                seg_kwargs["m"] = m[seg_s:seg_e]
+
+                q_est, extra = runner_func(K=K, **seg_kwargs)
+                g_body_est, _, _, _, _ = extra
+
+                if best_quasi_static is not None:
+                        qs, qe, _ = best_quasi_static
+                        inter_s: int = max(seg_s, qs)
+                        inter_e: int = min(seg_e, qe)
+                        if inter_e - inter_s >= 2:
+                                local_s = inter_s - seg_s
+                                local_e = inter_e - seg_s
+
+                                gb = g_body_est[local_s:local_e]
+                                gb_unit = gb / (np.linalg.norm(gb, axis=1, keepdims=True) + DELTA)
+                                mean_dir: Vec3 = as_vec3(np.mean(gb_unit, axis=0))
+                                mean_dir = mean_dir / (np.linalg.norm(mean_dir) + DELTA)
+                                dot: ScalarBatch = np.clip(gb_unit @ mean_dir, -1, 1)
+                                ang: ScalarBatch = np.arccos(dot)
+                                quasi_score += score_angle_err(ang)
+                ori_score += score_angle_err(calc_angle_err(q_est, q_ref[seg_s:seg_e]))
+                cnt += 1
+        if cnt == 0:
+                return quasi_score + ori_score
+        return (quasi_score + ori_score) / cnt
+
 def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                                    dt: ScalarBatch, g0: float,
                                    p_gyro: int, p_acc: int, p_mag: int, sigma_floor: float,

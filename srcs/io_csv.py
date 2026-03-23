@@ -111,13 +111,17 @@ def load_mag(csv_path: Path, t_new: ScalarBatch) -> Vec3Batch:
         m_src_interp: Vec3Batch = as_vec3_batch(resample_batch(t_new, t_src, m_src))
         return m_src_interp
 
-def read_best_exp2_from_log(log_path: Path) -> str:
+def read_best_from_log(log_path: Path, exp: int) -> str:
         """
-        Returns: '2-3' or '2-4'
+        Returns:
+                exp=2: returns '2-1', '2-2', ...
+                exp=3: returns '3-1', '3-2', ...
+                exp=4: returns '4-1', '4-2', ...
         """
         text = log_path.read_text(errors="ignore")
-        matches = re.findall(r"^\s*best:\s*(exp2-([0-9]+))\s*$", text, flags=re.IGNORECASE | re.MULTILINE)
+        pattern = rf"^\s*best:\s*(exp{exp}-([0-9]+))\s*$"
+        matches = re.findall(pattern, text, flags=re.IGNORECASE | re.MULTILINE)
         if not matches:
-                raise ValueError(f"'best: exp2-*' not found in log: {log_path}")
+                raise ValueError(f"'best: exp{exp}-*' not found in log: {log_path}")
         k = matches[-1][1]
-        return f"2-{k}"
+        return f"{exp}-{k}"
