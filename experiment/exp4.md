@@ -10,8 +10,9 @@
 
 
 - seg
-seg1: head 5s + trim 3s every 15s + tail 5s
-seg2: head 10s + trim 5s every 15s + tail 10s
+seg1: head 5s + trim 3s every 15s + tail 5s (for every data)
+seg2: head 10s + trim 5s every 15s + tail 10s (for every data)
+seg3: head 30 + trim 10s every 20s + tail 30s (for data more than 30m)
 
 
 
@@ -46,43 +47,58 @@ res: data 1-data3
 
 
 - why improved?
-1. full-data objective가 항상 더 좋은 objective는 아님
 
-전체 시퀀스는 너무 긴 쉬운 구간/비슷한 motion이 오래 반복되는 구간/특정 disturbance가 길게 이어지는 구간/
-실전 generalization엔 덜 중요한 구간 등을 포함.
-SEG는 시간축에 퍼진 대표 구간만 확인, 긴 구간의 편향을 줄여서 더 좋은 파라미터가 나올 수 있음
-
-2. 일종의 regularization 효과
-
-SEG tuning은 전체 데이터에 대한 exact fitting
-보다 대표 구간에 대한 proxy fitting이므로
-full-data tuning이 데이터셋의 특정 구간 패턴에 약간 끌려가던 걸 SEG가 덜 끌려가게 만들 수 있음
-
-3. objective는 recursive system이라 long-horizon effect가 큼
+1. objective는 recursive system이라 long-horizon effect가 큼
 
 어떤 파라미터는 초반엔 좋고 후반엔 나쁘거나, 특정 drift pattern에만 유리하거나, 특정 disturbance에만 유리할 수 있음.
 SEG는 각 구간을 끊어서 봐서 long-horizon accumulated artifact의 영향을 줄여줌, 지역적으로 안정적인 파라미터가 더 잘 뽑힐 수 있음
 
-4. segment reset 자체가 local behavior를 더 잘 보게 해줌
-
-segmented scorer는 각 구간에서 q0 = q_ref[seg_s] 로 reset후 local orientation quality를 평가.
-full-data tuning은 긴 드리프트 누적까지 포함한 전체 trajectory 최적화이고 SEG tuning은 여러 대표 구간에서 local fusion quality 최적화에 가까움
-
-5. finite trial에서는 objective가 단순한 쪽이 유리할 수 있음
+2. finite trial에서는 objective가 단순한 쪽이 유리할 수 있음
 
 Optuna trial이 무한대가 아닌 비교적 적은 횟수라면 문제가 복잡할수록 최적점 근처를 못 찾을 수 있음.
 SEG objective는 보통 더 단순하고, 더 noisy하지 않고, basin이 더 찾기 쉬울 수 있음.
 즉 연산량이 적어서 정확도가 올라감은 아니고 연산량이 적어지면서 더 다루기 쉬운 objective가 되어 제한된 trial 안에서 더 좋은 해를 찾음에 가까움
 
+3. segment reset 자체가 local behavior를 더 잘 보게 해줌
+
+segmented scorer는 각 구간에서 q0 = q_ref[seg_s] 로 reset후 local orientation quality를 평가.
+full-data tuning은 긴 드리프트 누적까지 포함한 전체 trajectory 최적화이고 SEG tuning은 여러 대표 구간에서 local fusion quality 최적화에 가까움
+
+4. 일종의 regularization 효과
+
+SEG tuning은 전체 데이터에 대한 exact fitting
+보다 대표 구간에 대한 proxy fitting이므로
+full-data tuning이 데이터셋의 특정 구간 패턴에 약간 끌려가던 걸 SEG가 덜 끌려가게 만들 수 있음
+
+5. full-data objective가 항상 더 좋은 objective는 아님
+
+전체 시퀀스는 너무 긴 쉬운 구간/비슷한 motion이 오래 반복되는 구간/특정 disturbance가 길게 이어지는 구간/
+실전 generalization엔 덜 중요한 구간 등을 포함.
+SEG는 시간축에 퍼진 대표 구간만 확인, 긴 구간의 편향을 줄여서 더 좋은 파라미터가 나올 수 있음
 
 
-- conclusion (after running data4):
+
+res: 4(stress case), why exp4 doesn't follow tendency of exp3?
+
+- mag 관련 스케일이 매우 이상함 (suggested mag_sigma 매우 큼)
+- 전체 orientation error가 아예 매우 큼
+- exp3에서 time-varying gate sigma는 adaptive하다는 장점보다 불안정한 adaptive behavior를 만들었을 가능성(second validation 큰 linear acc 오차)
+- orientation 오차는 exp4가 exp3에 비해 크지만 exp4의 best로 추정한 중력/선형가속도의 오차는 exp3의 best로부터 추정한 것보다 줄었음
+(Although exp4 yielded larger full-sequence orientation error than exp3 on Data 4, its selected parameter set produced clearly better secondary-validation results for gravity and linear-acceleration estimation. Therefore, for this dataset, exp4 appears to have identified a more practically useful solution.)
+
+Therefore: redefined the segmentation policy for data4 and re-evaluated (add seg3)
+-초반 transient / 초기 정렬 / bias settling을 더 많이 포함
+- 중간 더 촘촘
+- tail을 크게 잡아 후반 drift regime 반영
+- 기존 seg1/seg2보다 long-horizon characteristic 더 보존
+
+On Data 4, the full-sequence orientation metric favored the time-varying sigma variant selected by Exp. 3, but the secondary validation showed that the fixed-sigma variant selected by Exp. 4 produced substantially better gravity and linear-acceleration estimates. This suggests that optimizing the full-sequence orientation objective does not necessarily yield the most reliable solution for the downstream estimation target. Therefore, at least for Data 4, the Exp. 4 selection appears more practically trustworthy, although this interpretation should be re-examined after introducing the SEG3
+
+
+- conclusion:
 
 FULL DATA는 의미 없다X
 SEG가 더 우수하다X
 
-Full-data tuning은 개념적으로 가장 직접적인 접근이지만, 긴 시계열에서는 계산 비용이 과도하게 증가하였다. 반면 segment-based tuning은 실행 시간을 크게 줄이면서도 full-sequence 기준에서 유사한 정확도를 유지했고, 일부 경우에는 오히려 더 나은 결과를 보였다. 따라서 이후 실험에서는 full-data tuning의 지속 사용을 정당화할 만큼의 충분한 실용적 이점을 관찰하지 못하였다.
-
-(Full-data tuning is conceptually the most direct approach, but its computational cost became prohibitive for long sequences. Since segment-based tuning substantially reduced runtime while preserving comparable full-sequence accuracy, and occasionally even improving it, we did not observe enough practical benefit to justify continued use of full-data tuning in subsequent experiments.)
-
+Full-data tuning is conceptually the most direct optimization target, since it optimizes the objective on the entire sequence itself. However, for long recordings its computational cost became increasingly impractical. Across most datasets, segment-based tuning preserved comparable full-sequence accuracy while substantially reducing runtime, and in some cases even yielded slightly better results. Therefore, we did not observe sufficient practical advantage to justify continued reliance on full-data tuning for the remaining experiments.
 

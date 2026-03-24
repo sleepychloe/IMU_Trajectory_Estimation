@@ -174,6 +174,19 @@ def evaluate_estimated_vec3_autosign(est: Vec3Batch, ref: Vec3Batch
         print("RMSE norm:", rmse_norm)
         return est_sign_fixed, rmse_norm
 
+def find_estimated_vec3_sign(est: Vec3Batch, ref: Vec3Batch) -> Vec3Batch:
+        est_sign_fixed: Vec3Batch = est.copy()
+
+        d_minus: Vec3Batch = as_vec3_batch(est - ref)
+        d_plus: Vec3Batch = as_vec3_batch(est + ref)
+
+        rmse_minus: float = np.sqrt(np.mean(np.sum(d_minus*d_minus, axis=1)))
+        rmse_plus: float = np.sqrt(np.mean(np.sum(d_plus*d_plus, axis=1)))
+
+        if (rmse_plus < rmse_minus):
+                est_sign_fixed *= -1
+        return est_sign_fixed
+
 def save_estimated_vec3_csv(path: Path, t: ScalarBatch, vec3_batch: Vec3Batch) -> None:
         df: pd.DataFrame = pd.DataFrame({
                 "seconds_elapsed": t.astype(np.float64),
