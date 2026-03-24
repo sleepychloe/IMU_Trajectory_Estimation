@@ -63,7 +63,8 @@ At each step:<br>
 
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # pipeline.py
@@ -103,6 +104,8 @@ def integrate_gyro_acc(. . .) -> tuple[. . .]:
         return res, g_body_est, a_lin_est, weight_acc, weight_gyro
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -124,7 +127,8 @@ Quasi-static here means low angular rate and near-gravity accelerometer magnitud
 
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # autotune.py
@@ -162,6 +166,8 @@ def quasi_static_detector(. . .) -> tuple[int, int, int]:
         return best_quasi_static
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -180,7 +186,8 @@ The quasi-static score is computed as follows:<br>
 
 A lower score indicates lower orientation error (better quasi-static gravity consistency).<br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # autotune.py
@@ -202,6 +209,8 @@ def calc_score_quasi(. . .) -> float:
         return quasi_score
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -219,6 +228,9 @@ A fixed sigma_base is suggested from robust percentiles of the data.<br>
 If a quasi-static segment exists, statistics are computed on that segment, otherwise, the full sequence is used.<br>
 
 <br>
+
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # autotune.py
@@ -244,6 +256,8 @@ def suggest_fixed_gate_sigma(w. . .) -> tuple[float, float, float]:
         return gyro_sigma, acc_sigma, mag_sigma
 ```
 
+</details>
+
 <br>
 <br>
 
@@ -255,6 +269,9 @@ A time-varying sigma schedule is therefore constructed by recomputing percentile
 <br>
 
 At regular update steps, statistics are computed on the recent window and smoothed with EMA.<br>
+
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # autotune.py
@@ -282,6 +299,8 @@ def suggest_timevarying_gate_sigma(. . .) -> tuple[ScalarBatch, ScalarBatch, Sca
                 . . .
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
 ```
+
+</details>
 
 <br>
 <br>
@@ -350,7 +369,8 @@ then samples new parameters that maximize the ratio between them:<br>
 
 <br>
 
-#### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 The pipeline is wrapped inside an Optuna objective function.<br>
 
@@ -410,6 +430,8 @@ def exp_2_4(. . .) -> tuple[Any, ...]:
         return best_tau, best_K, timevarying_acc_sigma, timevarying_gyro_sigma
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -457,6 +479,9 @@ Each plot compares:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 04:05:48.975
 
@@ -470,6 +495,8 @@ Suggested acc_sigma:  2.908568806018301
 
 [END] 2026-03-17 04:05:49.806
 ```
+
+</details>
 
 <br>
 
@@ -488,6 +515,9 @@ Suggested acc_sigma:  2.908568806018301
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 04:05:50.987
@@ -553,6 +583,8 @@ best: exp2-3
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
@@ -576,6 +608,9 @@ These checks support that Experiment 2 is physically consistent and the orientat
 | acc  | <ul><li>0.15561 rad</li><li>8.91570 deg</li></ul> | <ul><li>0.33894 rad</li><li>19.42011 deg</li></ul> |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 04:17:45.687
@@ -601,6 +636,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 . . .
 [END] 2026-03-17 04:17:46.155
 ```
+
+</details>
+
 <br>
 
 #### [Observation]
@@ -643,6 +681,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 04:21:30.057
 
@@ -656,6 +697,8 @@ Suggested acc_sigma:  2.5176966756605874
 
 [END] 2026-03-17 04:21:30.973
 ```
+
+</details>
 
 <br>
 
@@ -674,6 +717,9 @@ Suggested acc_sigma:  2.5176966756605874
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 04:21:32.349
@@ -739,6 +785,8 @@ best: exp2-3
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
@@ -754,6 +802,9 @@ Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 15.85
 | acc  | <ul><li>0.27664 rad</li><li>15.85026 deg</li></ul> | <ul><li>0.55462 rad</li><li>31.77723 deg</li></ul> |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 04:43:32.825
@@ -779,6 +830,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 . . .
 [END] 2026-03-17 04:43:33.664
 ```
+
+</details>
+
 <br>
 
 #### [Observation]
@@ -821,6 +875,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 04:46:01.090
 
@@ -834,6 +891,8 @@ Suggested acc_sigma:  0.6755995626475786
 
 [END] 2026-03-17 04:46:01.897
 ```
+
+</details>
 
 <br>
 
@@ -852,6 +911,9 @@ Suggested acc_sigma:  0.6755995626475786
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 04:46:03.781
@@ -917,6 +979,8 @@ best: exp2-3
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
@@ -932,6 +996,9 @@ Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 11.99
 | acc  | <ul><li>0.20927 rad</li><li>11.99003 deg</li></ul> | <ul><li>0.42003 rad</li><li>24.06610 deg</li></ul> |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 05:15:48.577
@@ -961,6 +1028,8 @@ rmse_norm of (a_lin_est / g_est):  1.44114925012814
 
 [END] 2026-03-17 05:15:49.671
 ```
+
+</details>
 
 <br>
 
@@ -1005,6 +1074,9 @@ rmse_norm of (a_lin_est / g_est):  1.44114925012814
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 05:16:08.763
 
@@ -1018,6 +1090,8 @@ Suggested acc_sigma:  0.507068924693965
 
 [END] 2026-03-17 05:16:09.695
 ```
+
+</details>
 
 #### [Metrics]
 
@@ -1034,6 +1108,9 @@ Suggested acc_sigma:  0.507068924693965
 ** `exp 1-2` refers to the gyro-only baseline from experiment 1, evaluated on the same trimmed segment<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 05:16:11.902
@@ -1099,6 +1176,8 @@ best: exp2-1
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp2]
@@ -1114,6 +1193,9 @@ Linear-accel direction error is moderate with dynamic spikes (mean/p90 ≈ 17.86
 | acc  | <ul><li>0.31165 rad</li><li>17.85600 deg</li></ul> | <ul><li>0.75470 rad</li><li>43.24097 deg</li></ul> |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 08:52:16.589
@@ -1139,6 +1221,8 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 . . .
 [END] 2026-03-17 08:52:24.211
 ```
+
+</details>
 
 <br>
 

@@ -95,7 +95,8 @@ The total correction axis is defined as:<br>
 
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # pipeline.py
@@ -145,6 +146,8 @@ def integrate_gyro_acc_mag(. . .) -> tuple[. . .]:
         return res, g_body_est, a_lin_est, weight_acc, weight_gyro, weight_mag
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -167,7 +170,8 @@ Only samples with near-gravity accelerometer magnitude and a valid magnetometer 
 
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # pipeline.py
@@ -192,6 +196,8 @@ def generate_m_ref_world_h_unit(. . .) -> Vec3:
         return safe_unit_vec3(res)
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -208,6 +214,9 @@ A Gaussian-like confidence weight is used.<br>
 
 <br>
 
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
+
 ```py
 # pipeline.py
 
@@ -217,6 +226,8 @@ def calc_mag_gating(m0: float, mag_sigma: float, m_meas: Vec3) -> float:
         weight_mag : float = np.exp(-0.5 * (dev / mag_sigma) ** 2)
         return weight_mag
 ```
+
+</details>
 
 <br>
 <br>
@@ -240,6 +251,9 @@ while still allowing partial correction when the inconsistency is moderate:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
+
 ```py
 # pipeline.py
 
@@ -252,6 +266,8 @@ def calc_mag_innovation_gating(e_axis_mag: Vec3, mag_err_sigma: float) -> float:
                 return np.exp(-0.06 * (e_axis_norm / mag_err_sigma) ** 2)
         return 1
 ```
+
+</details>
 
 <br>
 
@@ -277,6 +293,9 @@ For the magnetometer, the residual is computed as the deviation from the global 
 
 #### [Fixed sigma]
 
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
+
 ```py
 # autotune.py
 
@@ -294,10 +313,15 @@ def suggest_fixed_gate_sigma(. . .) -> tuple[float, float, float]:
         return gyro_sigma, acc_sigma, mag_sigma
 ```
 
+</details>
+
 <br>
 <br>
 
 #### [Time-varying sigma]
+
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # autotune.py
@@ -320,6 +344,8 @@ def suggest_timevarying_gate_sigma(. . .) -> tuple[ScalarBatch, ScalarBatch, Sca
                 batch_mag_sigma[i] = mag_sigma
         return batch_gyro_sigma, batch_acc_sigma, batch_mag_sigma
 ```
+
+</details>
 
 <br>
 <br>
@@ -346,7 +372,8 @@ def suggest_timevarying_gate_sigma(. . .) -> tuple[ScalarBatch, ScalarBatch, Sca
 
 <br>
 
-#### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # optuna_exp_3.py
@@ -408,6 +435,8 @@ def exp_3_6(. . .) -> tuple[Any, ...]:
         return [. . .]
 ```
 
+</details>
+
 <br>
 <br>
 <br>
@@ -459,6 +488,9 @@ Each plot compares:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 22:47:47.057
 
@@ -473,6 +505,8 @@ Suggested mag_sigma:  6.850455808768257
 
 [END] 2026-03-17 22:47:47.803
 ```
+
+</details>
 
 <br>
 
@@ -495,6 +529,9 @@ Suggested mag_sigma:  6.850455808768257
 ** `b2` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 22:47:47.853
@@ -586,6 +623,8 @@ best: exp3-4
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
@@ -619,6 +658,9 @@ best: exp3-4
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 23:14:37.805
 
@@ -643,6 +685,8 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 . . .
 [END] 2026-03-17 23:14:38.143
 ```
+
+</details>
 
 #### [Observation]
 
@@ -686,6 +730,9 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 21:56:25.209
 
@@ -700,6 +747,8 @@ Suggested mag_sigma:  5.051061836028509
 
 [END] 2026-03-17 21:56:25.902
 ```
+
+</details>
 
 <br>
 
@@ -722,6 +771,9 @@ Suggested mag_sigma:  5.051061836028509
 ** `b2` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 21:56:25.952
@@ -813,6 +865,8 @@ best: exp3-4
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
@@ -846,6 +900,9 @@ best: exp3-4
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 22:47:31.435
 
@@ -874,6 +931,8 @@ rmse_norm of (a_lin_est / g_est):  3.4816922088911806
 
 [END] 2026-03-17 22:47:32.103
 ```
+
+</details>
 
 <br>
 
@@ -919,6 +978,9 @@ rmse_norm of (a_lin_est / g_est):  3.4816922088911806
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 20:46:01.373
 
@@ -933,6 +995,8 @@ Suggested mag_sigma:  5.098923949491506
 
 [END] 2026-03-17 20:46:02.299
 ```
+
+</details>
 
 <br>
 
@@ -955,6 +1019,9 @@ Suggested mag_sigma:  5.098923949491506
 ** `b2` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 20:46:02.347
@@ -1046,6 +1113,8 @@ best: exp3-3
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
@@ -1079,6 +1148,9 @@ best: exp3-3
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 21:56:13.567
 
@@ -1107,6 +1179,8 @@ rmse_norm of (a_lin_est / g_est):  3.4308439440132408
 
 [END] 2026-03-17 21:56:14.558
 ```
+
+</details>
 
 <br>
 
@@ -1152,6 +1226,9 @@ rmse_norm of (a_lin_est / g_est):  3.4308439440132408
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-17 23:34:53.724
 
@@ -1166,6 +1243,8 @@ Suggested mag_sigma:  190.98333381383583
 
 [END] 2026-03-17 23:34:54.695
 ```
+
+</details>
 
 <br>
 
@@ -1188,6 +1267,9 @@ Suggested mag_sigma:  190.98333381383583
 ** `b2` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-03-17 23:34:54.741
@@ -1279,6 +1361,8 @@ best: exp3-6
 
 ** `best` refers to the best experiment 2 result which makes minimum error (calculated by 0.4 * mean error + 0.3 * p95 + 0.2 * p99 + 0.1 * drift)<br>
 
+</details>
+
 <br>
 
 #### [Secondary validation — Gravity & Linear Accel from Best Exp3]
@@ -1312,6 +1396,9 @@ best: exp3-6
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-03-18 07:47:55.343
 
@@ -1336,6 +1423,8 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 . . .
 [END] 2026-03-18 07:48:01.944
 ```
+
+</details>
 
 <br>
 

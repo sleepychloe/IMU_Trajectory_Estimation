@@ -61,7 +61,8 @@ At each timestep, angular velocity ω is converted into a small delta quaternion
 ```
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # pipelines.py
@@ -79,6 +80,8 @@ def integrate_gyro(q0: Quat, w_avg: Vec3Batch, dt: ScalarBatch) -> QuatBatch:
                 res[i] = q
         return res
 ```
+
+</details>
 
 <br>
 <br>
@@ -100,7 +103,8 @@ min / max / mean / p90 are reported in radians and degrees.<br>
 
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # evaluation.py
@@ -112,6 +116,8 @@ def calc_angle_err(q_est: QuatBatch, q_ref: QuatBatch) -> ScalarBatch:
                 w_err[i] = np.clip(np.abs(q_err[0]), 0.0, 1.0)
         return as_scalar_batch(2 * np.arccos(w_err))
 ```
+
+</details>
 
 <br>
 <br>
@@ -186,7 +192,8 @@ to avoid premature stabilization detection under mild motion/noise.<br>
 <br>
 <br>
 
-##### [Implementation]
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
 
 ```py
 # resample.py
@@ -212,6 +219,9 @@ def find_stable_start_idx(. . .) -> int:
 	. . .
         return best_idx
 ```
+
+</details>
+
 <br>
 <br>
 <br>
@@ -254,6 +264,9 @@ Each plot compares:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-02-26 20:27:02.739
 
@@ -261,6 +274,8 @@ Each plot compares:<br>
 
 [END] 2026-02-26 20:27:02.993
 ```
+
+</details>
 
 <br>
 
@@ -272,6 +287,9 @@ Each plot compares:<br>
 | 1-2 | <ul><li>0.39107 rad</li><li>22.40684 deg</li></ul> | <ul><li>0.56630 rad</li><li>32.44667 deg</li></ul> |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-02-27 22:12:21.931
@@ -297,6 +315,8 @@ Each plot compares:<br>
 [END] 2026-02-27 22:12:25.836
 ```
 
+</details>
+
 <br>
 
 #### [Observation]
@@ -319,6 +339,9 @@ Each plot compares:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-02-26 20:26:15.470
 
@@ -326,6 +349,8 @@ Each plot compares:<br>
 
 [END] 2026-02-26 20:26:15.976
 ```
+
+</details>
 
 <br>
 
@@ -337,6 +362,9 @@ Each plot compares:<br>
 | 1-2 | <ul><li>0.38383 rad</li><li>21.99183 deg</li></ul>  | <ul><li>0.54410 rad</li><li>31.17450 deg</li></ul>  |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-02-27 22:12:39.241
@@ -362,6 +390,8 @@ Each plot compares:<br>
 [END] 2026-02-27 22:12:46.095
 ```
 
+</details>
+
 <br>
 
 #### [Observation]
@@ -383,6 +413,9 @@ Each plot compares:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Implementation</ins></b></summary>
+
 ```
 [START] 2026-02-26 20:24:54.374
 
@@ -390,6 +423,8 @@ Each plot compares:<br>
 
 [END] 2026-02-26 20:24:55.835
 ```
+
+</details>
 
 <br>
 
@@ -401,6 +436,9 @@ Each plot compares:<br>
 | 1-2 | <ul><li>0.53778 rad</li><li>30.81266 deg</li></ul>  | <ul><li>0.81277 rad</li><li>46.56837 deg</li></ul>  |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-02-27 22:12:54.863
@@ -426,6 +464,8 @@ Each plot compares:<br>
 [END] 2026-02-27 22:13:05.584
 ```
 
+</details>
+
 <br>
 
 #### [Observation]
@@ -448,6 +488,9 @@ Each plot compares:<br>
 
 <br>
 
+<details>
+<summary><b><ins>Logs</ins></b></summary>
+
 ```
 [START] 2026-02-26 20:23:56.918
 
@@ -455,6 +498,8 @@ Each plot compares:<br>
 
 [END] 2026-02-26 20:23:57.101
 ```
+
+</details>
 
 <br>
 
@@ -466,6 +511,9 @@ Each plot compares:<br>
 | 1-2 | <ul><li>0.88808 rad</li><li>50.88316 deg</li></ul> | <ul><li>2.03692 rad</li><li>116.70718 deg</li></ul> |
 
 <br>
+
+<details>
+<summary><b><ins>Logs</ins></b></summary>
 
 ```
 [START] 2026-02-27 22:13:23.931
@@ -490,6 +538,8 @@ Each plot compares:<br>
 
 [END] 2026-02-27 22:14:29.766
 ```
+
+</details>
 
 <br>
 
