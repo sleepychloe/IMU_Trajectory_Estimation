@@ -77,7 +77,7 @@ Experiment 4 asks two practical questions:<br>
 <br>
 <br>
 
-### Segment-based Proxy Objective <a name="exp-4-method-seg"></a>
+### Segment-based Proxy Objective <a name="exp-4-why-seg-proxy"></a>
 
 Instead of tuning on the full sequence, Experiment 4 uses a segment-based proxy objective.<br>
 
