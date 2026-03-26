@@ -140,6 +140,7 @@ Full experimental process and results:<br>
 - [Experiment 1](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp1.md)
 - [Experiment 2](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp2.md)
 - [Experiment 3](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp3.md)
+- [Experiment 4](https://github.com/sleepychloe/IMU_Orientation_Estimation/blob/main/experiment/exp4.md)
 
 <br>
 
@@ -326,6 +327,13 @@ In this dataset, fixed norm-based gating provides the best trade-off among the t
 
 <br>
 
+| exp |    p    |    win_s     | update_ratio |  ema_alpha   |
+|:---:|--------:|-------------:|-------------:|-------------:|
+| 3-5 |   80    | 8.373621     | 0.464217     | 0.188064     |
+| 3-6 |   79    | 9.474137     | 0.339160     | 0.185937     |
+
+<br>
+
 ##### [Metrics]
 
 | exp |  Mean error  |  p90 error   |
@@ -391,11 +399,11 @@ In this dataset, fixed norm-based gating provides the best trade-off among the t
 ##### [Conclusion across all datasets]
 
 1. In the evaluated datasets, adding magnetometer correction improves orientation angle error relative to the best gyro+accelerometer configuration from experiment 2 
-2. For the relatively consistent datasets in this experiment, fixed -gating configurations perform best among the evaluated variants, with norm-based gating present in each case
-3. For the long non-stationary dataset, a time-varying gating configuration performs best, suggesting that adaptive gating may become more useful under changing conditions, although it does not resolve all failure modes
+2. For the relatively consistent datasets in this experiment, fixed-gating configurations perform best among the evaluated variants, with norm-based gating present in each case
+3. For the long non-stationary dataset, a time-varying gating configuration performs best under the orientation-only criterion, suggesting that adaptive gating may become more useful under changing conditions, although it does not resolve all failure modes.
 4. These results suggest that the next step should focus on improving robustness during gyro integration itself, especially by detecting and suppressing abnormal integrated behavior before it propagates
 5. The effect of innovation gating is dataset-dependent: it is sometimes beneficial, especially when combined with norm-based gating, but it is not uniformly dominant across all sequences
-6. Secondary validation reveals an important limitation — on Dataset 04, orientation error improves while gravity and linear-acceleration estimation become worse, indicating that better orientation agreement does not always imply better downstream signal separation
+6. Secondary validation reveals an important limitation. On dataset 04, better orientation error does not necessarily lead to better gravity and linear-acceleration estimation, indicating that orientation agreement alone is not always a sufficient criterion for model selection.
 7. These results suggest that future improvements should be evaluated not only by orientation error, but also by their effect on gravity / linear-accel decomposition, especially for long uncontrolled sequences
 
 <br>
