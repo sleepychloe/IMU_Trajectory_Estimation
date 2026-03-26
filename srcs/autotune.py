@@ -325,7 +325,7 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
         if p_acc is not None:
                 acc_sigma = max(sigma_floor, float(np.percentile(acc_resid[:window_size], p_acc)))
         if p_mag is not None and m is not None:
-                mag_resid_init: float = np.abs(m_norm[:window_size] - np.median(m_norm[:window_size]))
+                mag_resid_init: ScalarBatch = np.abs(m_norm[:window_size] - np.median(m_norm[:window_size]))
                 mag_sigma = max(sigma_floor, float(np.percentile(mag_resid_init, p_mag)))
 
         for i in range(len(dt)):
@@ -347,7 +347,7 @@ def suggest_timevarying_gate_sigma(w: Vec3Batch, a: Vec3Batch, m: Vec3Batch,
                                         acc_sigma = (1 - ema_alpha) * acc_sigma + ema_alpha * acc_tmp
                         if p_mag is not None and m is not None:
                                 local_median: float = np.median(m_norm[low:high])
-                                mag_resid_window: float = np.abs(m_norm[low:high] - local_median)
+                                mag_resid_window: ScalarBatch = np.abs(m_norm[low:high] - local_median)
                                 mag_tmp: float = max(sigma_floor, float(np.percentile(mag_resid_window, p_mag)))
                                 if np.isinf(mag_sigma):
                                         mag_sigma = mag_tmp

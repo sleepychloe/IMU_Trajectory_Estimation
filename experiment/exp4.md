@@ -35,6 +35,12 @@ measurement:
 
 
 
+- best 평가 방법 변경
+
+exp3 data04에서 orientation err는 개선되었지만 secondary validation (gravity, linear acc추정)은 오히려 나빠졌음을 관찰,
+best exp 평가 방법을 minimum orientation error 에서 minimum (orientation error + grav err + lin acc err)로 변경
+
+
 res: data 1-data3
 - 실험 3과 실험 4의 결과 경향이 거의 동일 (어떤 계열이 좋은지, gating이 없는 것보다 fixed norm + mag innov 쪽이 좋은지, time-varying 계열은 상대적으로 불리한지)
 - SEG 기반 튜닝을 써도 full-data 성능이 크게 무너지지 않음
@@ -93,6 +99,9 @@ Therefore: redefined the segmentation policy for data4 and re-evaluated (add seg
 - 기존 seg1/seg2보다 long-horizon characteristic 더 보존
 
 On Data 4, the full-sequence orientation metric favored the time-varying sigma variant selected by Exp. 3, but the secondary validation showed that the fixed-sigma variant selected by Exp. 4 produced substantially better gravity and linear-acceleration estimates. This suggests that optimizing the full-sequence orientation objective does not necessarily yield the most reliable solution for the downstream estimation target. Therefore, at least for Data 4, the Exp. 4 selection appears more practically trustworthy, although this interpretation should be re-examined after introducing the SEG3
+
+- seg3 도입 후 거의 모든 실험에서(exp4-4제외: seg2로 돌린 결과보다 오차 소폭 상승) seg2로 돌린 결과보다 오차가 소폭 줄거나 비슷한 결과: 약간의 오차 개선에도 불구하고 러팅타임이 길어지므로(시간비용 증가) 추후 실험에서는 seg3 대신 seg2를 써도 품질이 아주 하락하진 않을것 같다고 판단됨
+
 
 
 - conclusion:
