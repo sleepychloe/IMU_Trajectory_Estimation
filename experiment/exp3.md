@@ -355,14 +355,14 @@ def suggest_timevarying_gate_sigma(. . .) -> tuple[ScalarBatch, ScalarBatch, Sca
 
 #### [Optimization target]
 
-| exp | trial |             Target ∈ Range (min, max)             |
-|:---:|------:|:--------------------------------------------------|
-| 3-1 |    20 | <ul><li>tau ∈ (0.1, 4)</li><li>mag_gain ∈ (0.01, 10)</li></ul> |
-| 3-2 |    20 | <ul><li>tau ∈ 3-1_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-1_best*(0.7, 1.3)</li><li>mag_err_sigma ∈ (0.01, 2)</li></ul> |
-| 3-3 |    30 | <ul><li>tau ∈ 3-2_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-2_best*(0.7, 1.3)</li><li>acc_gate_sigma ∈ suggested_acc*(0.01, 10)</li><li>gyro_gate_sigma ∈ suggested_gyro*(0.1, 10)</li><li>mag_gate_sigma ∈ suggested_mag*(0.01, 10)</li></ul> |
-| 3-4 |    20 | <ul><li>tau ∈ 3-3_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-3_best*(0.7, 1.3)</li><li>acc_gate_sigma ∈ 3-3_best*(0.7, 1.3)</li><li>gyro_gate_sigma ∈ 3-3_best*(0.7, 1.3)</li><li>mag_gate_sigma ∈ 3-3_best*(0.7, 1.3)</li><li>mag_err_sigma ∈ 3-2_best*(0.5, 1.5)</li></ul> |
-| 3-5 |    40 | <ul><li>tau ∈ 3-4_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-4_best*(0.7, 1.3)</li><li>percentile `p` ∈ (50, 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li></ul> |
-| 3-6 |    40 | <ul><li>tau ∈ 3-5_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-5_best*(0.7, 1.3)</li><li>percentile `p` ∈ (50, 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li><li>mag_err_sigma ∈ (0.01, 2)</li></ul> |
+| exp | trial | seed |             Target ∈ Range (min, max)             |
+|:---:|------:|-----:|:--------------------------------------------------|
+| 3-1 |    20 |   42 | <ul><li>tau ∈ (0.1, 4)</li><li>mag_gain ∈ (0.01, 10)</li></ul> |
+| 3-2 |    20 |   42 | <ul><li>tau ∈ 3-1_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-1_best*(0.7, 1.3)</li><li>mag_err_sigma ∈ (0.01, 2)</li></ul> |
+| 3-3 |    30 |   42 | <ul><li>tau ∈ 3-2_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-2_best*(0.7, 1.3)</li><li>acc_gate_sigma ∈ suggested_acc*(0.01, 10)</li><li>gyro_gate_sigma ∈ suggested_gyro*(0.1, 10)</li><li>mag_gate_sigma ∈ suggested_mag*(0.01, 10)</li></ul> |
+| 3-4 |    20 |   42 | <ul><li>tau ∈ 3-3_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-3_best*(0.7, 1.3)</li><li>acc_gate_sigma ∈ 3-3_best*(0.7, 1.3)</li><li>gyro_gate_sigma ∈ 3-3_best*(0.7, 1.3)</li><li>mag_gate_sigma ∈ 3-3_best*(0.7, 1.3)</li><li>mag_err_sigma ∈ 3-2_best*(0.5, 1.5)</li></ul> |
+| 3-5 |    40 |   42 | <ul><li>tau ∈ 3-4_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-4_best*(0.7, 1.3)</li><li>percentile `p` ∈ (50, 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li></ul> |
+| 3-6 |    40 |   42 | <ul><li>tau ∈ 3-5_best*(0.9, 1.1)</li><li>mag_gain ∈ 3-5_best*(0.7, 1.3)</li><li>percentile `p` ∈ (50, 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li><li>mag_err_sigma ∈ (0.01, 2)</li></ul> |
 
 <br>
 
@@ -379,12 +379,21 @@ def suggest_timevarying_gate_sigma(. . .) -> tuple[ScalarBatch, ScalarBatch, Sca
 # optuna_exp_3.py
 
 def exp_3_1(. . .) -> tuple[float, float, float]:
+	def objective(trial):
+                . . .
+                score: float = calc_score_quasi_ori(. . .)
+                return score
+	study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
 	. . .
 
 def exp_3_2(. . .) -> tuple[float, ...]:
 	. . .
+	study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
+	. . .
 
 def exp_3_3(. . .) -> tuple[float, ...]:
+	. . .
+	study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
 	. . .
 
 def exp_3_4(. . .) -> tuple[float, ...]:
@@ -406,6 +415,8 @@ def exp_3_4(. . .) -> tuple[float, ...]:
         return [. . .]
 
 def exp_3_5(. . .) -> tuple[Any, ...]:
+	. . .
+	study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
 	. . .
 
 def exp_3_6(. . .) -> tuple[Any, ...]:

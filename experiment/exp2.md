@@ -354,12 +354,12 @@ then samples new parameters that maximize the ratio between them:<br>
 
 #### [Optimization target]
 
-| exp | trial |             Target ∈ Range (min, max)             |
-|:---:|------:|:--------------------------------------------------|
-| 2-1 |    15 | <ul><li>tau ∈ (0.1, 4)</li></ul> |
-| 2-2 |    20 | <ul><li>tau ∈ 2-1_best*(0.9, 1.1)</li><li>acc_gate_sigma ∈ suggested_acc*(0.01, 10)</li></ul> |
-| 2-3 |    20 | <ul><li>tau ∈ 2-2_best*(0.9, 1.1)</li><li>acc_gate_sigma ∈ 2-2_best*(0.7, 1.3)</li><li>gyro_gate_sigma ∈ suggested_gyro*(0.1, 10)</li></ul> |
-| 2-4 |    40 | <ul><li>tau ∈ 2-3_best*(0.9, 1.1)</li><li>percentile `p` ∈ (50. 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li></ul> |
+| exp | trial | seed |             Target ∈ Range (min, max)             |
+|:---:|------:|-----:|:--------------------------------------------------|
+| 2-1 |    15 |   42 | <ul><li>tau ∈ (0.1, 4)</li></ul> |
+| 2-2 |    20 |   42 | <ul><li>tau ∈ 2-1_best*(0.9, 1.1)</li><li>acc_gate_sigma ∈ suggested_acc*(0.01, 10)</li></ul> |
+| 2-3 |    20 |   42 | <ul><li>tau ∈ 2-2_best*(0.9, 1.1)</li><li>acc_gate_sigma ∈ 2-2_best*(0.7, 1.3)</li><li>gyro_gate_sigma ∈ suggested_gyro*(0.1, 10)</li></ul> |
+| 2-4 |    40 |   42 | <ul><li>tau ∈ 2-3_best*(0.9, 1.1)</li><li>percentile `p` ∈ (50. 80)</li><li>sliding window size `win_s` ∈ (5, 10)</li><li>update ratio `update_ratio` ∈ (0.1, 0.5)</li><li>EMA factor `ema_alpha` ∈ (0.02, 0.2)</li></ul> |
 
 <br>
 
@@ -389,9 +389,19 @@ For each trial:<br>
 # optuna_exp_2.py
 
 def exp_2_1(. . .) -> tuple[float, float]:
+	def objective(trial):
+                . . .
+                score: float = calc_score_quasi(. . .)
+                return score
+	study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
 	. . .
 
 def exp_2_2(. . .) -> tuple[float, float]:
+	def objective(trial):
+                . . .
+                score: float = calc_score_quasi_ori(. . .)
+                return score
+	study = optuna.create_study(direction="minimize", sampler=optuna.samplers.TPESampler(seed=42))
 	. . .
 
 def exp_2_3(. . .) -> tuple[float, float]:
