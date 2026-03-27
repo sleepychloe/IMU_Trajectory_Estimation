@@ -855,6 +855,11 @@ mag_err_sigma=inf
 0.043178989102832147 34.95073665559485 2.067711449408056 3.081941701124979
 
 end :  2026-03-26 18:11:42.449
+
+
+
+
+[END] 2026-03-26 18:11:42.449
 ```
 
 </details>
@@ -1366,19 +1371,19 @@ Suggested mag_sigma:  5.051061836028509
 |              |     exp 3-1    |    exp 4-1-1   |    exp 4-1-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   21:23:46.312 |    |    |
-|   end time   |   21:28:40.496 |    |    |
-| running time |   00:04:54.184 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           3.97 |            |            |
-|       K      |    0.002518346 |     |     |
-|   mag_gain   |       3.724649 |        |        |
-|     σ_acc    |            inf |             |             |
-|    σ_gyro    |            inf |             |             |
-|     σ_mag    |            inf |             |             |
-|   σ_mag_err  |            inf |             |             |
-|  Mean error  | <ul><li>0.04564 rad</li><li>2.61517 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.08512 rad</li><li>4.87730 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   21:23:46.312 |   23:26:14.461 |   23:27:57.487 |
+|   end time   |   21:28:40.496 |   23:27:57.487 |   23:30:31.250 |
+| running time |   00:04:54.184 |   00:01:43.026 |   00:02:33.763 |
+|    speedup   |              - | 2.85× (−03m11s)| 1.92× (-02m20s)|
+|      tau     |           3.97 |           3.97 |           3.97 |
+|       K      |    0.002518346 |    0.002518346 |    0.002518346 |
+|   mag_gain   |       3.724649 |       3.724649 |       3.724649 |
+|     σ_acc    |            inf |            inf |            inf |
+|    σ_gyro    |            inf |            inf |            inf |
+|     σ_mag    |            inf |            inf |            inf |
+|   σ_mag_err  |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.04564 rad</li><li>2.61517 deg</li></ul> | <ul><li>0.04564 rad</li><li>2.61517 deg</li></ul> | <ul><li>0.04564 rad</li><li>2.61517 deg</li></ul> |
+|   p90 error  | <ul><li>0.08512 rad</li><li>4.87730 deg</li></ul> | <ul><li>0.08512 rad</li><li>4.87730 deg</li></ul> | <ul><li>0.08512 rad</li><li>4.87730 deg</li></ul> |
 
 <br>
 
@@ -1418,6 +1423,50 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-1</ins></b></summary>
 
 ```
+[START] 2026-03-25 23:26:14.461
+
+start :  2026-03-25 23:26:14.461
+
+[chosen value]
+tau= 3.9703762188793768 , K= 0.0025183455535897066
+mag_gain= 3.724648901612812
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.0014937441061020549 0.3703654566537466 0.04564329581096676 0.08512497175927315
+
+[exp 4-1-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.08558523295218959 21.220377543695115 2.6151682130355454 4.877301612976674
+
+end :  2026-03-25 23:27:57.487
+
+
+
+start :  2026-03-25 23:27:57.487
+
+[chosen value]
+tau= 3.9703762188793768 , K= 0.0025183455535897066
+mag_gain= 3.724648901612812
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-2] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.0014937441061020549 0.3703654566537466 0.04564329581096676 0.08512497175927315
+
+[exp 4-1-2] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.08558523295218959 21.220377543695115 2.6151682130355454 4.877301612976674
+
+end :  2026-03-25 23:30:31.250
+
+
+
+
+[END] 2026-03-25 23:30:31.250
 ```
 
 </details>
@@ -1429,19 +1478,19 @@ mag_err_sigma=inf
 |              |     exp 3-2    |    exp 4-2-1   |    exp 4-2-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   21:28:40.507 |    |    |
-|   end time   |   21:33:33.667 |    |    |
-| running time |   00:04:53.160 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           4.37 |            |            |
-|       K      |    0.002290369 |     |     |
-|   mag_gain   |       4.124038 |        |        |
-|     σ_acc    |            inf |             |             |
-|    σ_gyro    |            inf |             |             |
-|     σ_mag    |            inf |             |             |
-|   σ_mag_err  |      0.7518797 |             |             |
-|  Mean error  | <ul><li>0.04447 rad</li><li>2.54800 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.08333 rad</li><li>4.77430 deg</li></ul>  | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   21:28:40.507 |   23:30:31.272 |   23:32:11.832 |
+|   end time   |   21:33:33.667 |   23:32:11.832 |   23:34:47.579 |
+| running time |   00:04:53.160 |   00:01:40.560 |   00:02:35.747 |
+|    speedup   |              - | 2.93× (−03m12s)| 1.89× (-02m17s)|
+|      tau     |           4.37 |           4.36 |           4.37 |
+|       K      |    0.002290369 |    0.002291161 |    0.002289921 |
+|   mag_gain   |       4.124038 |       4.212683 |       4.822195 |
+|     σ_acc    |            inf |            inf |            inf |
+|    σ_gyro    |            inf |            inf |            inf |
+|     σ_mag    |            inf |            inf |            inf |
+|   σ_mag_err  |      0.7518797 |      0.7664148 |      0.5562251 |
+|  Mean error  | <ul><li>0.04447 rad</li><li>2.54800 deg</li></ul> | <ul><li>0.04445 rad</li><li>2.54693 deg</li></ul> | <ul><li>0.04459 rad</li><li>2.55465 deg</li></ul> |
+|   p90 error  | <ul><li>0.08333 rad</li><li>4.77430 deg</li></ul>  | <ul><li>0.08310 rad</li><li>4.76101 deg</li></ul> | <ul><li>0.08118 rad</li><li>4.65106 deg</li></ul> |
 
 <br>
 
@@ -1481,6 +1530,50 @@ mag_err_sigma=0.7518797
 <summary><b><ins>Logs exp 4-2</ins></b></summary>
 
 ```
+[START] 2026-03-25 23:30:31.272
+
+start :  2026-03-25 23:30:31.272
+
+[chosen value]
+tau= 4.364065984239298 , K= 0.0022911613465523895
+mag_gain= 4.212683051899651
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=0.7664148
+
+[exp 4-2-1] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0009483527717162655 0.39325831805278255 0.04445239765980317 0.08309527003459297
+
+[exp 4-2-1] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.05433661130887564 22.53204188283783 2.546934775143939 4.761008270482075
+
+end :  2026-03-25 23:32:11.832
+
+
+
+start :  2026-03-25 23:32:11.832
+
+[chosen value]
+tau= 4.366430225571531 , K= 0.002289920777466318
+mag_gain= 4.822194884752359
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=0.5562251
+
+[exp 4-2-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0006487525585265768 0.40356033972427807 0.04458712576859642 0.08117630832563494
+
+[exp 4-2-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.03717078355188678 23.122304245066832 2.5546541271595715 4.651059863511568
+
+end :  2026-03-25 23:34:47.579
+
+
+
+
+[END] 2026-03-25 23:34:47.579
 ```
 
 </details>
@@ -1492,19 +1585,19 @@ mag_err_sigma=0.7518797
 |              |     exp 3-3    |    exp 4-3-1   |    exp 4-3-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   21:33:33.679 |    |    |
-|   end time   |   21:44:20.840 |    |    |
-| running time |   00:10:47.161 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           4.54 |            |            |
-|       K      |    0.002202910 |     |     |
-|   mag_gain   |       3.892036 |        |        |
-|     σ_acc    |      1.7562440 |             |             |
-|    σ_gyro    |      6.2834979 |             |             |
-|     σ_mag    |     16.2250324 |             |             |
-|   σ_mag_err  |            inf |             |             |
-|  Mean error  | <ul><li>0.03320 rad</li><li>1.90235 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.08865 rad</li><li>5.07946 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   21:33:33.679 |   23:34:47.605 |   23:37:37.185 |
+|   end time   |   21:44:20.840 |   23:37:37.184 |   23:42:04.581 |
+| running time |   00:10:47.161 |   00:02:49.597 |   00:04:27.396 |
+|    speedup   |              - | 3.83× (−07m57s)| 2.42× (-06m19s)|
+|      tau     |           4.54 |           4.79 |           4.58 |
+|       K      |    0.002202910 |    0.002089426 |    0.002183965 |
+|   mag_gain   |       3.892036 |       5.035091 |       4.942928 |
+|     σ_acc    |      1.7562440 |      2.2571340 |      2.4943361 |
+|    σ_gyro    |      6.2834979 |      3.0676142 |      3.0676142 |
+|     σ_mag    |     16.2250324 |     27.3866293 |     14.5919279 |
+|   σ_mag_err  |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.03320 rad</li><li>1.90235 deg</li></ul> | <ul><li>0.03066 rad</li><li>1.75667 deg</li></ul> | <ul><li>0.03222 rad</li><li>1.84626 deg</li></ul> |
+|   p90 error  | <ul><li>0.08865 rad</li><li>5.07946 deg</li></ul> | <ul><li>0.05954 rad</li><li>3.41168 deg</li></ul> | <ul><li>0.06229 rad</li><li>3.56894 deg</li></ul> |
 
 <br>
 
@@ -1544,6 +1637,50 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-3</ins></b></summary>
 
 ```
+[START] 2026-03-25 23:34:47.605
+
+start :  2026-03-25 23:34:47.605
+
+[chosen value]
+tau= 4.785418869267393 , K= 0.0020894261443040445
+mag_gain= 5.035091163381099
+acc_gate_sigma=2.2571340
+gyro_gate_sigma=3.0676142
+mag_gate_sigma=27.3866293
+mag_err_sigma=inf
+
+[exp 4-3-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.0007829980204998273 0.4877178328970591 0.030659606009070903 0.05954497062396075
+
+[exp 4-3-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.04486248194173802 27.944173418268228 1.7566660258537004 3.4116755079834187
+
+end :  2026-03-25 23:37:37.184
+
+
+
+start :  2026-03-25 23:37:37.185
+
+[chosen value]
+tau= 4.578268316681022 , K= 0.0021839653347669502
+mag_gain= 4.9429280616754045
+acc_gate_sigma=2.4943361
+gyro_gate_sigma=3.0676142
+mag_gate_sigma=14.5919279
+mag_err_sigma=inf
+
+[exp 4-3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.0006303447287448243 0.47056595202021106 0.032223270815208246 0.06228967586075258
+
+[exp 4-3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.03611609259539714 26.96144303331369 1.8462574198185122 3.5689355340590465
+
+end :  2026-03-25 23:42:04.581
+
+
+
+
+[END] 2026-03-25 23:42:04.581
 ```
 
 </details>
@@ -1555,19 +1692,19 @@ mag_err_sigma=inf
 |              |     exp 3-4    |    exp 4-4-1   |    exp 4-4-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   21:44:20.855 |    |    |
-|   end time   |   21:53:00.866 |    |    |
-| running time |   00:08:40.011 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           4.19 |            |            |
-|       K      |    0.002387545 |     |     |
-|   mag_gain   |       4.519486 |        |        |
-|     σ_acc    |      1.8465124 |             |             |
-|    σ_gyro    |      6.8600581 |             |             |
-|     σ_mag    |     13.1831565 |             |             |
-|   σ_mag_err  |      0.8853287 |             |             |
-|  Mean error  | <ul><li>0.03020 rad</li><li>1.73052 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.07193 rad</li><li>4.12132 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   21:44:20.855 |   23:42:04.641 |   23:44:04.313 |
+|   end time   |   21:53:00.866 |   23:44:04.313 |   23:47:11.512 |
+| running time |   00:08:40.011 |   00:01:59.672 |   00:03:07.199 |
+|    speedup   |              - | 4.37× (−06m40s)| 2.78× (-05m32s)|
+|      tau     |           4.19 |           4.75 |           4.87 |
+|       K      |    0.002387545 |    0.002105088 |    0.002051649 |
+|   mag_gain   |       4.519486 |       5.136019 |       5.296570 |
+|     σ_acc    |      1.8465124 |      2.1881591 |      2.3563286 |
+|    σ_gyro    |      6.8600581 |      3.7356068 |      2.1600169 |
+|     σ_mag    |     13.1831565 |     15.5485159 |     16.9703900 |
+|   σ_mag_err  |      0.8853287 |      0.6492924 |      0.6641613 |
+|  Mean error  | <ul><li>0.03020 rad</li><li>1.73052 deg</li></ul> | <ul><li>0.03043 rad</li><li>1.74329 deg</li></ul> | <ul><li>0.03067 rad</li><li>1.75700 deg</li></ul> |
+|   p90 error  | <ul><li>0.07193 rad</li><li>4.12132 deg</li></ul> | <ul><li>0.05908 rad</li><li>3.38502 deg</li></ul> | <ul><li>0.06043 rad</li><li>3.46246 deg</li></ul> |
 
 <br>
 
@@ -1607,6 +1744,50 @@ mag_err_sigma=0.8853287
 <summary><b><ins>Logs exp 4-4</ins></b></summary>
 
 ```
+[START] 2026-03-25 23:42:04.639
+
+start :  2026-03-25 23:42:04.641
+
+[chosen value]
+tau= 4.749815240065617 , K= 0.0021050880490153675
+mag_gain= 5.136019364294149
+acc_gate_sigma=2.1881591
+gyro_gate_sigma=3.7356068
+mag_gate_sigma=15.5485159
+mag_err_sigma=0.6492924
+
+[exp 4-4-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.0006426356126626715 0.49417586405815517 0.030426073919845278 0.05907970401520231
+
+[exp 4-4-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.036820308370375 28.314191347763003 1.7432856227601994 3.385017694953196
+
+end :  2026-03-25 23:44:04.313
+
+
+
+start :  2026-03-25 23:44:04.313
+
+[chosen value]
+tau= 4.8735337059080255 , K= 0.002051648742014854
+mag_gain= 5.2965701856207055
+acc_gate_sigma=2.3563286
+gyro_gate_sigma=2.1600169
+mag_gate_sigma=16.9703900
+mag_err_sigma=0.6641613
+
+[exp 4-4-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.0004839198083786891 0.48434836052844527 0.030665371487720926 0.0604313091626525
+
+[exp 4-4-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.027726562642878417 27.751116872360704 1.7569963634472194 3.462458965470249
+
+end :  2026-03-25 23:47:11.512
+
+
+
+
+[END] 2026-03-25 23:47:11.512
 ```
 
 </details>
@@ -1618,23 +1799,23 @@ mag_err_sigma=0.8853287
 |              |     exp 3-5    |    exp 4-5-1   |    exp 4-5-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   21:53:00.885 |    |    |
-|   end time   |   22:08:27.826 |    |    |
-| running time |   00:15:26.941 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           3.79 |            |            |
-|       K      |    0.002635225 |     |     |
-|   mag_gain   |       5.460352 |        |        |
+|  start time  |   21:53:00.885 |   23:47:11.538 |   23:51:02.371 |
+|   end time   |   22:08:27.826 |   23:51:02.371 |   23:56:59.565 |
+| running time |   00:15:26.941 |   00:03:50.833 |   00:05:57.194 |
+|    speedup   |              - | 4.03× (−11m36s)| 2.59× (-09m29s)|
+|      tau     |           3.79 |           4.50 |           4.47 |
+|       K      |    0.002635225 |    0.002221352 |    0.002236531 |
+|   mag_gain   |       5.460352 |       6.853748 |       6.865375 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |
-|       p      |             80 |              |              |
-|     win_s    |       9.996655 |        |        |
-| update_ratio |       0.194599 |        |        |
-|   ema_alpha  |       0.096770 |        |        |
-|   σ_mag_err  |            inf |             |             |
-|  Mean error  | <ul><li>0.04852 rad</li><li>2.78041 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.09915 rad</li><li>5.68096 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|       p      |             80 |             77 |             78 |
+|     win_s    |       9.996655 |       7.787453 |       7.568446 |
+| update_ratio |       0.194599 |       0.194212 |       0.202047 |
+|   ema_alpha  |       0.096770 |       0.070864 |       0.091838 |
+|   σ_mag_err  |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.04852 rad</li><li>2.78041 deg</li></ul> | <ul><li>0.052342 rad</li><li>2.998947 deg</li></ul> | <ul><li>0.051218 rad</li><li>2.934587 deg</li></ul> |
+|   p90 error  | <ul><li>0.09915 rad</li><li>5.68096 deg</li></ul> | <ul><li>0.126034 rad</li><li>7.221191 deg</li></ul> | <ul><li>0.120673 rad</li><li>6.914050 deg</li></ul> |
 
 <br>
 
@@ -1674,6 +1855,50 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-5</ins></b></summary>
 
 ```
+[START] 2026-03-25 23:47:11.538
+
+start :  2026-03-25 23:47:11.538
+
+[chosen value]
+tau= 4.501213283313147 , K= 0.002221352037229732
+mag_gain= 6.853747810114865
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 77 , best_win_s= 7.787453028390081
+best_update_ratio= 0.1942118959369718 , best_ema_alpha= 0.07086352017932579
+mag_err_sigma=inf
+
+[exp 4-5-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.0020755191540742478 0.4224690739306768 0.05234150145369438 0.12603355293533147
+
+[exp 4-5-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.11891848782701724 24.205694911028132 2.998947126674551 7.221190660233141
+
+end :  2026-03-25 23:51:02.371
+
+
+
+start :  2026-03-25 23:51:02.371
+
+[chosen value]
+tau= 4.470665072708886 , K= 0.0022365306132929976
+mag_gain= 6.8653753304065495
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 78 , best_win_s= 7.568446067805139
+best_update_ratio= 0.20204743016125776 , best_ema_alpha= 0.09183794720005499
+mag_err_sigma=inf
+
+[exp 4-5-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.001309542238579109 0.4346812365116626 0.05121820828047676 0.120672933817597
+
+[exp 4-5-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.07503124336469688 24.905400285646213 2.934587168693324 6.914049809209813
+
+end :  2026-03-25 23:56:59.565
+
+
+
+
+[END] 2026-03-25 23:56:59.565
 ```
 
 </details>
@@ -1685,23 +1910,23 @@ mag_err_sigma=inf
 |              |     exp 3-6    |    exp 4-6-1   |    exp 4-6-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   22:08:27.842 |    |    |
-|   end time   |   22:21:16.698 |    |    |
-| running time |   00:12:48.856 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           3.56 |            |            |
-|       K      |    0.002812494 |     |     |
-|   mag_gain   |       6.998810 |        |        |
+|  start time  |   22:08:27.842 |   23:56:59.590 |   00:00:45.127 |
+|   end time   |   22:21:16.698 |   00:00:45.127 |   00:05:55.352 |
+| running time |   00:12:48.856 |   00:03:45.537 |   00:05:10.225 |
+|    speedup   |              - | 3.41× (−09m03s)| 2.48× (-07m38s)|
+|      tau     |           3.56 |           4.85 |           4.60 |
+|       K      |    0.002812494 |    0.002063009 |    0.002174497 |
+|   mag_gain   |       6.998810 |       8.493434 |       7.930354 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |
-|       p      |             79 |              |              |
-|     win_s    |       9.474137 |        |        |
-| update_ratio |       0.339160 |        |        |
-|   ema_alpha  |       0.185937 |        |        |
-|   σ_mag_err  |      1.5525143 |             |             |
-|  Mean error  | <ul><li>0.04861 rad</li><li>2.78499 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.10116 rad</li><li>5.79594 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|       p      |             79 |             77 |             79 |
+|     win_s    |       9.474137 |       7.953781 |       7.907742 |
+| update_ratio |       0.339160 |       0.453191 |       0.467391 |
+|   ema_alpha  |       0.185937 |       0.044901 |       0.021029 |
+|   σ_mag_err  |      1.5525143 |      1.4390070 |      1.0623418 |
+|  Mean error  | <ul><li>0.04861 rad</li><li>2.78499 deg</li></ul> | <ul><li>0.05836 rad</li><li>3.34387 deg</li></ul> | <ul><li>0.05968 rad</li><li>3.41938 deg</li></ul> |
+|   p90 error  | <ul><li>0.10116 rad</li><li>5.79594 deg</li></ul> | <ul><li>0.13955 rad</li><li>7.99570 deg</li></ul> | <ul><li>0.12551 rad</li><li>7.19133 deg</li></ul> |
 
 <br>
 
@@ -1741,6 +1966,50 @@ mag_err_sigma=1.5525143184886179
 <summary><b><ins>Logs exp 4-6</ins></b></summary>
 
 ```
+[START] 2026-03-25 23:56:59.590
+
+start :  2026-03-25 23:56:59.590
+
+[chosen value]
+tau= 4.846697030283956 , K= 0.0020630089387508894
+mag_gain= 8.493434110694148
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 77 , best_win_s= 7.953780592074017
+best_update_ratio= 0.4531913297699775 , best_ema_alpha= 0.04490080532161986
+mag_err_sigma=1.4390070367454333
+
+[exp 4-6-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.0019716478092152868 0.4225885320184767 0.05836161658890756 0.13955132271642842
+
+[exp 4-6-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.11296709815425088 24.21253935528777 3.343874316105095 7.995701817119479
+
+end :  2026-03-26 00:00:45.127
+
+
+
+start :  2026-03-26 00:00:45.127
+
+[chosen value]
+tau= 4.598202503539651 , K= 0.0021744973800514934
+mag_gain= 7.930353584877646
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 79 , best_win_s= 7.907742277291757
+best_update_ratio= 0.46739134824119727 , best_ema_alpha= 0.02102892166264869
+mag_err_sigma=1.062341808838822
+
+[exp 4-6-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.0019488813287196227 0.50596743199187 0.05967945098339161 0.12551244462976174
+
+[exp 4-6-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.11166267490748241 28.989798424206658 3.41938066500621 7.191333353654782
+
+end :  2026-03-26 00:05:55.352
+
+
+
+
+[END] 2026-03-26 00:05:55.352
 ```
 
 </details>
@@ -1751,8 +2020,8 @@ mag_err_sigma=1.5525143184886179
 
 |              |       exp 3     | exp 4 (`seg_2`) |
 |:------------:|:---------------:|:---------------:|
-|   ori_best   |     exp3-4      |                 |
-|  total_best  |                 |                 |
+|   ori_best   |     exp3-4      |     exp4-4      |
+|  total_best  |     exp3-4      |     exp4-4      |
 
 <br>
 
@@ -1773,6 +2042,36 @@ best: exp3-4
 <summary><b><ins>Logs exp 4</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:05:55.365
+
+exp 3-1: total_score=3.2750722 | ori=0.0961009, g=2.8174082, a=0.3615630
+exp 3-2: total_score=3.2646396 | ori=0.0938745, g=2.8176856, a=0.3530795
+exp 3-3: total_score=3.2515703 | ori=0.0882643, g=2.8256769, a=0.3376291
+exp 3-4: total_score=3.2187652 | ori=0.0805507, g=2.8252133, a=0.3130012
+exp 3-5: total_score=3.2508102 | ori=0.1000124, g=2.8180449, a=0.3327530
+exp 3-6: total_score=3.2542212 | ori=0.0969588, g=2.8182067, a=0.3390557
+
+ori_best: exp3-4
+total_best: exp3-4
+
+[END] 2026-03-26 00:07:37.289
+
+
+
+
+[START] 2026-03-26 00:07:37.305
+
+[seg_2]
+exp 4-1: total_score=0.5021090 | ori=0.0961009, g=0.0444451, a=0.3615630
+exp 4-2: total_score=0.4894822 | ori=0.0954347, g=0.0410016, a=0.3530459
+exp 4-3: total_score=0.4059686 | ori=0.0839723, g=0.0169935, a=0.3050027
+exp 4-4: total_score=0.4047399 | ori=0.0832023, g=0.0159329, a=0.3056046
+exp 4-5: total_score=0.5131377 | ori=0.1074809, g=0.0533255, a=0.3523312
+exp 4-6: total_score=0.5559652 | ori=0.1463290, g=0.0505558, a=0.3590804
+
+best: exp4-4
+
+[END] 2026-03-26 00:07:38.722
 ```
 
 </details>
@@ -1800,10 +2099,10 @@ best: exp3-4
     <tr>
       <td>0.57</td>
       <td>6.28</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td>0.62</td>
+      <td>0.98</td>
+      <td>5.94</td>
+      <td>14.36</td>
     </tr>
   </tbody>
 </table>
@@ -1814,6 +2113,28 @@ best: exp3-4
 <summary><b><ins>Logs</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:07:41.498
+
+[Gravity]
+RMSE norm: 0.11489979820267389
+
+Gravity est/ref angle error in rad — min/max/mean/p90
+3.9600707085944206e-05 0.03249040917804814 0.010766515660757465 0.017108123780704716
+
+Gravity est/ref angle error in deg — min/max/mean/p90
+0.002268953381758416 1.8615633205552724 0.6168759074229075 0.9802232880217777
+
+
+[Linear accel]
+RMSE norm: 0.4816489471602898
+
+Linear accel est/ref angle error in rad — min/max/mean/p90
+0.00013295198153897038 2.918325479965369 0.10361118700035109 0.2505444935273097
+
+Linear accel est/ref angle error in deg — min/max/mean/p90
+0.007617587420084238 167.20773324750593 5.936483725460858 14.355142059357616
+. . .
+[END] 2026-03-26 00:07:42.351
 ```
 
 </details>
@@ -1871,19 +2192,19 @@ Suggested mag_sigma:  5.098923949491506
 |              |     exp 3-1    |    exp 4-1-1   |    exp 4-1-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   22:36:25.196 |    |    |
-|   end time   |   22:44:31.294 |    |    |
-| running time |   00:08:06.098 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           3.93 |            |            |
-|       K      |    0.002542621 |     |     |
-|   mag_gain   |       3.577178 |        |        |
-|     σ_acc    |            inf |             |             |
-|    σ_gyro    |            inf |             |             |
-|     σ_mag    |            inf |             |             |
-|   σ_mag_err  |            inf |             |             |
-|  Mean error  | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   22:36:25.196 |   00:07:59.854 |   00:10:07.466 |
+|   end time   |   22:44:31.294 |   00:10:07.466 |   00:13:28.151 |
+| running time |   00:08:06.098 |   00:02:07.612 |   00:03:20.685 |
+|    speedup   |              - | 3.83× (−05m58s)| 2.43× (-04m45s)|
+|      tau     |           3.93 |           3.93 |           3.93 |
+|       K      |    0.002542621 |    0.002542621 |    0.002542621 |
+|   mag_gain   |       3.577178 |       3.577178 |       3.577178 |
+|     σ_acc    |            inf |            inf |            inf |
+|    σ_gyro    |            inf |            inf |            inf |
+|     σ_mag    |            inf |            inf |            inf |
+|   σ_mag_err  |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul> | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul> | <ul><li>0.04335 rad</li><li>2.48355 deg</li></ul> |
+|   p90 error  | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul> | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul> | <ul><li>0.07790 rad</li><li>4.46346 deg</li></ul> |
 
 <br>
 
@@ -1923,6 +2244,50 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-1</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:07:59.853
+
+start :  2026-03-26 00:07:59.854
+
+[chosen value]
+tau= 3.932469060126895 , K= 0.002542621224480923
+mag_gain= 3.5771776662400905
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.0009205019993881509 0.4253150125622266 0.04334613532077613 0.0779020739570321
+
+[exp 4-1-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.05274087959829493 24.368755183369174 2.4835506120834188 4.463460053053944
+
+end :  2026-03-26 00:10:07.466
+
+
+
+start :  2026-03-26 00:10:07.466
+
+[chosen value]
+tau= 3.932469060126895 , K= 0.002542621224480923
+mag_gain= 3.5771776662400905
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-2] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.0009205019993881509 0.4253150125622266 0.04334613532077613 0.0779020739570321
+
+[exp 4-1-2] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.05274087959829493 24.368755183369174 2.4835506120834188 4.463460053053944
+
+end :  2026-03-26 00:13:28.151
+
+
+
+
+[END] 2026-03-26 00:13:28.151
 ```
 
 </details>
@@ -1934,19 +2299,19 @@ mag_err_sigma=inf
 |              |     exp 3-2    |    exp 4-2-1   |    exp 4-2-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   22:44:31.305 |    |    |
-|   end time   |   22:52:58.524 |    |    |
-| running time |   00:08:27.219 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           4.32 |            |            |
-|       K      |    0.002311993 |     |     |
-|   mag_gain   |       3.388323 |        |        |
-|     σ_acc    |            inf |             |             |
-|    σ_gyro    |            inf |             |             |
-|     σ_mag    |            inf |             |             |
-|   σ_mag_err  |      0.7612136 |             |             |
-|  Mean error  | <ul><li>0.04219 rad</li><li>2.41742 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.07543 rad</li><li>4.32170 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   22:44:31.305 |   00:13:28.173 |   00:15:35.175 |
+|   end time   |   22:52:58.524 |   00:15:35.175 |   00:18:51.164 |
+| running time |   00:08:27.219 |   00:02:07.002 |   00:03:15.989 |
+|    speedup   |              - | 3.99× (−06m20s)| 2.60× (-05m11s)|
+|      tau     |           4.32 |           4.31 |           4.32 |
+|       K      |    0.002311993 |    0.002318593 |    0.002313149 |
+|   mag_gain   |       3.388323 |       3.586378 |       3.346182 |
+|     σ_acc    |            inf |            inf |            inf |
+|    σ_gyro    |            inf |            inf |            inf |
+|     σ_mag    |            inf |            inf |            inf |
+|   σ_mag_err  |      0.7612136 |      1.7999687 |      0.7541864 |
+|  Mean error  | <ul><li>0.04219 rad</li><li>2.41742 deg</li></ul> | <ul><li>0.04219 rad</li><li>2.41726 deg</li></ul> | <ul><li>0.04223 rad</li><li>2.41947 deg</li></ul> |
+|   p90 error  | <ul><li>0.07543 rad</li><li>4.32170 deg</li></ul> | <ul><li>0.07550 rad</li><li>4.32595 deg</li></ul> | <ul><li>0.07553 rad</li><li>4.32739 deg</li></ul> |
 
 <br>
 
@@ -1986,6 +2351,50 @@ mag_err_sigma=0.7612136
 <summary><b><ins>Logs exp 4-2</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:13:28.173
+
+start :  2026-03-26 00:13:28.173
+
+[chosen value]
+tau= 4.312433686162575 , K= 0.00231859317140958
+mag_gain= 3.5863784326810215
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=1.7999687
+
+[exp 4-2-1] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0009831923408568659 0.40759089772750956 0.04218906552640245 0.0755020007615878
+
+[exp 4-2-1] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.05633277158068627 23.353238207734673 2.417255396263737 4.325945988432508
+
+end :  2026-03-26 00:15:35.175
+
+
+
+start :  2026-03-26 00:15:35.175
+
+[chosen value]
+tau= 4.3225829930085435 , K= 0.0023131491779488033
+mag_gain= 3.346182088288985
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=0.7541864
+
+[exp 4-2-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0010814601350299493 0.40322640926317377 0.042227741156865915 0.07552717405048157
+
+[exp 4-2-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.06196310144886421 23.1031714389947 2.4194713466593014 4.327388311642585
+
+end :  2026-03-26 00:18:51.164
+
+
+
+
+[END] 2026-03-26 00:18:51.164
 ```
 
 </details>
@@ -1997,19 +2406,19 @@ mag_err_sigma=0.7612136
 |              |     exp 3-3    |    exp 4-3-1   |    exp 4-3-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   22:52:58.541 |    |    |
-|   end time   |   23:08:04.911 |    |    |
-| running time |   00:15:06.370 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           3.96 |            |            |
-|       K      |    0.002523787 |     |     |
-|   mag_gain   |       3.241114 |        |        |
-|     σ_acc    |      2.0484861 |             |             |
-|    σ_gyro    |      1.3120595 |             |             |
-|     σ_mag    |     34.8068405 |             |             |
-|   σ_mag_err  |            inf |             |             |
-|  Mean error  | <ul><li>0.03418 rad</li><li>1.95857 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.06214 rad</li><li>3.56029 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   22:52:58.541 |   00:18:51.185 |   00:22:24.619 |
+|   end time   |   23:08:04.911 |   00:22:24.619 |   00:27:58.214 |
+| running time |   00:15:06.370 |   00:03:33.434 |   00:05:33.595 |
+|    speedup   |              - | 4.25× (−11m32s)| 2.72× (-09m32s)|
+|      tau     |           3.96 |           4.24 |           4.19 |
+|       K      |    0.002523787 |    0.002356902 |    0.002387709 |
+|   mag_gain   |       3.241114 |       3.622718 |       3.670548 |
+|     σ_acc    |      2.0484861 |      1.7491436 |      1.6511250 |
+|    σ_gyro    |      1.3120595 |      4.7170521 |      4.6796846 |
+|     σ_mag    |     34.8068405 |     34.0296423 |     36.5415523 |
+|   σ_mag_err  |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.03418 rad</li><li>1.95857 deg</li></ul> | <ul><li>0.03007 rad</li><li>1.72294 deg</li></ul> | <ul><li>0.03015 rad</li><li>1.72740 deg</li></ul> |
+|   p90 error  | <ul><li>0.06214 rad</li><li>3.56029 deg</li></ul> | <ul><li>0.05715 rad</li><li>3.27473 deg</li></ul> | <ul><li>0.05905 rad</li><li>3.38354 deg</li></ul> |
 
 <br>
 
@@ -2049,6 +2458,50 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-3</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:18:51.185
+
+start :  2026-03-26 00:18:51.185
+
+[chosen value]
+tau= 4.242340507404989 , K= 0.002356901639422946
+mag_gain= 3.6227183013798925
+acc_gate_sigma=1.7491436
+gyro_gate_sigma=4.7170521
+mag_gate_sigma=34.0296423
+mag_err_sigma=inf
+
+[exp 4-3-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.0006698719658229318 0.2278980105825779 0.030071034770553794 0.05715487887672676
+
+[exp 4-3-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.038380836455785716 13.057594165809485 1.7229433779438823 3.2747333382178625
+
+end :  2026-03-26 00:22:24.619
+
+
+
+start :  2026-03-26 00:22:24.619
+
+[chosen value]
+tau= 4.187603893313796 , K= 0.002387708950423391
+mag_gain= 3.670548403421193
+acc_gate_sigma=1.6511250
+gyro_gate_sigma=4.6796846
+mag_gate_sigma=36.5415523
+mag_err_sigma=inf
+
+[exp 4-3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.000559214054110156 0.22939883026300692 0.030148761541005376 0.059053839045386664
+
+[exp 4-3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.03204060514491238 13.143584799308242 1.72739679384594 3.383535741345526
+
+end :  2026-03-26 00:27:58.214
+
+
+
+
+[END] 2026-03-26 00:27:58.214
 ```
 
 </details>
@@ -2060,19 +2513,19 @@ mag_err_sigma=inf
 |              |     exp 3-4    |    exp 4-4-1   |    exp 4-4-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   23:08:04.927 |    |    |
-|   end time   |   23:20:05.288 |    |    |
-| running time |   00:12:00.361 |    |    |
-|    speedup   |              - | × (−) | × (-) |
-|      tau     |           4.09 |            |            |
-|       K      |    0.002444338 |     |     |
-|   mag_gain   |       3.375010 |        |        |
-|     σ_acc    |      2.3851260 |             |             |
-|    σ_gyro    |      1.1860780 |             |             |
-|     σ_mag    |     40.2588639 |             |             |
-|   σ_mag_err  |      0.7412543 |             |             |
-|  Mean error  | <ul><li>0.03677 rad</li><li>2.10667 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.06585 rad</li><li>3.77265 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   23:08:04.927 |   00:27:58.234 |   00:30:30.401 |
+|   end time   |   23:20:05.288 |   00:30:30.401 |   00:34:22.811 |
+| running time |   00:12:00.361 |   00:02:32.167 |   00:03:52.410 |
+|    speedup   |              - | 4.74× (−09m28s)| 3.10× (-08m07s)|
+|      tau     |           4.09 |           3.99 |           4.34 |
+|       K      |    0.002444338 |    0.002503571 |    0.002303090 |
+|   mag_gain   |       3.375010 |       3.372414 |       3.798423 |
+|     σ_acc    |      2.3851260 |      1.6679678 |      1.9949000 |
+|    σ_gyro    |      1.1860780 |      4.2382947 |      4.1465728 |
+|     σ_mag    |     40.2588639 |     34.4579239 |     42.8469248 |
+|   σ_mag_err  |      0.7412543 |      0.5835949 |      0.8122204 |
+|  Mean error  | <ul><li>0.03677 rad</li><li>2.10667 deg</li></ul> | <ul><li>0.03012 rad</li><li>1.72558 deg</li></ul> | <ul><li>0.03168 rad</li><li>1.81525 deg</li></ul> |
+|   p90 error  | <ul><li>0.06585 rad</li><li>3.77265 deg</li></ul> | <ul><li>0.05814 rad</li><li>3.33093 deg</li></ul> | <ul><li>0.05796 rad</li><li>3.32113 deg</li></ul> |
 
 <br>
 
@@ -2112,6 +2565,50 @@ mag_err_sigma=0.7412543
 <summary><b><ins>Logs exp 4-4</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:27:58.233
+
+start :  2026-03-26 00:27:58.234
+
+[chosen value]
+tau= 3.993807474932584 , K= 0.002503570680272206
+mag_gain= 3.3724140644923666
+acc_gate_sigma=1.6679678
+gyro_gate_sigma=4.2382947
+mag_gate_sigma=34.4579239
+mag_err_sigma=0.5835949
+
+[exp 4-4-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.00039225580399048193 0.22453033051147936 0.03011712773000501 0.05813566874955086
+
+[exp 4-4-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.02247460205816549 12.864640310985221 1.7255843099857044 3.3309284585198564
+
+end :  2026-03-26 00:30:30.401
+
+
+
+start :  2026-03-26 00:30:30.401
+
+[chosen value]
+tau= 4.341462829256334 , K= 0.0023030899238646527
+mag_gain= 3.7984231856644057
+acc_gate_sigma=1.9949000
+gyro_gate_sigma=4.1465728
+mag_gate_sigma=42.8469248
+mag_err_sigma=0.8122204
+
+[exp 4-4-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.0008392422616374184 0.2496515918223503 0.03168204228160993 0.05796462780806503
+
+[exp 4-4-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.04808503958083807 14.303982560143409 1.8152473090912742 3.3211285344487744
+
+end :  2026-03-26 00:34:22.811
+
+
+
+
+[END] 2026-03-26 00:34:22.811
 ```
 
 </details>
@@ -2123,23 +2620,23 @@ mag_err_sigma=0.7412543
 |              |     exp 3-5    |    exp 4-5-1   |    exp 4-5-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   23:20:05.307 |    |    |
-|   end time   |   23:41:01.545 |    |    |
-| running time |   00:20:56.238 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           4.45 |            |            |
-|       K      |    0.002246526 |     |     |
-|   mag_gain   |       3.298374 |        |        |
+|  start time  |   23:20:05.307 |   00:34:22.836 |   00:39:05.433 |
+|   end time   |   23:41:01.545 |   00:39:05.433 |   00:46:38.969 |
+| running time |   00:20:56.238 |   00:04:42.597 |   00:07:33.536 |
+|    speedup   |              - | 4.45× (−16m13s)| 2.77× (-13m22s)|
+|      tau     |           4.45 |           4.76 |           4.76 |
+|       K      |    0.002246526 |    0.002099760 |    0.002099760 |
+|   mag_gain   |       3.298374 |       4.260123 |       4.260123 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |
-|       p      |             80 |              |              |
-|     win_s    |       8.373621 |        |        |
-| update_ratio |       0.464217 |        |        |
-|   ema_alpha  |       0.188064 |        |        |
-|   σ_mag_err  |            inf |             |             |
-|  Mean error  | <ul><li>0.06298 rad</li><li>3.60866 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.11860 rad</li><li>6.79522 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|       p      |             80 |             80 |             80 |
+|     win_s    |       8.373621 |       9.148510 |       9.148510 |
+| update_ratio |       0.464217 |       0.291020 |       0.291020 |
+|   ema_alpha  |       0.188064 |       0.020566 |       0.020566 |
+|   σ_mag_err  |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.06298 rad</li><li>3.60866 deg</li></ul> | <ul><li>0.05938 rad</li><li>3.40226 deg</li></ul> | <ul><li>0.05938 rad</li><li>3.40226 deg</li></ul> |
+|   p90 error  | <ul><li>0.11860 rad</li><li>6.79522 deg</li></ul> | <ul><li>0.10830 rad</li><li>6.20521 deg</li></ul> | <ul><li>0.10830 rad</li><li>6.20521 deg</li></ul> |
 
 <br>
 
@@ -2179,6 +2676,50 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-5</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:34:22.836
+
+start :  2026-03-26 00:34:22.836
+
+[chosen value]
+tau= 4.761868013316307 , K= 0.002099759856621843
+mag_gain= 4.260122553283831
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 80 , best_win_s= 9.148509985104303
+best_update_ratio= 0.2910204473093046 , best_ema_alpha= 0.020566329226358745
+mag_err_sigma=inf
+
+[exp 4-5-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.0010247195274085826 0.694384440143722 0.059380695086943304 0.10830132362419623
+
+[exp 4-5-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.05871210410515207 39.78529777978981 3.4022632130350745 6.205208759346921
+
+end :  2026-03-26 00:39:05.433
+
+
+
+start :  2026-03-26 00:39:05.433
+
+[chosen value]
+tau= 4.761868013316307 , K= 0.002099759856621843
+mag_gain= 4.260122553283831
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 80 , best_win_s= 9.148509985104303
+best_update_ratio= 0.2910204473093046 , best_ema_alpha= 0.020566329226358745
+mag_err_sigma=inf
+
+[exp 4-5-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.0010247195274085826 0.694384440143722 0.059380695086943304 0.10830132362419623
+
+[exp 4-5-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.05871210410515207 39.78529777978981 3.4022632130350745 6.205208759346921
+
+end :  2026-03-26 00:46:38.969
+
+
+
+
+[END] 2026-03-26 00:46:38.969
 ```
 
 </details>
@@ -2190,23 +2731,23 @@ mag_err_sigma=inf
 |              |     exp 3-6    |    exp 4-6-1   |    exp 4-6-2   |
 |:------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |
-|  start time  |   23:41:01.559 |    |    |
-|   end time   |   00:02:29.468 |    |    |
-| running time |   00:21:27.909 |    |    |
-|    speedup   |              - | × (−)| × (-)|
-|      tau     |           4.17 |            |            |
-|       K      |    0.002397647 |     |     |
-|   mag_gain   |       4.227693 |        |        |
+|  start time  |   23:41:01.559 |   00:46:38.991 |   00:51:30.521 |
+|   end time   |   00:02:29.468 |   00:51:30.521 |   00:59:11.508 |
+| running time |   00:21:27.909 |   00:04:51.530 |   00:07:40.987 |
+|    speedup   |              - | 4.42× (−16m36s)| 2.80× (-13m46s)|
+|      tau     |           4.17 |           4.90 |           4.90 |
+|       K      |    0.002397647 |    0.002041520 |    0.002041520 |
+|   mag_gain   |       4.227693 |       4.926100 |       4.926100 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |
-|       p      |             79 |              |              |
-|     win_s    |       9.474137 |        |        |
-| update_ratio |       0.339160 |        |        |
-|   ema_alpha  |       0.185937 |        |        |
-|   σ_mag_err  |      1.5525143 |             |             |
-|  Mean error  | <ul><li>0.06038 rad</li><li>3.45952 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>0.11016 rad</li><li>6.31160 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|       p      |             79 |             79 |             79 |
+|     win_s    |       9.474137 |       7.907742 |       7.907742 |
+| update_ratio |       0.339160 |       0.417634 |       0.417634 |
+|   ema_alpha  |       0.185937 |       0.021029 |       0.021029 |
+|   σ_mag_err  |      1.5525143 |      1.0495151 |      1.0495151 |
+|  Mean error  | <ul><li>0.06038 rad</li><li>3.45952 deg</li></ul> | <ul><li>0.05883 rad</li><li>3.37079 deg</li></ul> | <ul><li>0.05883 rad</li><li>3.37079 deg</li></ul> |
+|   p90 error  | <ul><li>0.11016 rad</li><li>6.31160 deg</li></ul> | <ul><li>0.10713 rad</li><li>6.13797 deg</li></ul> | <ul><li>0.10713 rad</li><li>6.13797 deg</li></ul> |
 
 <br>
 
@@ -2246,6 +2787,50 @@ mag_err_sigma=1.5525143184886179
 <summary><b><ins>Logs exp 4-6</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:46:38.991
+
+start :  2026-03-26 00:46:38.991
+
+[chosen value]
+tau= 4.897712770750926 , K= 0.0020415201472421506
+mag_gain= 4.9261000255182905
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 79 , best_win_s= 7.907742277291757
+best_update_ratio= 0.41763357596324446 , best_ema_alpha= 0.02102892166264869
+mag_err_sigma=1.0495150821624968
+
+[exp 4-6-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.0007190206257814828 0.695410863839615 0.0588314187226086 0.10712779821963235
+
+[exp 4-6-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.04119684724013432 39.844107525556694 3.3707919955724055 6.137970706514028
+
+end :  2026-03-26 00:51:30.521
+
+
+
+start :  2026-03-26 00:51:30.521
+
+[chosen value]
+tau= 4.897712770750926 , K= 0.0020415201472421506
+mag_gain= 4.9261000255182905
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 79 , best_win_s= 7.907742277291757
+best_update_ratio= 0.41763357596324446 , best_ema_alpha= 0.02102892166264869
+mag_err_sigma=1.0495150821624968
+
+[exp 4-6-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.0007190206257814828 0.695410863839615 0.0588314187226086 0.10712779821963235
+
+[exp 4-6-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.04119684724013432 39.844107525556694 3.3707919955724055 6.137970706514028
+
+end :  2026-03-26 00:59:11.508
+
+
+
+
+[END] 2026-03-26 00:59:11.509
 ```
 
 </details>
@@ -2256,8 +2841,8 @@ mag_err_sigma=1.5525143184886179
 
 |              |       exp 3     | exp 4 (`seg_2`) |
 |:------------:|:---------------:|:---------------:|
-|   ori_best   |     exp3-3      |                 |
-|  total_best  |                 |                 |
+|   ori_best   |     exp3-3      |     exp4-4      |
+|  total_best  |     exp3-4      |     exp4-4      |
 
 <br>
 
@@ -2278,6 +2863,36 @@ best: exp3-3
 <summary><b><ins>Logs exp 4</ins></b></summary>
 
 ```
+[START] 2026-03-26 00:59:11.526
+
+exp 3-1: total_score=3.2229077 | ori=0.0757255, g=2.8149010, a=0.3322812
+exp 3-2: total_score=3.2185424 | ori=0.0726234, g=2.8151221, a=0.3307969
+exp 3-3: total_score=3.2124597 | ori=0.0598384, g=2.8197735, a=0.3328477
+exp 3-4: total_score=3.2060719 | ori=0.0623238, g=2.8175517, a=0.3261964
+exp 3-5: total_score=3.2986983 | ori=0.1551030, g=2.8146794, a=0.3289160
+exp 3-6: total_score=3.2926167 | ori=0.1478990, g=2.8143185, a=0.3303992
+
+ori_best: exp3-3
+total_best: exp3-4
+
+[END] 2026-03-26 01:01:58.808
+
+
+
+
+[START] 2026-03-26 01:01:58.831
+
+[seg_2]
+exp 4-1: total_score=0.4413041 | ori=0.0757255, g=0.0332974, a=0.3322812
+exp 4-2: total_score=0.4346313 | ori=0.0726918, g=0.0311373, a=0.3308023
+exp 4-3: total_score=0.4552170 | ori=0.0584643, g=0.0318952, a=0.3648575
+exp 4-4: total_score=0.4131489 | ori=0.0570370, g=0.0186799, a=0.3374320
+exp 4-5: total_score=0.5048393 | ori=0.1547801, g=0.0232926, a=0.3267666
+exp 4-6: total_score=0.5053582 | ori=0.1558785, g=0.0229354, a=0.3265443
+
+best: exp4-4
+
+[END] 2026-03-26 01:02:00.988
 ```
 
 </details>
@@ -2305,10 +2920,10 @@ best: exp3-3
     <tr>
       <td>0.87</td>
       <td>6.75</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td>0.75</td>
+      <td>1.12</td>
+      <td>6.52</td>
+      <td>15.67</td>
     </tr>
   </tbody>
 </table>
@@ -2319,6 +2934,28 @@ best: exp3-3
 <summary><b><ins>Logs</ins></b></summary>
 
 ```
+[START] 2026-03-26 01:02:02.961
+
+[Gravity]
+RMSE norm: 0.13782494216404365
+
+Gravity est/ref angle error in rad — min/max/mean/p90
+0.00016522475014165244 0.03697557574713851 0.01308594273707843 0.019478257054331257
+
+Gravity est/ref angle error in deg — min/max/mean/p90
+0.009466680854220236 2.118544435377322 0.7497692897844667 1.116021921484104
+
+
+[Linear accel]
+RMSE norm: 0.5384373625637601
+
+Linear accel est/ref angle error in rad — min/max/mean/p90
+0.00029370543201043216 2.937704087344635 0.1137618711265993 0.2735186271176008
+
+Linear accel est/ref angle error in deg — min/max/mean/p90
+0.016828081674264313 168.31804566317896 6.51807508506532 15.671462952051034
+. . .
+[END] 2026-03-26 01:02:04.270
 ```
 
 </details>
