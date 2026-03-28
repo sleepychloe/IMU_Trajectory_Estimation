@@ -25,26 +25,31 @@
 
 ### Goal <a name="exp-4-goal"></a>
 
-This experiment evaluates whether a segment-based proxy objective can replace full-data tuning without causing a large loss in final full-sequence performance.<br>
+This experiment investigates whether a segment-based proxy objective can replace full-sequence tuning while preserving final full-sequence performance.<br>
 
 <br>
 
-In Experiment 3, each configuration was tuned on the full dataset and then evaluated on the full dataset.<br>
-While this is conceptually the most direct optimization target, the tuning cost becomes increasingly impractical for long recordings.<br>
+In Experiment 3, each configuration was:<br>
+
+- tuned on the full dataset
+- evaluated on the full dataset
 
 <br>
 
-Therefore, Experiment 4 introduces segment-based tuning:<br>
+This provides a direct optimization target, but becomes computationally expensive for long recordings.<br>
 
-- tuning is performed on a subset of representative segments
-- final evaluation is still performed on the full dataset
-- runtime reduction and final performance preservation are both examined
+<br>
+
+To address this, Experiment 4 introduces:<br>
+
+- tuning on representative segments
+- final evaluation on the full sequence
 
 <br>
 
 Key hypothesis:<br>
 
-A segment-based proxy objective is expected to preserve comparable full-sequence performance, or degrade it only marginally, while substantially reducing the tuning cost.<br>
+A segment-based proxy objective is expected to preserve comparable full-sequence performance, while substantially reducing the tuning cost, with limited degradation in downstream metrics.<br>
 
 <br>
 <br>
@@ -53,15 +58,15 @@ A segment-based proxy objective is expected to preserve comparable full-sequence
 
 ### Why Segment-based Tuning? <a name="exp-4-why-seg"></a>
 
-In long datasets, the total tuning cost of Experiment 3 becomes very large.<br>
+The cost of full-data tuning grows linearly with sequence length.<br>
 
 <br>
 
-Using the full sequence for every Optuna trial is computationally expensive because:<br>
+Each Optuna trial requires:<br>
 
-- each trial requires running the full recursive estimation pipeline
-- the cost grows directly with sequence length
-- the same expensive full-sequence evaluation is repeated many times across all experiment variants
+- running the full recursive estimation pipeline
+- processing the entire sequence
+- repeating this process across all trials
 
 <br>
 
@@ -69,10 +74,10 @@ As a result, full-data tuning becomes increasingly impractical for long recordin
 
 <br>
 
-Experiment 4 asks two practical questions:<br>
+Therefore, Experiment 4 evaluates:<br>
 
-1. How much runtime can be reduced by replacing the full-data tuning objective with a segment-based proxy objective?<br>
-2. How much of the final full-data performance can still be preserved after doing so?<br>
+1. How much runtime reduction is achievable using segment-based tuning?
+2. How well the resulting parameters transfer to the full sequence?
 
 <br>
 <br>
@@ -80,29 +85,33 @@ Experiment 4 asks two practical questions:<br>
 
 ### Segment-based Proxy Objective <a name="exp-4-why-seg-proxy"></a>
 
-Instead of tuning on the full sequence, Experiment 4 uses a segment-based proxy objective.<br>
+Instead of optimizing over the full sequence, tuning is performed on a set of representative segments.<br>
 
 <br>
 
-- choose multiple representative sub-segments from the sequence
-- evaluate candidate parameters only on those segments during tuning
-- after tuning, run the selected parameters once on the full sequence for the final evaluation
+Under the assumption that local estimation quality correlates with global performance, the segment-based objective serves as a proxy for full-sequence optimization.<br>
 
 <br>
 
-This reduces the total optimization cost because each Optuna trial runs on a much smaller amount of data.<br>
+- select multiple segments across the sequence
+- evaluate candidate parameters only on those segments
+- after optimization, run the selected parameters once on the full dataset
 
 <br>
 
-For each selected segment, the local score is evaluated after resetting the initial orientation to the reference orientation at the segment start:<br>
-
-- each segment begins from `q0 = q_ref[seg_start]`
-- the local fusion behavior inside the segment is evaluated
-- long-horizon accumulated drift from earlier parts of the sequence is not carried into the segment score
+This reduces cost because each trial processes only a fraction of the data.<br>
 
 <br>
 
-The segment-based scorer behaves more like a local-quality proxy than a full-trajectory optimization target.<br>
+Localized evaluation:<br>
+
+Each segment is evaluated independently with a reset initial condition `q0 = q_ref[seg_start]`.<br>
+
+This removes long-horizon error accumulation and isolates the intrinsic estimation behavior of the model.<br>
+
+<br>
+
+As a result, the proxy objective behaves more like a measure of local estimation quality than a full-trajectory optimization target.<br>
 
 <br>
 
@@ -165,11 +174,7 @@ def exp_4_1(seg: list[tuple[int, int]], . . .) -> tuple[float, float, float]:
 
 ### Segment Policies <a name="exp-4-why-seg-policy"></a>
 
-Three segment policies are prepared.<br>
-
-<br>
-
-The purpose of these designs is to preserve representative temporal coverage while reducing the amount of data used during tuning.<br>
+To maintain temporal representativeness, three segment policies are defined.<br>
 
 <br>
 
@@ -180,16 +185,21 @@ For all datasets:<br>
 
 <br>
 
-For datasets longer than 30 minutes:<br>
+For long datasets (>30 minutes):<br>
 
 - `seg_3`: head 30 s + 10 s window every 20 s + tail 30 s
 
 <br>
 
-- the head captures early transient behavior
-- the middle windows sample recurring motion across time
-- the tail reflects late-stage drift behavior
-- `seg_3` is intended to preserve more long-horizon characteristics for long recordings
+Each component captures different behavior:<br>
+
+- head: initialization / transient response
+- middle windows: recurring motion patterns
+- tail: accumulated drift / late-stage behavior
+
+<br>
+
+`seg_3` increases temporal coverage for long recordings, preserving more long-horizon characteristics.<br>
 
 <br>
 
@@ -244,17 +254,15 @@ with Tee(path_log):
 
 ### Redefine the Best-Model Criterion <a name="exp-4-method-best"></a>
 
-A major change in Experiment 4 is the definition of the `best` result.<br>
+Experiment 3 revealed an important limitation: lower orientation error does not necessarily imply better downstream estimation.<br>
 
 <br>
 
-In Experiment 3, the best configuration per dataset was selected mainly from the orientation-angle-error criterion.<br>
-However, on Dataset 04, it was observed that orientation error improved while the secondary validation became worse (gravity / linear-acceleration estimation degraded).<br>
-This showed that lower orientation error does not always imply a better downstream solution.<br>
+In particular, on dataset 04, orientation error improved but gravity and linear acceleration estimation degraded.<br>
 
 <br>
 
-Therefore, in Experiment 4, the best experiment is selected using a combined score:<br>
+To address this, Experiment 4 defines a combined evaluation metric:<br>
 
 ```
 total_score = ori_score + g_score + a_score
@@ -262,6 +270,8 @@ total_score = ori_score + g_score + a_score
 ori_score: orientation angle error score
 g_score: gravity direction error score
 a_score: linear-acceleration direction error score
+
+All three components are computed using the same scoring function score_angle_err(...), so they can be combined on a comparable scale
 ```
 
 <br>
@@ -333,6 +343,10 @@ with Tee(path_log):
 
 <br>
 
+All optimization targets are evaluated using the segment-based proxy objective defined above.<br>
+
+<br>
+
 <details>
 <summary><b><ins>Implementation</ins></b></summary>
 
@@ -381,7 +395,7 @@ def exp_4_6(seg: list[tuple[int, int]], . . .) -> tuple[Any, ...]:
 
 ### Experiment Structure <a name="exp-4-method-structure"></a>
 
-Experiment 4 mirrors the structure of Experiment 3 as close as possible.<br>
+Experiment 4 mirrors the structure of Experiment 3 as closely as possible.<br>
 
 <br>
 
@@ -398,11 +412,11 @@ For each Experiment 3 variant, a corresponding Experiment 4 variant is defined:<
 
 For a fair comparison with Experiment 3, each corresponding pair uses:<br>
 
-- the same search space
-- the same number of Optuna trials
-- the same random seed
-- the same dataset
-- full-data evaluation after tuning
+- identical search space
+- identical number of Optuna trials
+- identical random seed
+- identical dataset
+- identical evaluation (full sequence)
 
 <br>
 
@@ -413,7 +427,7 @@ The only major difference is the tuning objective:<br>
 
 <br>
 
-This allows the effect of the proxy objective itself to be isolated.<br>
+This isolates the effect of the proxy objective.<br>
 
 <br>
 <br>
@@ -428,68 +442,89 @@ All final comparisons are performed on the full dataset, not on the tuning segme
 For each experiment, the following are compared:<br>
 
 - angle error statistics: min / max / mean / p90 (in rad and deg)
-- total running time
+- total runtime
 - speedup relative to full-data tuning
 - selected best-parameter differences relative to Experiment 3
-- best experiment under the revised total score
+- best configuration under the total score
 
 <br>
 
-This design is important because the goal is not merely to perform well on the segments,<br>
-but to verify whether segment-based tuning preserves useful performance on the full sequence.<br>
+This evaluation protocol is critical because the objective is not to optimize segment performance itself, but to assess generalization to the full sequence.<br>
 
 <br>
 <br>
 <br>
 
-### Why Segment-based Tuning Sometimes Works Better <a name="exp-4-method-why-seg-better"></as>
+### Why Segment-based Tuning Sometimes Works Better <a name="exp-4-method-why-seg-better"></a>
 
-Although the main purpose of Experiment 4 is runtime reduction,<br>
-it is also possible that segment-based tuning may sometimes produce slightly better full-sequence results.<br>
-
-<br>
-
-This may happen for several reasons:<br>
-
-1. Reduced long-horizon artifact dominance
-
-The optimization target is recursive, so long-horizon effects can dominate the score.<br>
-Some parameters may appear good only because they match a specific late drift pattern, a particular disturbance regime, or a sequence-specific accumulated artifact.<br>
-By cutting the sequence into segments, the proxy objective reduces the influence of such accumulated long-horizon behavior and may favor parameters that are locally more stable.<br>
+Although the main purpose of Experiment 4 is runtime reduction, segment-based tuning can occasionally yield slightly better full-sequence results.<br>
 
 <br>
 
-2. Simpler optimization target under finite trials
+1. **Reduced long-horizon bias**
 
-Optuna does not search infinitely many trials.<br>
-When the objective is complex and noisy, a limited number of trials may fail to approach a good basin.<br>
-A segment-based objective can be computationally cheaper and also easier to optimize, so within the same finite trial budget it may sometimes produce a better parameter set.<br>
+Full-sequence optimization may overfit:<br>
 
-<br>
-
-3. Segment reset emphasizes local fusion quality
-
-In the segment-based scorer, each segment starts from `q0 = q_ref[seg_start]`.<br>
-This means the objective focuses more on local estimation quality inside representative windows,<br>
-rather than on the entire long accumulated trajectory.<br>
-As a result, the selected parameters may better reflect local fusion robustness.<br>
+- drift patterns
+- specific disturbances
+- late-stage artifacts
 
 <br>
 
-4. Regularization-like effect
+Segment-based tuning reduces this dominance.<br>
+
+<br>
+
+2. **Simpler optimization landscape**
+
+With finite Optuna trials:<br>
+
+- full objective: complex, noisy
+- segment objective: simpler, cheaper
+
+The proxy objective introduces a smoother and less noisy optimization landscape,
+increasing the probability of finding a better solution under limited trials.<br>
+
+<br>
+
+3. **Emphasis on local fusion quality**
+
+Segment reset (`q0 = q_ref[seg_start]`) removes:<br>
+
+- accumulated error
+- trajectory dependency
+
+The selected parameters may better reflect local fusion robustness.<br>
+
+<br>
+
+4. **Regularization effect**
 
 Segment-based tuning can behave like a weak regularizer.<br>
-Instead of fitting the exact full-sequence trajectory, it fits a set of representative windows distributed over time.<br>
-This may reduce overreaction to a specific portion of the dataset and lead to a parameter set that is more practically robust.<br>
 
 <br>
 
-5. Full-data objective is not always the most practically useful objective
+It avoids overfitting to:<br>
 
-The full sequence may contain very long easy intervals, repeated motion regimes, or prolonged disturbances that are not equally important for practical generalization.<br>
-A distributed segment set may reduce this temporal bias by sampling representative regions more evenly.<br>
+- specific time intervals
+- repeated motion patterns
 
-These possibilities do not imply that segment-based tuning is intrinsically superior to full-data tuning.<br>
+<br>
+
+5. **Better temporal balance**
+
+Full sequences may contain:<br>
+
+- long easy regions
+- dominant motion regimes
+
+<br>
+
+Segment selection distributes attention more evenly across time.<br>
+
+<br>
+
+These effects do not guarantee better performance, but explain why segment-based tuning can sometimes match or outperform full-data tuning.<br>
 
 <br>
 <br>
@@ -568,7 +603,7 @@ Suggested mag_sigma:  6.850455808768257
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-1) - (running time of exp 4-1-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -661,21 +696,21 @@ end :  2026-03-26 18:06:50.944
 |   end time   |   16:53:51.713 |   18:07:34.493 |   18:08:41.699 |
 | running time |   00:03:21.666 |   00:00:43.532 |   00:01:07.206 |
 |    speedup   |              - | 4.67× (−02m38s)| 3.00× (-02m14s)|
-|      tau     |           4.37 |           4.31 |           4.32 |
-|       K      |    0.002290369 |    0.002318593 |    0.002311993 |
-|   mag_gain   |       4.124038 |       3.586378 |       3.388323 |
+|      tau     |           4.28 |           4.31 |           4.32 |
+|       K      |    0.002334764 |    0.002318593 |    0.002311993 |
+|   mag_gain   |       3.519930 |       3.586378 |       3.388323 |
 |     σ_acc    |            inf |            inf |            inf |
 |    σ_gyro    |            inf |            inf |            inf |
 |     σ_mag    |            inf |            inf |            inf |
-|   σ_mag_err  |      0.7518797 |      1.7999687 |      0.7612136 |
-|  Mean error  | <ul><li>0.04447 rad</li><li>2.54800 deg</li></ul> | <ul><li>0.04131 rad</li><li>2.36665 deg</li></ul> | <ul><li>0.04144 rad</li><li>2.37406 deg</li></ul> |
-|   p90 error  | <ul><li>0.08333 rad</li><li>4.77430 deg</li></ul> | <ul><li>0.07946 rad</li><li>4.55272 deg</li></ul> | <ul><li>0.08010 rad</li><li>4.58945 deg</li></ul> |
+|   σ_mag_err  |      1.6224342 |      1.7999687 |      0.7612136 |
+|  Mean error  | <ul><li>0.04137 rad</li><li>2.37029 deg</li></ul> | <ul><li>0.04131 rad</li><li>2.36665 deg</li></ul> | <ul><li>0.04144 rad</li><li>2.37406 deg</li></ul> |
+|   p90 error  | <ul><li>0.07968 rad</li><li>4.77430 deg</li></ul> | <ul><li>0.07946 rad</li><li>4.56528 deg</li></ul> | <ul><li>0.08010 rad</li><li>4.58945 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-2) - (running time of exp 4-2-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -768,21 +803,21 @@ end :  2026-03-26 18:08:41.699
 |   end time   |   16:59:42.931 |   18:09:52.109 |   18:11:42.449 |
 | running time |   00:05:51.203 |   00:01:10.390 |   00:01:50.340 |
 |    speedup   |              - | 5.01× (−04m40s)| 3.19× (-04m00s)|
-|      tau     |           4.54 |           4.76 |           4.67 |
-|       K      |    0.002202910 |    0.002102056 |    0.002142129 |
-|   mag_gain   |       3.892036 |       3.846369 |       3.674369 |
-|     σ_acc    |      1.7562440 |      9.9262628 |      5.7291508 |
-|    σ_gyro    |      6.2834979 |      0.2901186 |      0.4576878 |
-|     σ_mag    |     16.2250324 |     44.4812203 |     39.1623427 |
+|      tau     |           4.57 |           4.76 |           4.67 |
+|       K      |    0.002186687 |    0.002102056 |    0.002142129 |
+|   mag_gain   |       4.397713 |       3.846369 |       3.674369 |
+|     σ_acc    |     20.4765482 |      9.9262628 |      5.7291508 |
+|    σ_gyro    |      1.1233809 |      0.2901186 |      0.4576878 |
+|     σ_mag    |     25.3407412 |     44.4812203 |     39.1623427 |
 |   σ_mag_err  |            inf |            inf |            inf |
-|  Mean error  | <ul><li>0.03320 rad</li><li>1.90235 deg</li></ul> | <ul><li>0.03703 rad</li><li>2.12167 deg</li></ul> | <ul><li>0.03609 rad</li><li>2.06771 deg</li></ul> |
-|   p90 error  | <ul><li>0.08865 rad</li><li>5.07946 deg</li></ul> | <ul><li>0.05096 rad</li><li>2.92002 deg</li></ul> | <ul><li> rad</li><li>3.08194 deg</li></ul> |
+|  Mean error  | <ul><li>0.03815 rad</li><li>2.18586 deg</li></ul> | <ul><li>0.03703 rad</li><li>2.12167 deg</li></ul> | <ul><li>0.03609 rad</li><li>2.06771 deg</li></ul> |
+|   p90 error  | <ul><li>0.07351 rad</li><li>4.21208 deg</li></ul> | <ul><li>0.05096 rad</li><li>2.92002 deg</li></ul> | <ul><li>0.05379 rad</li><li>3.08194 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-3) - (running time of exp 4-3-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -875,21 +910,21 @@ end :  2026-03-26 18:11:42.449
 |   end time   |   17:03:45.382 |   18:12:33.387 |   18:13:51.416 |
 | running time |   00:04:02.434 |   00:00:50.920 |   00:01:18.028 |
 |    speedup   |              - | 4.84× (−03m11s)| 3.10× (-02m44s)|
-|      tau     |           4.19 |           5.02 |           5.01 |
-|       K      |    0.002387545 |    0.001993253 |    0.001996605 |
-|   mag_gain   |       4.519486 |       4.367921 |       4.148098 |
-|     σ_acc    |      1.8465124 |      5.0794965 |      5.1120395 |
-|    σ_gyro    |      6.8600581 |      0.3945917 |      0.3595636 |
-|     σ_mag    |     13.1831565 |     27.5380465 |     37.0785850 |
-|   σ_mag_err  |      0.8853287 |      0.8856901 |      0.8695816 |
-|  Mean error  | <ul><li>0.03020 rad</li><li>1.73052 deg</li></ul> | <ul><li>0.03390 rad</li><li>1.94246 deg</li></ul> | <ul><li>0.03458 rad</li><li>1.98155 deg</li></ul> |
-|   p90 error  | <ul><li>0.07193 rad</li><li>4.12132 deg</li></ul> | <ul><li>0.04893 rad</li><li>2.80326 deg</li></ul> | <ul><li>0.04782 rad</li><li>2.73973 deg</li></ul> |
+|      tau     |           4.76 |           5.02 |           5.01 |
+|       K      |    0.002096190 |    0.001993253 |    0.001996605 |
+|   mag_gain   |       5.678210 |       4.367921 |       4.148098 |
+|     σ_acc    |     15.8903128 |      5.0794965 |      5.1120395 |
+|    σ_gyro    |      0.9994370 |      0.3945917 |      0.3595636 |
+|     σ_mag    |     18.0364040 |     27.5380465 |     37.0785850 |
+|   σ_mag_err  |      1.5374059 |      0.8856901 |      0.8695816 |
+|  Mean error  | <ul><li>0.03794 rad</li><li>2.17366 deg</li></ul> | <ul><li>0.03390 rad</li><li>1.94246 deg</li></ul> | <ul><li>0.03458 rad</li><li>1.98155 deg</li></ul> |
+|   p90 error  | <ul><li>0.07607 rad</li><li>4.35842 deg</li></ul> | <ul><li>0.04893 rad</li><li>2.80326 deg</li></ul> | <ul><li>0.04782 rad</li><li>2.73973 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-4) - (running time of exp 4-4-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -982,25 +1017,25 @@ end :  2026-03-26 18:13:51.416
 |   end time   |   17:11:37.212 |   18:15:27.488 |   18:17:58.874 |
 | running time |   00:07:51.812 |   00:01:36.053 |   00:02:31.386 |
 |    speedup   |              - | 4.91× (−06m15s)| 3.12× (-05m20s)|
-|      tau     |           3.79 |           5.22 |           5.49 |
-|       K      |    0.002635225 |    0.001914986 |    0.001820333 |
-|   mag_gain   |       5.460352 |       5.207657 |       4.652301 |
+|      tau     |           5.17 |           5.22 |           5.49 |
+|       K      |    0.001932617 |    0.001914986 |    0.001820333 |
+|   mag_gain   |       4.930732 |       5.207657 |       4.652301 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |
-|       p      |             80 |             80 |             80 |
-|     win_s    |       9.996655 |       9.244633 |       9.148510 |
-| update_ratio |       0.194599 |       0.411771 |       0.291020 |
-|   ema_alpha  |       0.096770 |       0.047866 |       0.020566 |
+|       p      |             76 |             80 |             80 |
+|     win_s    |       5.777591 |       9.244633 |       9.148510 |
+| update_ratio |       0.395468 |       0.411771 |       0.291020 |
+|   ema_alpha  |       0.050896 |       0.047866 |       0.020566 |
 |   σ_mag_err  |            inf |            inf |            inf |
-|  Mean error  | <ul><li>0.04852 rad</li><li>2.78041 deg</li></ul> | <ul><li>0.05663 rad</li><li>3.24449 deg</li></ul> | <ul><li>0.06079 rad</li><li>3.48297 deg</li></ul> |
-|   p90 error  | <ul><li>0.09915 rad</li><li>5.68096 deg</li></ul> | <ul><li>0.10513 rad</li><li>6.02340 deg</li></ul> | <ul><li>0.11554 rad</li><li>6.62021 deg</li></ul> |
+|  Mean error  | <ul><li>0.05958 rad</li><li>3.41390 deg</li></ul> | <ul><li>0.05663 rad</li><li>3.24449 deg</li></ul> | <ul><li>0.06079 rad</li><li>3.48297 deg</li></ul> |
+|   p90 error  | <ul><li>0.10931 rad</li><li>6.26327 deg</li></ul> | <ul><li>0.10513 rad</li><li>6.02340 deg</li></ul> | <ul><li>0.11554 rad</li><li>6.62021 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-5) - (running time of exp 4-5-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1093,25 +1128,25 @@ end :  2026-03-26 18:17:58.874
 |   end time   |   17:19:36.843 |   18:19:36.642 |   18:22:10.496 |
 | running time |   00:07:59.618 |   00:01:37.746 |   00:02:33.854 |
 |    speedup   |              - | 4.94× (−06m21s)| 3.13× (-05m25s)|
-|      tau     |           3.56 |           5.09 |           5.01 |
-|       K      |    0.002812494 |    0.001962530 |    0.001996456 |
-|   mag_gain   |       6.998810 |       6.025085 |       5.866344 |
+|      tau     |           5.16 |           5.09 |           5.01 |
+|       K      |    0.001937734 |    0.001962530 |    0.001996456 |
+|   mag_gain   |       5.600152 |       6.025085 |       5.866344 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |
-|       p      |             79 |             78 |             78 |
-|     win_s    |       9.474137 |       8.146240 |       7.546818 |
-| update_ratio |       0.339160 |       0.418640 |       0.412702 |
-|   ema_alpha  |       0.185937 |       0.066146 |       0.023297 |
-|   σ_mag_err  |      1.5525143 |      1.3935356 |      1.4270680 |
-|  Mean error  | <ul><li>0.04861 rad</li><li>2.78499 deg</li></ul> | <ul><li>0.05550 rad</li><li>3.17997 deg</li></ul> | <ul><li>0.05964 rad</li><li>3.41724 deg</li></ul> |
-|   p90 error  | <ul><li>0.10116 rad</li><li>5.79594 deg</li></ul> | <ul><li>0.09866 rad</li><li>5.65289 deg</li></ul> | <ul><li>0.11592 rad</li><li>6.64166 deg</li></ul> |
+|       p      |             80 |             78 |             78 |
+|     win_s    |       5.046138 |       8.146240 |       7.546818 |
+| update_ratio |       0.265996 |       0.418640 |       0.412702 |
+|   ema_alpha  |       0.025141 |       0.066146 |       0.023297 |
+|   σ_mag_err  |      1.9951554 |      1.3935356 |      1.4270680 |
+|  Mean error  | <ul><li>0.05704 rad</li><li>3.26791 deg</li></ul> | <ul><li>0.05550 rad</li><li>3.17997 deg</li></ul> | <ul><li>0.05964 rad</li><li>3.41724 deg</li></ul> |
+|   p90 error  | <ul><li>0.10546 rad</li><li>6.04262 deg</li></ul> | <ul><li>0.09866 rad</li><li>5.65289 deg</li></ul> | <ul><li>0.11592 rad</li><li>6.64166 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-6) - (running time of exp 4-6-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1322,6 +1357,13 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 #### [Observation]
 
+- Segment-based tuning preserves broadly comparable full-sequence orientation performance relative to full-data tuning on this dataset
+- No large degradation is observed when replacing full-data tuning with either `seg_1` or `seg_2`
+- In some configurations (notably exp 4-2), segment-based tuning yields slightly improved results
+- The best-performing configuration remains consistent with Experiment 3 (fixed norm gating combined with magnetometer innovation gating)
+- Runtime is reduced substantially, by approximately 3× to 5× depending on the segmentation policy
+- `seg_1` and `seg_2` produce similar results on this dataset, without a strong consistent advantage for either policy
+
 <br>
 <br>
 <br>
@@ -1389,7 +1431,7 @@ Suggested mag_sigma:  5.051061836028509
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-1) - (running time of exp 4-1-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1496,7 +1538,7 @@ end :  2026-03-25 23:30:31.250
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-2) - (running time of exp 4-2-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1603,7 +1645,7 @@ end :  2026-03-25 23:34:47.579
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-3) - (running time of exp 4-3-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1710,7 +1752,7 @@ end :  2026-03-25 23:42:04.581
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-4) - (running time of exp 4-4-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1814,14 +1856,14 @@ end :  2026-03-25 23:47:11.512
 | update_ratio |       0.194599 |       0.194212 |       0.202047 |
 |   ema_alpha  |       0.096770 |       0.070864 |       0.091838 |
 |   σ_mag_err  |            inf |            inf |            inf |
-|  Mean error  | <ul><li>0.04852 rad</li><li>2.78041 deg</li></ul> | <ul><li>0.052342 rad</li><li>2.998947 deg</li></ul> | <ul><li>0.051218 rad</li><li>2.934587 deg</li></ul> |
-|   p90 error  | <ul><li>0.09915 rad</li><li>5.68096 deg</li></ul> | <ul><li>0.126034 rad</li><li>7.221191 deg</li></ul> | <ul><li>0.120673 rad</li><li>6.914050 deg</li></ul> |
+|  Mean error  | <ul><li>0.04852 rad</li><li>2.78041 deg</li></ul> | <ul><li>0.05234 rad</li><li>2.99895 deg</li></ul> | <ul><li>0.05122 rad</li><li>2.93459 deg</li></ul> |
+|   p90 error  | <ul><li>0.09915 rad</li><li>5.68096 deg</li></ul> | <ul><li>0.12603 rad</li><li>7.22119 deg</li></ul> | <ul><li>0.12067 rad</li><li>6.91405 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-5) - (running time of exp 4-5-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -1932,7 +1974,7 @@ end :  2026-03-25 23:56:59.565
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-6) - (running time of exp 4-6-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2143,6 +2185,14 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 #### [Observation]
 
+- Segment-based tuning again preserves broadly comparable full-sequence orientation performance on this dataset
+- Differences between full-data and segment-based tuning remain small across the evaluated configurations
+- In some configurations (especially exp 4-3 and exp 4-4), segment-based tuning yields slightly improved results
+- The best-performing configuration remains unchanged from Experiment 3
+- `seg_1` and `seg_2` produce comparable results, with no clear consistent advantage for one policy over the other
+- Runtime reduction remains substantial, ranging from approximately 2× to 4×
+- No large degradation is observed when using segment-based tuning instead of full-data tuning on this dataset
+
 <br>
 <br>
 <br>
@@ -2210,7 +2260,7 @@ Suggested mag_sigma:  5.098923949491506
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-1) - (running time of exp 4-1-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2317,7 +2367,7 @@ end :  2026-03-26 00:13:28.151
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-2) - (running time of exp 4-2-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2424,7 +2474,7 @@ end :  2026-03-26 00:18:51.164
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-3) - (running time of exp 4-3-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2531,7 +2581,7 @@ end :  2026-03-26 00:27:58.214
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-4) - (running time of exp 4-4-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2642,7 +2692,7 @@ end :  2026-03-26 00:34:22.811
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-5) - (running time of exp 4-5-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2753,7 +2803,7 @@ end :  2026-03-26 00:46:38.969
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-6) - (running time of exp 4-6-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -2964,6 +3014,13 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 
 #### [Observation]
 
+- Segment-based tuning preserves broadly comparable full-sequence performance on this dataset
+- In some configurations (notably exp 4-3 and exp 4-4), segment-based tuning yields slightly improved mean and p90 errors relative to full-data tuning
+- The best-performing configuration differs slightly from Experiment 3, although the gap between the top candidates remains small
+- This suggests that model selection can be sensitive when several configurations perform similarly
+- Runtime reduction remains substantial, with speedups of approximately 2.5× to 4×
+- `seg_1` and `seg_2` produce similar results on this dataset, without a strong consistent advantage for either policy
+
 <br>
 <br>
 <br>
@@ -3015,25 +3072,25 @@ Suggested mag_sigma:  190.98333381383583
 |              |     exp 3-1    |    exp 4-1-1   |    exp 4-1-2   |    exp 4-1-3   |
 |:------------:|---------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |          seg_3 |
-|  start time  |   00:08:48.169 |    |    |    |
-|   end time   |   01:10:02.735 |    |    |    |
-| running time |   01:01:14.566 |    |    |    |
-|    speedup   |              - | × (−) | × (-)| × (-)|
-|      tau     |           2.28 |            |            |            |
-|       K      |    0.004408465 |     |     |     |
-|   mag_gain   |       0.075637 |        |        |        |
-|     σ_acc    |            inf |             |             |             |
-|    σ_gyro    |            inf |             |             |             |
-|     σ_mag    |            inf |             |             |             |
-|   σ_mag_err  |            inf |             |             |             |
-|  Mean error  | <ul><li>0.77836 rad</li><li>44.59698 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>1.99740 rad</li><li>114.44248 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   00:08:48.169 |   08:19:18.349 |   08:34:37.755 |   08:55:36.754 |
+|   end time   |   01:10:02.735 |   08:34:37.755 |   08:55:36.754 |   09:22:08.581 |
+| running time |   01:01:14.566 |   00:15:19.406 |   00:20:58.999 |   00:26:31.827 |
+|    speedup   |              - | 4.00× (−45m55s)| 2.92× (-40m15s)| 2.31× (-34m42s)|
+|      tau     |           2.28 |           3.62 |           3.62 |           3.62 |
+|       K      |    0.004408465 |    0.002775150 |    0.002775150 |    0.002775150 |
+|   mag_gain   |       0.075637 |       0.051682 |       0.051682 |       0.051682 |
+|     σ_acc    |            inf |            inf |            inf |            inf |
+|    σ_gyro    |            inf |            inf |            inf |            inf |
+|     σ_mag    |            inf |            inf |            inf |            inf |
+|   σ_mag_err  |            inf |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.77836 rad</li><li>44.59698 deg</li></ul> | <ul><li>0.82778 rad</li><li>47.42830 deg</li></ul> | <ul><li>0.82778 rad</li><li>47.42830 deg</li></ul> | <ul><li>0.82778 rad</li><li>47.42830 deg</li></ul> |
+|   p90 error  | <ul><li>1.99740 rad</li><li>114.44248 deg</li></ul> | <ul><li>2.18361 rad</li><li>125.11142 deg</li></ul> | <ul><li>2.18361 rad</li><li>125.11142 deg</li></ul> | <ul><li>2.18361 rad</li><li>125.11142 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-1) - (running time of exp 4-1-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -3067,6 +3124,70 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-1</ins></b></summary>
 
 ```
+[START] 2026-03-26 08:19:18.348
+
+start :  2026-03-26  
+
+[chosen value]
+tau= 3.624609913306148 , K= 0.002775150466264329
+mag_gain= 0.05168160656620317
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-1] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.00043224609575303604 3.1415919070014238 0.8277799304377768 2.18360616310963
+
+[exp 4-1-1] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.024765876997656623 179.9999572236374 47.42829637971748 125.11141726493703
+
+end :  2026-03-26 08:34:37.755
+
+
+
+start :  2026-03-26 08:34:37.755
+
+[chosen value]
+tau= 3.624609913306148 , K= 0.002775150466264329
+mag_gain= 0.05168160656620317
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-2] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.00043224609575303604 3.1415919070014238 0.8277799304377768 2.18360616310963
+
+[exp 4-1-2] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.024765876997656623 179.9999572236374 47.42829637971748 125.11141726493703
+
+end :  2026-03-26 08:55:36.754
+
+
+
+start :  2026-03-26 08:55:36.754
+
+[chosen value]
+tau= 3.624609913306148 , K= 0.002775150466264329
+mag_gain= 0.05168160656620317
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=inf
+
+[exp 4-1-3] Gyro+Acc+Mag angle error in rad — min/max/mean/p90
+0.00043224609575303604 3.1415919070014238 0.8277799304377768 2.18360616310963
+
+[exp 4-1-3] Gyro+Acc+Mag angle error in deg — min/max/mean/p90
+0.024765876997656623 179.9999572236374 47.42829637971748 125.11141726493703
+
+end :  2026-03-26 09:22:08.581
+
+
+
+
+[END] 2026-03-26 09:22:08.581
 ```
 
 </details>
@@ -3078,25 +3199,25 @@ mag_err_sigma=inf
 |              |     exp 3-2    |    exp 4-2-1   |    exp 4-2-2   |    exp 4-2-3   |
 |:------------:|---------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |          seg_3 |
-|  start time  |   01:10:02.746 |    |    |    |
-|   end time   |   02:02:03.748 |    |    |    |
-| running time |   00:52:01.002 |    |    |    |
-|    speedup   |              - | × (−)| × (-)| × (-)|
-|      tau     |           2.44 |            |            |            |
-|       K      |    0.004115562 |     |     |     |
-|   mag_gain   |       0.081290 |        |        |        |
-|     σ_acc    |            inf |             |             |             |
-|    σ_gyro    |            inf |             |             |             |
-|     σ_mag    |            inf |             |             |             |
-|   σ_mag_err  |      0.1141336 |             |             |             |
-|  Mean error  | <ul><li>0.63786 rad</li><li>36.54686 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>1.75871 rad</li><li>100.76688 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   01:10:02.746 |   09:22:08.597 |   09:34:24.569 |   09:53:16.613 |
+|   end time   |   02:02:03.748 |   09:34:24.569 |   09:53:16.613 |   10:20:32.398 |
+| running time |   00:52:01.002 |   00:12:15.972 |   00:18:52.044 |   00:27:15.785 |
+|    speedup   |              - | 4.25× (−39m45s)| 2.76× (-33m08s)| 1.91× (-24m45s)|
+|      tau     |           2.44 |           3.97 |           3.97 |           3.97 |
+|       K      |    0.004115562 |    0.002530634 |    0.002530634 |    0.002530634 |
+|   mag_gain   |       0.081290 |       0.054196 |       0.054196 |       0.054196 |
+|     σ_acc    |            inf |            inf |            inf |            inf |
+|    σ_gyro    |            inf |            inf |            inf |            inf |
+|     σ_mag    |            inf |            inf |            inf |            inf |
+|   σ_mag_err  |      0.1141336 |      0.0467602 |      0.0467602 |      0.0467602 |
+|  Mean error  | <ul><li>0.63786 rad</li><li>36.54686 deg</li></ul> | <ul><li>0.77167 rad</li><li>44.21363 deg</li></ul> | <ul><li>0.77167 rad</li><li>44.21363 deg</li></ul> | <ul><li>0.77167 rad</li><li>44.21363 deg</li></ul> |
+|   p90 error  | <ul><li>1.75871 rad</li><li>100.76688 deg</li></ul> | <ul><li>1.96249 rad</li><li>112.44226 deg</li></ul> | <ul><li>1.96249 rad</li><li>112.44226 deg</li></ul> | <ul><li>1.96249 rad</li><li>112.44226 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-2) - (running time of exp 4-2-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -3130,6 +3251,70 @@ mag_err_sigma=0.1141336
 <summary><b><ins>Logs exp 4-2</ins></b></summary>
 
 ```
+[START] 2026-03-26 09:22:08.597
+
+start :  2026-03-26 09:22:08.597
+
+[chosen value]
+tau= 3.9748284475595734 , K= 0.002530634472316332
+mag_gain= 0.05419565268459507
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=0.0467602
+
+[exp 4-2-1] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0011414317447457762 3.1414828275914535 0.771673501127199 1.9624876326374276
+
+[exp 4-2-1] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.06539922157618686 179.99370743381434 44.21363477667228 112.44225869674496
+
+end :  2026-03-26 09:34:24.569
+
+
+
+start :  2026-03-26 09:34:24.569
+
+[chosen value]
+tau= 3.9748284475595734 , K= 0.002530634472316332
+mag_gain= 0.05419565268459507
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=0.0467602
+
+[exp 4-2-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0011414317447457762 3.1414828275914535 0.771673501127199 1.9624876326374276
+
+[exp 4-2-2] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.06539922157618686 179.99370743381434 44.21363477667228 112.44225869674496
+
+end :  2026-03-26 09:53:16.613
+
+
+
+start :  2026-03-26 09:53:16.613
+
+[chosen value]
+tau= 3.9748284475595734 , K= 0.002530634472316332
+mag_gain= 0.05419565268459507
+acc_gate_sigma=inf
+gyro_gate_sigma=inf
+mag_gate_sigma=inf
+mag_err_sigma=0.0467602
+
+[exp 4-2-3] Gyro+Acc+Mag+Gating(Mag_innov) angle error in rad — min/max/mean/p90
+0.0011414317447457762 3.1414828275914535 0.771673501127199 1.9624876326374276
+
+[exp 4-2-3] Gyro+Acc+Mag+Gating(Mag_innov) angle error in deg — min/max/mean/p90
+0.06539922157618686 179.99370743381434 44.21363477667228 112.44225869674496
+
+end :  2026-03-26 10:20:32.398
+
+
+
+
+[END] 2026-03-26 10:20:32.398
 ```
 
 </details>
@@ -3141,25 +3326,25 @@ mag_err_sigma=0.1141336
 |              |     exp 3-3    |    exp 4-3-1   |    exp 4-3-2   |    exp 4-3-3   |
 |:------------:|---------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |          seg_3 |
-|  start time  |   02:02:03.760 |    |    |    |
-|   end time   |   03:33:28.681 |    |    |    |
-| running time |   01:31:24.921 |    |    |    |
-|    speedup   |              - | × (−)| × (-)| × (-)|
-|      tau     |           2.61 |            |            |            |
-|       K      |    0.003856468 |     |     |     |
-|   mag_gain   |       0.090535 |        |        |        |
-|     σ_acc    |      0.9858854 |             |             |             |
-|    σ_gyro    |      0.5807959 |             |             |             |
-|     σ_mag    |     54.0217667 |             |             |             |
-|   σ_mag_err  |            inf |             |             |             |
-|  Mean error  | <ul><li>0.62563 rad</li><li>35.84594 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>1.51352 rad</li><li>86.71842 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   02:02:03.760 |   10:20:32.415 |   10:40:48.389 |   11:12:48.359 |
+|   end time   |   03:33:28.681 |   10:40:48.389 |   11:12:48.359 |   12:00:02.990 |
+| running time |   01:31:24.921 |   00:20:15.974 |   00:31:59.970 |   00:47:14.631 |
+|    speedup   |              - | 4.51× (−71m08s)| 2.86× (-59m24s)| 1.94× (-44m10s)|
+|      tau     |           2.61 |           4.29 |           4.32 |           4.32 |
+|       K      |    0.003856468 |    0.002344903 |    0.002327978 |    0.002327978 |
+|   mag_gain   |       0.090535 |       0.038243 |       0.061560 |       0.061560 |
+|     σ_acc    |      0.9858854 |      1.8111151 |      1.6591989 |      1.6591989 |
+|    σ_gyro    |      0.5807959 |      0.7862228 |      0.2607787 |      0.2607787 |
+|     σ_mag    |     54.0217667 |   1357.3048162 |      9.0199464 |      9.0199464 |
+|   σ_mag_err  |            inf |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.62563 rad</li><li>35.84594 deg</li></ul> | <ul><li>0.73346 rad</li><li>42.02402 deg</li></ul> | <ul><li>0.63779 rad</li><li>36.54272 deg</li></ul> | <ul><li>0.63779 rad</li><li>36.54272 deg</li></ul> |
+|   p90 error  | <ul><li>1.51352 rad</li><li>86.71842 deg</li></ul> | <ul><li>1.88300 rad</li><li>107.88798 deg</li></ul> | <ul><li>1.83274 rad</li><li>105.00823 deg</li></ul> | <ul><li>1.83274 rad</li><li>105.00823 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-3) - (running time of exp 4-3-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -3193,6 +3378,70 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-3</ins></b></summary>
 
 ```
+[START] 2026-03-26 10:20:32.415
+
+start :  2026-03-26 10:20:32.415
+
+[chosen value]
+tau= 4.289660570600159 , K= 0.0023449029883337723
+mag_gain= 0.03824255524468722
+acc_gate_sigma=1.8111151
+gyro_gate_sigma=0.7862228
+mag_gate_sigma=1357.3048162
+mag_err_sigma=inf
+
+[exp 4-3-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.0005571061990019701 3.1413396517557333 0.7334574849815911 1.8830005072765463
+
+[exp 4-3-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.031919833943388244 179.9855040626993 42.02401834172513 107.88798188793916
+
+end :  2026-03-26 10:40:48.389
+
+
+
+start :  2026-03-26 10:40:48.389
+
+[chosen value]
+tau= 4.32084775905666 , K= 0.002327977853386332
+mag_gain= 0.061560352062797724
+acc_gate_sigma=1.6591989
+gyro_gate_sigma=0.2607787
+mag_gate_sigma=9.0199464
+mag_err_sigma=inf
+
+[exp 4-3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.002286355460023382 3.1388806839633165 0.6377908216240241 1.832739422488426
+
+[exp 4-3-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.1309985183260316 179.84461558623522 36.5427222912377 105.00823385583068
+
+end :  2026-03-26 11:12:48.359
+
+
+
+start :  2026-03-26 11:12:48.359
+
+[chosen value]
+tau= 4.32084775905666 , K= 0.002327977853386332
+mag_gain= 0.061560352062797724
+acc_gate_sigma=1.6591989
+gyro_gate_sigma=0.2607787
+mag_gate_sigma=9.0199464
+mag_err_sigma=inf
+
+[exp 4-3-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in rad — min/max/mean/p90
+0.002286355460023382 3.1388806839633165 0.6377908216240241 1.832739422488426
+
+[exp 4-3-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm) angle error in deg — min/max/mean/p90
+0.1309985183260316 179.84461558623522 36.5427222912377 105.00823385583068
+
+end :  2026-03-26 12:00:02.990
+
+
+
+
+[END] 2026-03-26 12:00:02.990
 ```
 
 </details>
@@ -3204,25 +3453,25 @@ mag_err_sigma=inf
 |              |     exp 3-4    |    exp 4-4-1   |    exp 4-4-2   |    exp 4-4-3   |
 |:------------:|---------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |          seg_3 |
-|  start time  |   03:33:28.693 |    |    |    |
-|   end time   |   04:35:02.755 |    |    |    |
-| running time |   01:01:34.062 |    |    |    |
-|    speedup   |              - | × (−)| × (-)| × (-)|
-|      tau     |           2.46 |            |            |            |
-|       K      |    0.004088848 |     |     |     |
-|   mag_gain   |       0.103103 |        |        |        |
-|     σ_acc    |      1.0180438 |             |             |             |
-|    σ_gyro    |      0.6821457 |             |             |             |
-|     σ_mag    |     64.1990739 |             |             |             |
-|   σ_mag_err  |      0.1663950 |             |             |             |
-|  Mean error  | <ul><li>0.66606 rad</li><li>38.16220 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>1.70196 rad</li><li>97.51531 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|  start time  |   03:33:28.693 |   12:00:03.006 |   12:14:42.995 |   12:37:25.963 |
+|   end time   |   04:35:02.755 |   12:14:42.995 |   12:37:25.963 |   13:10:25.812 |
+| running time |   01:01:34.062 |   00:14:39.989 |   00:22:42.968 |   00:32:59.849 |
+|    speedup   |              - | 4.20× (−46m54s)| 2.71× (-38m51s)| 1.87× (-28m34s)|
+|      tau     |           2.46 |           3.94 |           4.06 |           4.60 |
+|       K      |    0.004088848 |    0.002553681 |    0.002480581 |    0.002186936 |
+|   mag_gain   |       0.103103 |       0.075086 |       0.061593 |       0.062231 |
+|     σ_acc    |      1.0180438 |      1.7598608 |      2.0511352 |      1.9938993 |
+|    σ_gyro    |      0.6821457 |      0.2933352 |      0.2442438 |      0.3132505 |
+|     σ_mag    |     64.1990739 |      6.4253651 |      6.3724831 |     10.6196586 |
+|   σ_mag_err  |      0.1663950 |      0.0687333 |      0.0699812 |      0.0557789 |
+|  Mean error  | <ul><li>0.66606 rad</li><li>38.16220 deg</li></ul> | <ul><li>0.80620 rad</li><li>46.19160 deg</li></ul> | <ul><li>0.81961 rad</li><li>46.96016 deg</li></ul> | <ul><li>0.83928 rad</li><li>48.08735 deg</li></ul> |
+|   p90 error  | <ul><li>1.70196 rad</li><li>97.51531 deg</li></ul> | <ul><li>1.98956 rad</li><li>113.99285 deg</li></ul> | <ul><li>1.99982 rad</li><li>114.58126 deg</li></ul> | <ul><li>2.02167 rad</li><li>115.83293 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-4) - (running time of exp 4-4-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -3256,6 +3505,70 @@ mag_err_sigma=0.1663950
 <summary><b><ins>Logs exp 4-4</ins></b></summary>
 
 ```
+[START] 2026-03-26 12:00:03.006
+
+start :  2026-03-26 12:00:03.006
+
+[chosen value]
+tau= 3.93895707224597 , K= 0.0025536805063992173
+mag_gain= 0.07508551153333974
+acc_gate_sigma=1.7598608
+gyro_gate_sigma=0.2933352
+mag_gate_sigma=6.4253651
+mag_err_sigma=0.0687333
+
+[exp 4-4-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.0025529911720431103 3.1403162744857256 0.8061955158623374 1.989550639376818
+
+[exp 4-4-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.14627561929222768 179.92686886427825 46.191600521284144 113.99285476384613
+
+end :  2026-03-26 12:14:42.995
+
+
+
+start :  2026-03-26 12:14:42.995
+
+[chosen value]
+tau= 4.055033464733176 , K= 0.002480580734640064
+mag_gain= 0.06159326824007658
+acc_gate_sigma=2.0511352
+gyro_gate_sigma=0.2442438
+mag_gate_sigma=6.3724831
+mag_err_sigma=0.0699812
+
+[exp 4-4-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.0013532906250457238 3.1379089898671007 0.819609486213152 1.999820203835809
+
+[exp 4-4-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.07753784126974116 179.78894161554427 46.960164408899445 114.58125746478386
+
+end :  2026-03-26 12:37:25.963
+
+
+
+start :  2026-03-26 12:37:25.963
+
+[chosen value]
+tau= 4.599511373139761 , K= 0.002186936192761582
+mag_gain= 0.06223108284167501
+acc_gate_sigma=1.9938993
+gyro_gate_sigma=0.3132505
+mag_gate_sigma=10.6196586
+mag_err_sigma=0.0557789
+
+[exp 4-4-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in rad — min/max/mean/p90
+0.001700880885922848 3.1399218155193624 0.8392825304549183 2.0216660303504703
+
+[exp 4-4-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—fixed_norm+Mag_innov) angle error in deg — min/max/mean/p90
+0.09745329621785162 179.90426803031454 48.087346814126796 115.83293112404894
+
+end :  2026-03-26 13:10:25.812
+
+
+
+
+[END] 2026-03-26 13:10:25.812
 ```
 
 </details>
@@ -3267,29 +3580,29 @@ mag_err_sigma=0.1663950
 |              |     exp 3-5    |    exp 4-5-1   |    exp 4-5-2   |    exp 4-5-3   |
 |:------------:|---------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |          seg_3 |
-|  start time  |   04:35:02.770 |    |    |    |
-|   end time   |   06:35:06.344 |    |    |    |
-| running time |   02:00:03.574 |    |    |    |
-|    speedup   |              - | × (−)| × (-)| × (-)|
-|      tau     |           2.23 |            |            |            |
-|       K      |    0.004508710 |     |     |     |
-|   mag_gain   |       0.128425 |        |        |        |
+|  start time  |   04:35:02.770 |   13:10:25.831 |   13:37:33.896 |   14:20:02.692 |
+|   end time   |   06:35:06.344 |   13:37:33.896 |   14:20:02.692 |   15:22:27.178 |
+| running time |   02:00:03.574 |   00:27:08.065 |   00:42:28.796 |   01:02:24.486 |
+|    speedup   |              - | 4.42× (−92m55s)| 2.83× (-77m34s)| 1.92× (-57m39s)|
+|      tau     |           2.23 |           4.52 |           4.23 |           4.62 |
+|       K      |    0.004508710 |    0.002225248 |    0.002378750 |    0.002175047 |
+|   mag_gain   |       0.128425 |       0.056995 |       0.049781 |       0.048686 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |   time-varying |
-|       p      |             58 |              |              |              |
-|     win_s    |       8.312611 |        |        |        |
-| update_ratio |       0.224684 |        |        |        |
-|   ema_alpha  |       0.113612 |        |        |        |
-|   σ_mag_err  |            inf |             |             |             |
-|  Mean error  | <ul><li>0.54571 rad</li><li>31.26704 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
-|   p90 error  | <ul><li>1.57967 rad</li><li>90.50838 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> |
+|       p      |             58 |             66 |             68 |             75 |
+|     win_s    |       8.312611 |       9.976591 |       8.169525 |       9.773986 |
+| update_ratio |       0.224684 |       0.200027 |       0.130646 |       0.308748 |
+|   ema_alpha  |       0.113612 |       0.120144 |       0.094614 |       0.071261 |
+|   σ_mag_err  |            inf |            inf |            inf |            inf |
+|  Mean error  | <ul><li>0.54571 rad</li><li>31.26704 deg</li></ul> | <ul><li>0.61175 rad</li><li>35.05096 deg</li></ul> | <ul><li>0.61923 rad</li><li>35.47905 deg</li></ul> | <ul><li>0.61268 rad</li><li>35.10404 deg</li></ul> |
+|   p90 error  | <ul><li>1.57967 rad</li><li>90.50838 deg</li></ul> | <ul><li>1.84428 rad</li><li>105.66965 deg</li></ul> | <ul><li>1.86994 rad</li><li>107.13981 deg</li></ul> | <ul><li>1.84001 rad</li><li>105.42508 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-5) - (running time of exp 4-5-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -3323,6 +3636,70 @@ mag_err_sigma=inf
 <summary><b><ins>Logs exp 4-5</ins></b></summary>
 
 ```
+[START] 2026-03-26 13:10:25.831
+
+start :  2026-03-26 13:10:25.831
+
+[chosen value]
+tau= 4.520322285312156 , K= 0.0022252479482761573
+mag_gain= 0.056995105315943505
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 66 , best_win_s= 9.976591110804682
+best_update_ratio= 0.20002660533489514 , best_ema_alpha= 0.12014417974580677
+mag_err_sigma=inf
+
+[exp 4-5-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.00410455660052187 3.140341317876471 0.6117545823544913 1.844283285050746
+
+[exp 4-5-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.23517376998246778 179.92830374487266 35.050955666700695 105.6696484599307
+
+end :  2026-03-26 13:37:33.896
+
+
+
+start :  2026-03-26 13:37:33.896
+
+[chosen value]
+tau= 4.228623311317688 , K= 0.002378750044728722
+mag_gain= 0.049781156730359676
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 68 , best_win_s= 8.169524618926353
+best_update_ratio= 0.13064555708444062 , best_ema_alpha= 0.09461405699687192
+mag_err_sigma=inf
+
+[exp 4-5-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.00443980017951733 3.1415041015771505 0.6192262005346935 1.8699425000198193
+
+[exp 4-5-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.25438181216776823 179.9949263434082 35.4790478545595 107.13981318327751
+
+end :  2026-03-26 14:20:02.692
+
+
+
+start :  2026-03-26 14:20:02.692
+
+[chosen value]
+tau= 4.624653577798774 , K= 0.002175046783877299
+mag_gain= 0.048685968424018504
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 75 , best_win_s= 9.773986162007244
+best_update_ratio= 0.30874845915243115 , best_ema_alpha= 0.07126063738348828
+mag_err_sigma=inf
+
+[exp 4-5-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in rad — min/max/mean/p90
+0.0027042381090563623 3.1412575347174987 0.6126810570407563 1.8400147240573352
+
+[exp 4-5-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm)  angle error in deg — min/max/mean/p90
+0.154941430447368 179.98079910298233 35.104038756049384 105.42507793041409
+
+end :  2026-03-26 15:22:27.178
+
+
+
+
+[END] 2026-03-26 15:22:27.178
 ```
 
 </details>
@@ -3334,29 +3711,29 @@ mag_err_sigma=inf
 |              |     exp 3-6    |    exp 4-6-1   |    exp 4-6-2   |    exp 4-6-3   |
 |:------------:|---------------:|---------------:|---------------:|---------------:|
 |  tuning data |           full |          seg_1 |          seg_2 |          seg_3 |
-|  start time  |   06:35:06.360 |    |    |    |
-|   end time   |   08:42:48.769 |    |    |    |
-| running time |   02:07:42.409 |    |    |    |
-|    speedup   |              - | × (−)| × (-)| × (-)|
-|      tau     |           2.13 |            |            |            |
-|       K      |    0.004730251 |     |     |     |
-|   mag_gain   |       0.145923 |        |        |        |
+|  start time  |   06:35:06.360 |   15:22:27.200 |   15:50:32.827 |   16:34:31.119 |
+|   end time   |   08:42:48.769 |   15:50:32.827 |   16:34:31.119 |   17:45:01.124 |
+| running time |   02:07:42.409 |   00:28:05.547 |   00:43:58.292 |   01:10:30.005 |
+|    speedup   |              - | 4.55× (−99m36s)| 2.90× (-83m44s)| 1.81× (-57m12s)|
+|      tau     |           2.13 |           4.40 |           4.37 |           4.82 |
+|       K      |    0.004730251 |    0.002285143 |    0.002302736 |    0.002085775 |
+|   mag_gain   |       0.145923 |       0.036417 |       0.040780 |       0.041199 |
 |     σ_acc    |   time-varying |   time-varying |   time-varying |   time-varying |
 |    σ_gyro    |   time-varying |   time-varying |   time-varying |   time-varying |
 |     σ_mag    |   time-varying |   time-varying |   time-varying |   time-varying |
-|       p      |             54 |              |              |              |
-|     win_s    |       9.118412 |        |        |        |
-| update_ratio |       0.251041 |        |        |        |
-|   ema_alpha  |       0.169355 |        |        |        |
-|   σ_mag_err  |      1.7665532 |             |             |             |
-|  Mean error  | <ul><li>0.54640 rad</li><li>31.30636 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul
-|   p90 error  | <ul><li>1.60174 rad</li><li>91.77311 deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul> | <ul><li> rad</li><li> deg</li></ul
+|       p      |             54 |             71 |             68 |             74 |
+|     win_s    |       9.118412 |       8.180015 |       7.958232 |       9.724363 |
+| update_ratio |       0.251041 |       0.424806 |       0.231253 |       0.192439 |
+|   ema_alpha  |       0.169355 |       0.053551 |       0.034836 |       0.058035 |
+|   σ_mag_err  |      1.7665532 |      0.1166076 |      0.1323406 |      0.1521823 |
+|  Mean error  | <ul><li>0.54640 rad</li><li>31.30636 deg</li></ul> | <ul><li>0.70361 rad</li><li>40.31377 deg</li></ul> | <ul><li>0.68749 rad</li><li>39.39036 deg</li></ul> | <ul><li>0.67410 rad</li><li>38.62323 deg</li></ul> |
+|   p90 error  | <ul><li>1.60174 rad</li><li>91.77311 deg</li></ul> | <ul><li>1.95238 rad</li><li>111.86303 deg</li></ul> | <ul><li>1.95519 rad</li><li>112.02397 deg</li></ul> | <ul><li>1.94582 rad</li><li>111.48701 deg</li></ul> |
 
 <br>
 
 ** `σ = inf` means gating not applied<br>
 ** time format: hh:mm:ss.ms<br>
-** `speedup`: (running time of exp 3-6) - (running time of exp 4-6-X)
+** `speedup`: multiplicative speedup relative to full-data tuning. the value in parentheses denotes absolute time reduction<br>
 
 <br>
 
@@ -3390,6 +3767,70 @@ mag_err_sigma=1.7665531582622025
 <summary><b><ins>Logs exp 4-6</ins></b></summary>
 
 ```
+[START] 2026-03-26 15:22:27.199
+
+start :  2026-03-26 15:22:27.200
+
+[chosen value]
+tau= 4.40184246363846 , K= 0.002285142636073229
+mag_gain= 0.03641717202079333
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 71 , best_win_s= 8.180014660662678
+best_update_ratio= 0.4248060499474774 , best_ema_alpha= 0.05355105461742209
+mag_err_sigma=0.1166076430796149
+
+[exp 4-6-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.004493125176493342 3.1415830034983414 0.7036080474694799 1.9523782089558916
+
+[exp 4-6-1] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.2574371094370416 179.9994470904879 40.31377155144168 111.86303138648333
+
+end :  2026-03-26 15:50:32.827
+
+
+
+start :  2026-03-26 15:50:32.827
+
+[chosen value]
+tau= 4.368210886576224 , K= 0.002302736326638735
+mag_gain= 0.04078049156753014
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 68 , best_win_s= 7.958232083026185
+best_update_ratio= 0.23125252858661066 , best_ema_alpha= 0.034836383042531234
+mag_err_sigma=0.13234060542793807
+
+[exp 4-6-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.004462051286859954 3.1384129875446414 0.687491506714047 1.9551871273558858
+
+[exp 4-6-2] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.2556567067079932 179.81781855535175 39.39036178580479 112.02397055579964
+
+end :  2026-03-26 16:34:31.119
+
+
+
+start :  2026-03-26 16:34:31.119
+
+[chosen value]
+tau= 4.822589880401419 , K= 0.00208577510018343
+mag_gain= 0.0411993461458936
+acc/gyro/mag_gate_sigma = time-varying gate sigma
+best_p= 74 , best_win_s= 9.724363195965493
+best_update_ratio= 0.19243868119080831 , best_ema_alpha= 0.05803519228943914
+mag_err_sigma=0.15218234845223808
+
+[exp 4-6-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in rad — min/max/mean/p90
+0.0028630505105614696 3.1384805142608396 0.6741025299840645 1.945815344755684
+
+[exp 4-6-3] Gyro+Acc+Mag+Gating(Gyro/Acc/Mag—time-varying_norm+Mag_innov)  angle error in deg — min/max/mean/p90
+0.16404071078794774 179.8216875511943 38.623229927177924 111.48700696629395
+
+end :  2026-03-26 17:45:01.124
+
+
+
+
+[END] 2026-03-26 17:45:01.124
 ```
 
 </details>
@@ -3400,8 +3841,8 @@ mag_err_sigma=1.7665531582622025
 
 |              |       exp 3     | exp 4 (`seg_3`) |
 |:------------:|:---------------:|:---------------:|
-|   ori_best   |     exp3-6      |                 |
-|  total_best  |                 |                 |
+|   ori_best   |     exp3-6      |     exp4-5      |
+|  total_best  |     exp3-2      |     exp4-3      |
 
 <br>
 
@@ -3409,6 +3850,11 @@ mag_err_sigma=1.7665531582622025
 <summary><b><ins>Logs exp 3</ins></b></summary>
 
 ```
+[START] 2026-03-26 08:43:33.245
+
+best: exp3-6
+
+[END] 2026-03-26 08:43:33.399
 ```
 
 </details>
@@ -3417,11 +3863,36 @@ mag_err_sigma=1.7665531582622025
 <summary><b><ins>Logs exp 4</ins></b></summary>
 
 ```
-[START] 2026-03-26 08:43:33.245
+[START] 2026-03-26 17:45:01.137
 
-best: exp3-6
+exp 3-1: total_score=5.3734524 | ori=1.5663607, g=2.8164360, a=0.9906556
+exp 3-2: total_score=5.2296440 | ori=1.4402342, g=2.8166692, a=0.9727405
+exp 3-3: total_score=5.5445234 | ori=1.4084937, g=2.8092348, a=1.3267949
+exp 3-4: total_score=5.4069555 | ori=1.3442309, g=2.8104827, a=1.2522419
+exp 3-5: total_score=5.5345874 | ori=1.3089293, g=2.8040225, a=1.4216357
+exp 3-6: total_score=5.5245646 | ori=1.3004890, g=2.8044867, a=1.4195890
 
-[END] 2026-03-26 08:43:33.399
+ori_best: exp3-6
+total_best: exp3-2
+
+[END] 2026-03-26 18:01:28.418
+
+
+
+
+[START] 2026-03-26 18:01:28.438
+
+[seg_3]
+exp 4-1: total_score=2.6393331 | ori=1.7325959, g=0.0518524, a=0.8548848
+exp 4-2: total_score=2.4715143 | ori=1.5972535, g=0.0503878, a=0.8238731
+exp 4-3: total_score=2.2134157 | ori=1.4460966, g=0.0537378, a=0.7135813
+exp 4-4: total_score=2.2618031 | ori=1.6470711, g=0.0441323, a=0.5705996
+exp 4-5: total_score=3.0178949 | ori=1.4447698, g=0.1011854, a=1.4719397
+exp 4-6: total_score=3.0924498 | ori=1.5322361, g=0.0997948, a=1.4604189
+
+best: exp4-3
+
+[END] 2026-03-26 18:01:39.775
 ```
 
 </details>
@@ -3449,10 +3920,10 @@ best: exp3-6
     <tr>
       <td>3.06</td>
       <td>36.69</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td>1.14</td>
+      <td>2.48</td>
+      <td>15.40</td>
+      <td>34.82</td>
     </tr>
   </tbody>
 </table>
@@ -3463,6 +3934,28 @@ best: exp3-6
 <summary><b><ins>Logs</ins></b></summary>
 
 ```
+[START] 2026-03-26 18:01:53.974
+
+[Gravity]
+RMSE norm: 0.29415665754269
+
+Gravity est/ref angle error in rad — min/max/mean/p90
+2.650200319338574e-05 0.16928381341158324 0.01985237786506237 0.0433162564471935
+
+Gravity est/ref angle error in deg — min/max/mean/p90
+0.001518452931623233 9.699248048363842 1.1374574649670095 2.4818386787305293
+
+
+[Linear accel]
+RMSE norm: 0.6285299177917264
+
+Linear accel est/ref angle error in rad — min/max/mean/p90
+5.19675043157872e-05 3.114404714478231 0.268836462740289 0.6077097984126015
+
+Linear accel est/ref angle error in deg — min/max/mean/p90
+0.0029775186691224976 178.44224583524883 15.403194694244569 34.819206617788126
+. . .
+[END] 2026-03-26 18:02:00.474
 ```
 
 </details>
@@ -3471,12 +3964,40 @@ best: exp3-6
 
 #### [Observation]
 
+- Unlike Datasets 01–03, Dataset 04 does not preserve the same overall tendency under segment-based tuning as under full-data tuning
+- All Experiment 4 configurations remain worse than their Experiment 3 counterparts in terms of full-sequence orientation error, despite substantial runtime reduction
+- This suggests that, on this long and highly variable sequence, the segment-based proxy objective does not reproduce the same parameter preference as the full-data objective
+- Dataset 04 already appears atypical in Experiment 3, with an unusually large suggested magnetometer scale and persistently large orientation error across configurations
+- This indicates that the sequence is substantially more difficult and likely more non-stationary than the other datasets
+- Under the revised total criterion, the best Experiment 4 result on `seg_3` is a fixed norm-gating configuration (exp 4-3)
+- Although its orientation error is worse than the best Experiment 3 orientation result, its gravity and linear-acceleration estimates are much better in secondary validation
+- This suggests that the Experiment 4 selection may be more useful for downstream estimation on this dataset
+- Introducing `seg_3` preserves more long-horizon structure than `seg_1` and `seg_2`, and often yields similar or slightly improved results relative to `seg_2`. However, the improvement remains modest compared with the increased runtime
+- As a result, `seg_2` may still be a reasonable default trade-off between computational cost and performance for later experiments
+
 <br>
 <br>
 <br>
 <br>
 
 ### Cross-dataset Summary <a name="exp-4-data-sum"></a>
+
+For datasets 01–03:<br>
+
+- Segment-based tuning preserves the main performance tendencies observed in Experiment 3
+-The relative ranking among the strongest configurations remains broadly similar
+- Full-sequence orientation accuracy is maintained with only minor variations
+- In some cases, segment-based tuning yields slightly improved results
+- Runtime reduction is consistently substantial, typically between 2× and 5×
+
+<br>
+
+For dataset 04:<br>
+
+- Segment-based tuning does not reproduce the same behavior as full-data tuning
+- Full-sequence orientation error increases relative to full-data tuning across the evaluated Experiment 4 configurations
+- However, under the revised selection criterion, the selected Experiment 4 result provides better gravity and linear-acceleration estimates in secondary validation
+- This suggests that model selection on long and highly non-stationary data depends strongly on which downstream target is emphasized
 
 <br>
 <br>
@@ -3485,55 +4006,33 @@ best: exp3-6
 
 ### Conclusion <a name="exp-4-conclusion"></a>
 
+Experiment 4 evaluates segment-based tuning as a proxy for full-sequence optimization.<br>
+
+<br>
+
+The results indicate that:<br>
+
+1. For datasets with relatively stable characteristics (datasets 01–03), segment-based tuning preserves broadly comparable full-sequence performance while substantially reducing computational cost
+2. The relative ranking among the strongest configurations remains broadly consistent with full-data tuning, suggesting that the proxy objective captures much of the main performance structure
+3. On the evaluated stable datasets, segment-based tuning does not introduce clear systematic degradation and, in some cases, yields slightly improved results
+4. On long and highly non-stationary data (dataset 04), segment-based tuning behaves differently and does not reproduce the same optimal configuration as full-data tuning
+5. However, secondary validation suggests that the segment-based selection may produce more reliable gravity and linear-acceleration estimates in such cases
+
+<br>
+
+Overall:<br>
+
+- Full-data tuning remains the most direct optimization approach, but its computational cost becomes prohibitive for long sequences
+- Segment-based tuning provides a practical alternative, offering substantial runtime reduction while maintaining comparable performance on most evaluated datasets
+- The discrepancy observed on dataset 04 indicates that the choice of optimization objective remains critical, particularly for long and non-stationary sequences
+- These results suggest that segment-based tuning is a useful approximation for model selection in many cases, although its behavior should be examined further under more challenging conditions
+
+<br>
+
+Next steps:<br>
+- Experiment 5: improve gyro integration robustness on long uncontrolled sequences
+
 <br>
 <br>
 <br>
 <br>
-
-
-
-
-
-
-
-
-
-
-res: data 1-data3
-- 실험 3과 실험 4의 결과 경향이 거의 동일 (어떤 계열이 좋은지, gating이 없는 것보다 fixed norm + mag innov 쪽이 좋은지, time-varying 계열은 상대적으로 불리한지)
-- SEG 기반 튜닝을 써도 full-data 성능이 크게 무너지지 않음
-- 경우에 따라서 오히려 더 좋아질 때도 있음을 관찰
-- 시간 절감 효과 매우 큼
-- data 1,2: exp 4가 더 좋거나 거의 동일
-- data 3: best가 바뀌었지만 원래 exp3-3/3-4차이 미미했음
-- 두 SEG 설정 중에서는 SEG2(5s window) 가 더 안정적으로 좋은 결과를 보임
-
-
-
-res: 4(stress case), why exp4 doesn't follow tendency of exp3?
-
-- mag 관련 스케일이 매우 이상함 (suggested mag_sigma 매우 큼)
-- 전체 orientation error가 아예 매우 큼
-- exp3에서 time-varying gate sigma는 adaptive하다는 장점보다 불안정한 adaptive behavior를 만들었을 가능성(second validation 큰 linear acc 오차)
-- orientation 오차는 exp4가 exp3에 비해 크지만 exp4의 best로 추정한 중력/선형가속도의 오차는 exp3의 best로부터 추정한 것보다 줄었음
-(Although exp4 yielded larger full-sequence orientation error than exp3 on Data 4, its selected parameter set produced clearly better secondary-validation results for gravity and linear-acceleration estimation. Therefore, for this dataset, exp4 appears to have identified a more practically useful solution.)
-
-Therefore: redefined the segmentation policy for data4 and re-evaluated (add seg3)
--초반 transient / 초기 정렬 / bias settling을 더 많이 포함
-- 중간 더 촘촘
-- tail을 크게 잡아 후반 drift regime 반영
-- 기존 seg1/seg2보다 long-horizon characteristic 더 보존
-
-On Data 4, the full-sequence orientation metric favored the time-varying sigma variant selected by Exp. 3, but the secondary validation showed that the fixed-sigma variant selected by Exp. 4 produced substantially better gravity and linear-acceleration estimates. This suggests that optimizing the full-sequence orientation objective does not necessarily yield the most reliable solution for the downstream estimation target. Therefore, at least for Data 4, the Exp. 4 selection appears more practically trustworthy, although this interpretation should be re-examined after introducing the SEG3
-
-- seg3 도입 후 거의 모든 실험에서(exp4-4제외: seg2로 돌린 결과보다 오차 소폭 상승) seg2로 돌린 결과보다 오차가 소폭 줄거나 비슷한 결과: 약간의 오차 개선에도 불구하고 러팅타임이 길어지므로(시간비용 증가) 추후 실험에서는 seg3 대신 seg2를 써도 품질이 아주 하락하진 않을것 같다고 판단됨
-
-
-
-- conclusion:
-
-FULL DATA는 의미 없다X
-SEG가 더 우수하다X
-
-Full-data tuning is conceptually the most direct optimization target, since it optimizes the objective on the entire sequence itself. However, for long recordings its computational cost became increasingly impractical. Across most datasets, segment-based tuning preserved comparable full-sequence accuracy while substantially reducing runtime, and in some cases even yielded slightly better results. Therefore, we did not observe sufficient practical advantage to justify continued reliance on full-data tuning for the remaining experiments.
-

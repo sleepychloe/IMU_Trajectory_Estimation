@@ -1511,21 +1511,21 @@ Across all datasets:<br>
 
 2. Innovation gating
 
-[2-1] For data 01 and data 02:<br>
+For data 01 and data 02:<br>
 
 - Innovation-only gating improves slightly over ungated magnetometer correction
 - When combined with norm-based gating, it produces the best overall result on these two datasets
 
 <br>
 
-[2-2] For data 03:<br>
+For data 03:<br>
 
 - Innovation-only gating remains better than ungated correction, but fixed norm-based gating alone performs best
 - Adding innovation gating on top of norm-based gating remains competitive, but does not improve further on this dataset
 
 <br>
 
-[2-3] For data 04:<br>
+For data 04:<br>
 
 - The effect of innovation gating is not clear-cut on this dataset
 - Innovation-only gating performs better than ungated correction, but when combined with fixed norm-based gating, it performs worse than fixed norm-based gating alone
