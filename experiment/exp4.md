@@ -3985,7 +3985,7 @@ Linear accel est/ref angle error in deg — min/max/mean/p90
 For datasets 01–03:<br>
 
 - Segment-based tuning preserves the main performance tendencies observed in Experiment 3
--The relative ranking among the strongest configurations remains broadly similar
+- The relative ranking among the strongest configurations remains broadly similar
 - Full-sequence orientation accuracy is maintained with only minor variations
 - In some cases, segment-based tuning yields slightly improved results
 - Runtime reduction is consistently substantial, typically between 2× and 5×
