@@ -704,7 +704,7 @@ end :  2026-03-26 18:06:50.944
 |     σ_mag    |            inf |            inf |            inf |
 |   σ_mag_err  |      1.6224342 |      1.7999687 |      0.7612136 |
 |  Mean error  | <ul><li>0.04137 rad</li><li>2.37029 deg</li></ul> | <ul><li>0.04131 rad</li><li>2.36665 deg</li></ul> | <ul><li>0.04144 rad</li><li>2.37406 deg</li></ul> |
-|   p90 error  | <ul><li>0.07968 rad</li><li>4.77430 deg</li></ul> | <ul><li>0.07946 rad</li><li>4.56528 deg</li></ul> | <ul><li>0.08010 rad</li><li>4.58945 deg</li></ul> |
+|   p90 error  | <ul><li>0.07968 rad</li><li>4.56528 deg</li></ul> | <ul><li>0.07946 rad</li><li>4.55272 deg</li></ul> | <ul><li>0.08010 rad</li><li>4.58945 deg</li></ul> |
 
 <br>
 
